@@ -1,0 +1,11 @@
+Scrum Log
+---------
+
+28 March 2016
+- First meeting
+- Decided team name (jerryberry)
+- Exchanged contact informtion
+- Setup github
+- Setup waffle
+- Setup Qt stub
+- Opened issues 1 through 10

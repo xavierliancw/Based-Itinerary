@@ -1,0 +1,9 @@
+Is there always going to be one team per one stadium, or will there be a case where multiple teams share one stadium?
+
+What is park typology? (Referencing requirement 1.9)
+
+Would adding a new stadium require modifying the map given to us, or would we just be adding a new stadium next to an already existing one, similar to the case between Dodger stadium and Angels Stadium?
+
+Will the program have to handle demolishing a stadium? If so, how would that work in terms of the distances?
+
+Would you clarify number 1 under "Planning a vacation:"? It says, "note: each trip begins at Dodger stadium," which implies more than one trip, but the requirment seems to imply, "Plan one trip to every stadium." What does it really mean?
