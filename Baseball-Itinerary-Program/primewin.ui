@@ -702,62 +702,300 @@
        </layout>
       </widget>
       <widget class="QWidget" name="itinerary">
-       <widget class="QLabel" name="label_4">
-        <property name="geometry">
-         <rect>
-          <x>480</x>
-          <y>170</y>
-          <width>47</width>
-          <height>13</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>itinerary</string>
-        </property>
-       </widget>
-       <widget class="QTableWidget" name="tableWidget">
+       <widget class="QScrollArea" name="scrollArea">
         <property name="geometry">
          <rect>
           <x>40</x>
-          <y>20</y>
-          <width>361</width>
-          <height>241</height>
+          <y>70</y>
+          <width>521</width>
+          <height>581</height>
          </rect>
         </property>
-        <column>
-         <property name="text">
-          <string>Icon</string>
+        <property name="verticalScrollBarPolicy">
+         <enum>Qt::ScrollBarAsNeeded</enum>
+        </property>
+        <property name="widgetResizable">
+         <bool>true</bool>
+        </property>
+        <widget class="QWidget" name="scrollAreaWidgetContents">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>519</width>
+           <height>579</height>
+          </rect>
          </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Stadium Name</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Bookmark?</string>
-         </property>
-        </column>
+         <widget class="QTableWidget" name="tableWidget_3">
+          <property name="geometry">
+           <rect>
+            <x>30</x>
+            <y>360</y>
+            <width>461</width>
+            <height>251</height>
+           </rect>
+          </property>
+         </widget>
+         <widget class="QTableWidget" name="tableWidget">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>10</y>
+            <width>251</width>
+            <height>291</height>
+           </rect>
+          </property>
+          <column>
+           <property name="text">
+            <string>Stadium Name</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Bookmark?</string>
+           </property>
+          </column>
+         </widget>
+         <widget class="QLabel" name="label_16">
+          <property name="geometry">
+           <rect>
+            <x>40</x>
+            <y>330</y>
+            <width>47</width>
+            <height>13</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Souvenirs</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_17">
+          <property name="geometry">
+           <rect>
+            <x>280</x>
+            <y>20</y>
+            <width>81</width>
+            <height>71</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>stadium pic</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_18">
+          <property name="geometry">
+           <rect>
+            <x>390</x>
+            <y>20</y>
+            <width>91</width>
+            <height>81</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>team logo</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_19">
+          <property name="geometry">
+           <rect>
+            <x>290</x>
+            <y>120</y>
+            <width>47</width>
+            <height>13</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>stadium</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_20">
+          <property name="geometry">
+           <rect>
+            <x>300</x>
+            <y>160</y>
+            <width>47</width>
+            <height>13</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>phone</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_21">
+          <property name="geometry">
+           <rect>
+            <x>310</x>
+            <y>210</y>
+            <width>47</width>
+            <height>13</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>address</string>
+          </property>
+         </widget>
+        </widget>
        </widget>
-       <widget class="QTableWidget" name="tableWidget_3">
+       <widget class="QTabWidget" name="tabWidget">
         <property name="geometry">
          <rect>
-          <x>50</x>
-          <y>280</y>
-          <width>341</width>
-          <height>161</height>
+          <x>650</x>
+          <y>40</y>
+          <width>351</width>
+          <height>631</height>
          </rect>
         </property>
+        <property name="tabPosition">
+         <enum>QTabWidget::North</enum>
+        </property>
+        <property name="tabShape">
+         <enum>QTabWidget::Rounded</enum>
+        </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="itinTab">
+         <attribute name="title">
+          <string>Itinerary</string>
+         </attribute>
+         <widget class="QFrame" name="frame_10">
+          <property name="geometry">
+           <rect>
+            <x>30</x>
+            <y>30</y>
+            <width>291</width>
+            <height>541</height>
+           </rect>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <widget class="QListWidget" name="listWidget">
+           <property name="geometry">
+            <rect>
+             <x>30</x>
+             <y>30</y>
+             <width>241</width>
+             <height>351</height>
+            </rect>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="pushButton">
+           <property name="geometry">
+            <rect>
+             <x>50</x>
+             <y>390</y>
+             <width>75</width>
+             <height>23</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Optimize</string>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="pushButton_2">
+           <property name="geometry">
+            <rect>
+             <x>110</x>
+             <y>510</y>
+             <width>75</width>
+             <height>23</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Finalize</string>
+           </property>
+          </widget>
+          <widget class="QLabel" name="label_8">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>480</y>
+             <width>241</width>
+             <height>20</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>total distance or maybe total layovers needed?</string>
+           </property>
+          </widget>
+          <widget class="QLabel" name="label_14">
+           <property name="geometry">
+            <rect>
+             <x>90</x>
+             <y>450</y>
+             <width>121</width>
+             <height>16</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>stadiums queued</string>
+           </property>
+          </widget>
+          <zorder>listWidget</zorder>
+          <zorder>listWidget</zorder>
+          <zorder>pushButton</zorder>
+          <zorder>pushButton_2</zorder>
+          <zorder>label_8</zorder>
+          <zorder>label_14</zorder>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="wishTab">
+         <attribute name="title">
+          <string>Wishlist</string>
+         </attribute>
+         <widget class="QTableWidget" name="tableWidget_4">
+          <property name="geometry">
+           <rect>
+            <x>40</x>
+            <y>40</y>
+            <width>256</width>
+            <height>311</height>
+           </rect>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_4">
+          <property name="geometry">
+           <rect>
+            <x>80</x>
+            <y>410</y>
+            <width>47</width>
+            <height>13</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string># of items</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_15">
+          <property name="geometry">
+           <rect>
+            <x>80</x>
+            <y>450</y>
+            <width>47</width>
+            <height>13</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>grand total</string>
+          </property>
+         </widget>
+        </widget>
        </widget>
-       <widget class="QListWidget" name="listWidget">
+       <widget class="QPushButton" name="pushButton_3">
         <property name="geometry">
          <rect>
-          <x>620</x>
-          <y>20</y>
-          <width>241</width>
-          <height>351</height>
+          <x>40</x>
+          <y>40</y>
+          <width>75</width>
+          <height>23</height>
          </rect>
+        </property>
+        <property name="text">
+         <string>Start Over</string>
         </property>
        </widget>
       </widget>

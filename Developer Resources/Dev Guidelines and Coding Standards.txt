@@ -1,0 +1,27 @@
+WORKING WITH GIT:
+Pick a story to work on,
+create a branch for the story,
+implement the story,
+TRACK THE CHANGES YOU MAKE WITH A SIMPLE CHANGELOG,
+save a backup of your branch,
+pull to get latest changes into your branch,
+handle the pull (make sure everything you pulled works, and make sure your implementation works too),
+create a pull request to master when you're done. Xavier will merge your branch.
+
+IF YOU DON'T KNOW HOW TO DO SOMETHING, LABEL THE STORY WITH "question" AND ADD A COMMENT. (on waffle)
+Post something in the hangout.
+
+If there's a task you can't finish, label the story "help wanted" and post a comment on waffle
+Post something in the hangout as well.
+
+QMessageBoxes look like this:
+int ret = QMessageBox::warning(this, tr("My Application"),
+                               tr("The document has been modified.\n"
+                                  "Do you want to save your changes?"),
+                               QMessageBox::Save | QMessageBox::Discard
+                               | QMessageBox::Cancel,
+                               QMessageBox::Save);
+qDebug() << ret;
+
+Be sure to put functions in the correct places.
+For example, if you create a new button in admin page, put the slot for that button under the correct comment heading in primewin.cpp and in primewin.h

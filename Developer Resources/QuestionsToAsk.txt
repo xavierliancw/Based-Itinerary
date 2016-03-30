@@ -6,4 +6,7 @@ Would adding a new stadium require modifying the map given to us, or would we ju
 
 Will the program have to handle demolishing a stadium? If so, how would that work in terms of the distances?
 
-Would you clarify number 1 under "Planning a vacation:"? It says, "note: each trip begins at Dodger stadium," which implies more than one trip, but the requirment seems to imply, "Plan one trip to every stadium." What does it really mean?
+For number 1 under "Planning a vacation," do you mean choose ONE stadium to visit, so when you're on your way there, you'll also just visit any stadiums that are coincidentally along the way? 
+So for example, if I wanted to go to Safeco Field in Washington, would the trip also involve visiting Dodger Stadium, AT&T Park, and O.co Coliseum as well?
+
+So if we use Qt's built in sort function, which runs in O(nlogn), but we don't know what algorithm Qt is using, how would we write that down in our Big O analysis?

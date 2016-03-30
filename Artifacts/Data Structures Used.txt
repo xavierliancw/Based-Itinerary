@@ -1,0 +1,10 @@
+vector of stadium objects
+	each stadium has a vector of souv objects
+		(vectors allow constant-time data retrieval)
+
+optimization will use a graph implemented by means of an adjacency matrix
+	(adjacency matrix will allow constant-time distance queries)
+	(Djikstra's algorithm will be O(ElogV))
+
+itinerary will use a list of itinerary objects
+	(double linked list allows for constant-time reordering of the itinerary)
