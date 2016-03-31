@@ -6,6 +6,7 @@
 #include <QShortcut>
 #include <QSqlDatabase>
 #include <QSqlQuery>
+#include <QDir>
 
 #include "adminlogin.h"
 

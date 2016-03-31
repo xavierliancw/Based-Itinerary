@@ -25,18 +25,34 @@ PrimeWin::PrimeWin(QWidget *parent, int dummyVarForNow) :
                   this, SLOT(on_adminLoginBt_clicked()));
 
 
+    //TEST AREA
 
-    //TEST AREA BLARMOS
-    QString xPath = "C:/Users/Xavier Lian/Dropbox/CS1D/Project2/";
-    QString bPath = "";
-    QString projectFolder = "Baseball-Project/Baseball-Itinerary-Program/APPDATA/DATA.db";
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName(xPath + projectFolder);
-    db.open();
-    QSqlQuery query;
-    query.exec("CREATE TABLE person(name VARCHAR(20));");
-    query.exec("INSERT INTO person (name) VALUES ('Peter');");
-    db.close();
+    //The next code block will determine your path to the APPDATA folder
+    QString dir = QDir::currentPath();              //Get path to build folder
+    qDebug() << dir;                                //Display it
+    dir.resize(dir.lastIndexOf("/"));               //Cut off the build folder
+    dir += "/Baseball-Itinerary-Program/APPDATA/";  //Add in the path to APPDATA
+    qDebug() << dir;                                //Check to see if the path is correct
+
+    //See if the code above worked
+    QFile ourDatabase(dir + "DATABASE.db");
+    if (ourDatabase.exists())
+    {
+        //This code block will add something to the database
+        QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+        db.setDatabaseName(dir + "DATABASE.db");
+        db.open();
+        QSqlQuery query;
+        query.exec("INSERT INTO sometable (someString)"
+                   "VALUES ('YOU DID THIS');");
+        db.close();
+        qDebug() << "IT WORKED! Tell Xavier!";
+    }
+    else
+    {
+        qDebug() << "Dang.. It didn't work. Tell Xavier";
+    }
+    //END TEST AREA
 }
 
 /*PUBLIC SLOTS==========================================================*/
