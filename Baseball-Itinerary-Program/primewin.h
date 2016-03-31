@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QDebug>
 #include <QShortcut>
+#include <QSqlDatabase>
+#include <QSqlQuery>
 
 #include "adminlogin.h"
 

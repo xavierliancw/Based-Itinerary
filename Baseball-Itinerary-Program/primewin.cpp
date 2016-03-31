@@ -23,6 +23,20 @@ PrimeWin::PrimeWin(QWidget *parent, int dummyVarForNow) :
     //Keystroke to pull up admin login window
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return),
                   this, SLOT(on_adminLoginBt_clicked()));
+
+
+
+    //TEST AREA BLARMOS
+    QString xPath = "C:/Users/Xavier Lian/Dropbox/CS1D/Project2/";
+    QString bPath = "";
+    QString projectFolder = "Baseball-Project/Baseball-Itinerary-Program/APPDATA/DATA.db";
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName(xPath + projectFolder);
+    db.open();
+    QSqlQuery query;
+    query.exec("CREATE TABLE person(name VARCHAR(20));");
+    query.exec("INSERT INTO person (name) VALUES ('Peter');");
+    db.close();
 }
 
 /*PUBLIC SLOTS==========================================================*/

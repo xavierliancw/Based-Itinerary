@@ -11,7 +11,7 @@ Scrum Log
 - Opened issues 1 through 10
 
 30 March
-- Opened issues 11 through XX
+- Opened issues 11 through 32
 - Planning poker for all mandatory stories
 - Divided project into three blocks (stadium information, distance algorithms, and itinerary building)
 - Talked about how Dijkstra's algorithm works
