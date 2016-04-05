@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QStackedWidget" name="stackWidg">
       <property name="currentIndex">
-       <number>1</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="start">
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -1039,7 +1039,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButton_6">
+            <widget class="QPushButton" name="adminRestartBt">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -1059,7 +1059,7 @@
               </size>
              </property>
              <property name="text">
-              <string>Restart</string>
+              <string>Save and Restart</string>
              </property>
             </widget>
            </item>

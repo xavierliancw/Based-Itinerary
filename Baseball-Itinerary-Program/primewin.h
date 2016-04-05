@@ -7,6 +7,8 @@
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QDir>
+#include <QProcess>
+#include <QMessageBox>
 
 #include "datastructures.h"
 #include "adminlogin.h"
@@ -60,7 +62,7 @@ private slots:
 //Index3==================================================================
 
 //Index4==================================================================
-
+    void on_adminRestartBt_clicked();
 
 private:
     Ui::PrimeWin *ui;

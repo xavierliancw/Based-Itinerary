@@ -116,7 +116,7 @@ public:
     int getMST() const;
 
     //Export contents of all databases to SQL database
-    void exportSQL();
+    bool exportSQL();
 
 private:
     std::vector<StadObj> masterVect;        //Vector of all stadiums
