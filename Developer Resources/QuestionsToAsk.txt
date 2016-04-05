@@ -1,12 +1,18 @@
-Is there always going to be one team per one stadium, or will there be a case where multiple teams share one stadium?
+We're going to ask again, just to be absolutely sure. Does the program need to be able to handle a case where there will be two or more teams that share one stadium?
 
-What is park typology? (Referencing requirement 1.9)
+Since teams can move to new stadiums, will we have to handle adding and deleting flight routes? For example, what if the Angels move to Nevada's new stadium, "Vegas Park"?
 
-Would adding a new stadium require modifying the map given to us, or would we just be adding a new stadium next to an already existing one, similar to the case between Dodger stadium and Angels Stadium?
+Let's say the Blue Jays move to New York, and Rogers Centre gets demolished. Would the program just delete the flight routes to Ontario, Canada?
 
-Will the program have to handle demolishing a stadium? If so, how would that work in terms of the distances?
+(If not deleting flight routes)
+So the airport at Ontario would still be a fylable location, right? Dijkstra's, Prim's, and Kruskal's algorithms would still factor in Ontario's airport, right?. There's just no stadium there to visit.
 
-For number 1 under "Planning a vacation," do you mean choose ONE stadium to visit, so when you're on your way there, you'll also just visit any stadiums that are coincidentally along the way? 
-So for example, if I wanted to go to Safeco Field in Washington, would the trip also involve visiting Dodger Stadium, AT&T Park, and O.co Coliseum as well?
+(If deleting flight routes)
+Would you show us the most effective way of removing from an adjacency matrix?
 
-So if we use Qt's built in sort function, which runs in O(nlogn), but we don't know what algorithm Qt is using, how would we write that down in our Big O analysis?
+For number 1 under "Planning a vacation," the one that says "choose Dodgers as the starting stadium," do you mean choose ONE other stadium to visit, so when you're on your way there, you'll also just visit any stadiums that are coincidentally along the way? 
+So for example, if I wanted to go to Safeco Field in Washington, would the trip also involve visiting Dodger Stadium, Angels Stadium, AT&T Park, and O.co Coliseum as well?
+
+So if we use Qt's built in sort function, which runs in O(nlogn), but we don't know how Qt is sorting, how would we write that down in our Big O analysis (since nlogn would be the program's largest complexity, and you'd probably expect that on the Big O analysis)? Would we just write something like "Qt's sort runs in O(nlogn)?"
+
+Are we allowed to use a text file to import and export our data for persistence?
