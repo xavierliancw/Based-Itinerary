@@ -92,7 +92,8 @@ public:
     void modDist();
     void delDist();
 
-    int size() const;
+    //Returns number of stadiums in the program
+    unsigned int size() const;
     QString getStadName(int stadNum) const;
     QString getStadAddress(int stadNum) const;
     QString getStadPhone(int stadNum) const;
@@ -101,6 +102,8 @@ public:
     QString getStadGrass(int stadNum) const;
     QString getStadType(int stadNum) const;
 
+    //Returns number of teams at a stadium
+    unsigned int teamSize(int stadNum) const;
     QString getTeamName(int stadNum, int teamIndex) const;
     QString getTeamLeague(int stadNum, int teamIndex) const;
     int getTeamStad() const;

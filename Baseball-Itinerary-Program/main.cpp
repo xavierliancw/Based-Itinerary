@@ -4,7 +4,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    PrimeWin w(NULL,0);
+    PrimeWin w(NULL,1);
     w.resize(800,500);
     w.show();
 
