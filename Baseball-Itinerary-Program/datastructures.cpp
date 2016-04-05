@@ -249,9 +249,11 @@ void Data::importSQL()
     }
 }
 
-void Data::exportSQL()
+bool Data::exportSQL()
 //Exports all data structures into the SQL database
 {
+    bool failure = false;
+
     //Determine path to APPDATA folder
     QString dir = QDir::currentPath();
     dir.resize(dir.lastIndexOf("/build"));
@@ -264,9 +266,7 @@ void Data::exportSQL()
     if (ourDatabase.exists())
     {
         //Initialize database and its driver
-        qDebug() << "hep";
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-        qDebug() << "dep";
 
         //Line up database with APPDATA's database
         db.setDatabaseName(dir + "DATABASE.db");
@@ -275,14 +275,19 @@ void Data::exportSQL()
         db.open();
         if (db.open())
         {
-            qDebug() << "Database is open";
+            qDebug() << "Exporting data to" << dir + "DATABASE.db";
+        }
+        else
+        {
+            qDebug() << "Data::exportSQL(): Cannot open database";
+            failure = true;
         }
 
         //Create a variable to execute SQL commands
         QSqlQuery query;
 
         //Export stadium data
-        qDebug() << "Updating stadiuminfo in DATABASE.db";
+        qDebug() << "Writing into stadiuminfo table...";
         query.exec("DELETE FROM stadiuminfo");
         query.prepare("INSERT INTO stadiuminfo(stadnum,name,address,"
                       "                        phone,opened,capacity,"
@@ -303,11 +308,12 @@ void Data::exportSQL()
             {
                 qDebug() << "SQL exporting stadiuminfo failed with "
                          << query.lastError();
+                failure = true;
             }
         }
         qDebug() << "Complete";
         //Export team data
-        qDebug() << "Updating teams in DATABASE.db";
+        qDebug() << "Writing into teams table...";
         query.exec("DELETE FROM teams");
         query.prepare("INSERT INTO teams(stadnum,name,league)"
                       "VALUES (:stadnum,:name,:league)");
@@ -323,12 +329,13 @@ void Data::exportSQL()
                 {
                     qDebug() << "SQL exporting team failed with "
                              << query.lastError();
+                    failure = true;
                 }
             }
         }
         qDebug() << "Complete";
         //Export souvenir data
-        qDebug() << "Updating souvenirs in DATABASE.db";
+        qDebug() << "Writing into souvenirs table...";
         query.exec("DELETE FROM souvenirs");
         query.prepare("INSERT INTO souvenirs(stadnum,souvenir,price)"
                       "VALUES (:stadnum,:souvenir,:price)");
@@ -344,12 +351,13 @@ void Data::exportSQL()
                 {
                     qDebug() << "SQL exporting souvenir failed with "
                              << query.lastError();
+                    failure = true;
                 }
             }
         }
         qDebug() << "Complete";
         //Export distance data
-        qDebug() << "Updating distances in DATABASE.db";
+        qDebug() << "Writing into distances table...";
         query.exec("DROP TABLE distances");
         QString prepareCmd = "CREATE TABLE 'distances' (";
         for (unsigned int x = 0; x < masterVect.size(); x++)
@@ -382,15 +390,26 @@ void Data::exportSQL()
             {
                 qDebug() << "SQL exporting distance matrix failed with "
                          << query.lastError();
+                failure = true;
             }
         }
         qDebug() << "Complete";
         db.close();
-        qDebug() << "Database closed. Export successful.";
+
+        if (!failure)
+        {
+            qDebug() << "Export successful";
+        }
+        else
+        {
+            qDebug() << "Export unsuccessful";
+        }
+        return !failure;
     }
     else
     {
         qDebug() << "Data::exportSQL(): Cannot access database";
+        return false;
     }
 }
 

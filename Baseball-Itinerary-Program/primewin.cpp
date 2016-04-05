@@ -129,7 +129,6 @@ void PrimeWin::refreshHomeDetails()
 //Refreshes detail labels on the home page (Index 1)
 {
     int stadNum;        //Stadium vector index number
-    int teamNum;        //Team vector index number within stadium
     QString teams;      //Teams that play at the stadium
     QString address;    //Address of stadium
     QString cityZip;    //Everything in the address after the street
@@ -139,9 +138,6 @@ void PrimeWin::refreshHomeDetails()
     stadNum = ui->homeStadTbl
                     ->item(ui->homeStadTbl
                            ->currentRow(),0)->text().toInt();
-    teamNum = ui->homeStadTbl
-                    ->item(ui->homeStadTbl
-                           ->currentRow(),1)->text().toInt();
     address = data.getStadAddress(stadNum);
     cityZip = address;
     capacity = QString::number(data.getStadCapactiy(stadNum));
@@ -225,6 +221,29 @@ void PrimeWin::on_homePlanTripBt_clicked()
 //Index 1 to 2
 {ui->stackWidg->setCurrentIndex(2);}
 
+//Index2==================================================================
 
+//Index3==================================================================
 
+//Index4==================================================================
+void PrimeWin::on_adminRestartBt_clicked()
+//Exports to SQL database then restarts program
+{
+    //Export data structures
+    if (data.exportSQL() == true)
+    {
+        //Restart the program if export is successful
+        qDebug() << "Restarting program...";
+        qApp->quit();
+        QProcess::startDetached(qApp->arguments()[0],qApp->arguments());
+    }
+    else
+    {
+        qDebug() << "Program restart aborted.";
+        QMessageBox::critical(this, tr("SQL Export Failure"),
+                              tr("Failed to export data.\n"
+                                 "Restart has been aborted."),
+                              QMessageBox::Close);
 
+    }
+}
