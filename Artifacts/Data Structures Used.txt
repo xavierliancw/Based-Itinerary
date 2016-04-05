@@ -1,10 +1,10 @@
-vector of stadium objects
-	each stadium has a vector of souv objects
-		(vectors allow constant-time data retrieval)
+~VECTOR of stadium objects
+	VECTOR of souvenir objects (each stadium object has a vector of souvenirs)
+	VECTOR of team objects (each stadium has a vector of teams)
+Reason: The program only requires stadium information retrieval, so a vector's constant-time data retrieval is the best option.
 
-optimization will use a graph implemented by means of an adjacency matrix
-	(adjacency matrix will allow constant-time distance queries)
-	(Djikstra's algorithm will be O(ElogV))
+~GRAPH of stadiums-distances relationships
+Reason: The program will use a graph implemented by means of an adjacency matrix to store all stadiums and the flight distances between. An adjacency matrix will allow constant-time distance queries, so it is the ideal option.
 
-itinerary will use a list of itinerary objects
-	(double linked list allows for constant-time reordering of the itinerary)
+~DOUBLY LINKED LIST of  of itinerary objects
+Reason: The program will need to reorder the itinerary very often. Since a doubly linked list allows for constant-time data reordering, it is the ideal option.

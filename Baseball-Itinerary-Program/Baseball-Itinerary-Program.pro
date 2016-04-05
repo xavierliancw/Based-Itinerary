@@ -15,10 +15,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         primewin.cpp \
-    adminlogin.cpp
+    adminlogin.cpp \
+    datastructures.cpp
 
 HEADERS  += primewin.h \
-    adminlogin.h
+    adminlogin.h \
+    datastructures.h
 
 FORMS    += primewin.ui \
     adminlogin.ui

@@ -8,6 +8,7 @@
 #include <QSqlQuery>
 #include <QDir>
 
+#include "datastructures.h"
 #include "adminlogin.h"
 
 namespace Ui {
@@ -24,7 +25,7 @@ public:
     PrimeWin(QWidget *parent, int dummyVarForNow);
 
 public slots:
-    void catchLoginStatus(bool status);
+    void catchLoginStatus(bool status); //Catches login signal
 
 private slots:
 /*PAGE INDEX============================================================*/
@@ -48,9 +49,14 @@ private slots:
 
 //Index2==================================================================
 
+//Index3==================================================================
+
+//Index4==================================================================
+
 
 private:
     Ui::PrimeWin *ui;
+    Data master;
 };
 
 #endif // PRIMEWIN_H

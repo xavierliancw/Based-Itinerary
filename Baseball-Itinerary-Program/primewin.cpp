@@ -15,44 +15,14 @@ PrimeWin::PrimeWin(QWidget *parent, int dummyVarForNow) :
     ui(new Ui::PrimeWin)
 {
     ui->setupUi(this);
-    ui->stackWidg->setCurrentIndex(0);
-    qDebug() << dummyVarForNow;
 
+    //GUI display initializations
+    ui->stackWidg->setCurrentIndex(0);
     ui->adminLoginBt->hide();
 
     //Keystroke to pull up admin login window
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return),
                   this, SLOT(on_adminLoginBt_clicked()));
-
-
-    //TEST AREA
-
-    //The next code block will determine your path to the APPDATA folder
-    QString dir = QDir::currentPath();              //Get path to build folder
-    qDebug() << dir;                                //Display it
-    dir.resize(dir.lastIndexOf("/"));               //Cut off the build folder
-    dir += "/Baseball-Itinerary-Program/APPDATA/";  //Add in the path to APPDATA
-    qDebug() << dir;                                //Check to see if the path is correct
-
-    //See if the code above worked
-    QFile ourDatabase(dir + "DATABASE.db");
-    if (ourDatabase.exists())
-    {
-        //This code block will add something to the database
-        QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-        db.setDatabaseName(dir + "DATABASE.db");
-        db.open();
-        QSqlQuery query;
-        query.exec("INSERT INTO sometable (someString)"
-                   "VALUES ('YOU DID THIS');");
-        db.close();
-        qDebug() << "IT WORKED! Tell Xavier!";
-    }
-    else
-    {
-        qDebug() << "Dang.. It didn't work. Tell Xavier";
-    }
-    //END TEST AREA
 }
 
 /*PUBLIC SLOTS==========================================================*/

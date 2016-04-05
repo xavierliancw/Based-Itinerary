@@ -11,13 +11,19 @@ Scrum Log
 - Opened issues 1 through 10
 
 30 March
+- Arman Jafarinia joined the team
+- Exchanged contact information
 - Opened issues 11 through 32
-- Planning poker for all mandatory stories
 - Divided project into three blocks (stadium information, distance algorithms, and itinerary building)
-- Talked about how Dijkstra's algorithm works
-- Talked about how a graph implemented via an adjacency matrix works
-- Decided what data structures to use (vector, graph, doubly linked list)
-- Planned out sprint goals
 - Designed stadium information GUI
 - Designed itinerary GUI
 - Set coding standards
+- Figured out and tested Qt and SQL compatability between everyone's computers
+
+04 April
+- Designed data structures
+- Story point poker for all stories
+- Designed admin GUI
+- Finished Qt and SQL compatability between everyone's computers
+
+06 April
