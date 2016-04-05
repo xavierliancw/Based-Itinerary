@@ -24,6 +24,12 @@ public:
     ~PrimeWin();
     PrimeWin(QWidget *parent, int dummyVarForNow);
 
+    //Refreshes the view of everything on the home page (Index 1)
+    void refreshHome();
+
+    //Refreshes detail labels on the home page (Index 1)
+    void refreshHomeDetails();
+
 public slots:
     void catchLoginStatus(bool status); //Catches login signal
 
@@ -42,6 +48,8 @@ private slots:
 
     void on_adminLoginBt_clicked();
 
+    void on_homeStadTbl_itemSelectionChanged();
+
 //Index1==================================================================
     void on_homeBackBt_clicked();
 
@@ -56,7 +64,7 @@ private slots:
 
 private:
     Ui::PrimeWin *ui;
-    Data master;
+    Data data;
 };
 
 #endif // PRIMEWIN_H
