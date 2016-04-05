@@ -16,7 +16,7 @@ public:
     ~AdminLogin();
 
 signals:
-    throwLoginStatus(bool);
+    void throwLoginStatus(bool);
 
 private slots:
     void on_loginBt_clicked();

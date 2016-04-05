@@ -153,6 +153,21 @@ void Data::addDist(int x, int y, int newDist)
     matrix[y][x] = newDist;
 }
 
+unsigned int Data::size() const
+//Returns number of teams in the program
+//Complexity: O(t) where t = number of teams
+{return masterVect.size();
+    int UNFINISHED;
+//    int teamCount = 0;  //Tracks how many teams are in the program
+
+//    //Loop through every stadium
+//    for (unsigned int x = 0; x < masterVect.size(); x++)
+//    {
+//        teamCount += masterVect.at(x).teamVect.size();
+//    }
+//    return teamCount;
+}
+
 void Data::importSQL()
 //Fill data structures with information from SQL database
 {
@@ -406,6 +421,10 @@ QString Data::getStadGrass(int stadNum) const
 QString Data::getStadType(int stadNum) const
 //Returns type of stadium at stadNum
 {return masterVect.at(stadNum).type;}
+
+unsigned int Data::teamSize(int stadNum) const
+//Returns number of teams at a stadium
+{return masterVect.at(stadNum).teamVect.size();}
 
 QString Data::getTeamName(int stadNum, int teamIndex) const
 {return masterVect.at(stadNum).teamVect.at(teamIndex).name;}
