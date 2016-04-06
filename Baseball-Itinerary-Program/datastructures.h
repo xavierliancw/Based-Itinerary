@@ -118,6 +118,9 @@ public:
     //Export contents of all databases to SQL database
     bool exportSQL();
 
+    //Import from a text file (Really just resets to defaults for devs)
+    bool importTXT(QString path);
+
 private:
     std::vector<StadObj> masterVect;        //Vector of all stadiums
     std::vector< std::vector<int> > matrix; //2D matrix of all distances

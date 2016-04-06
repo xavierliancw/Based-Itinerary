@@ -154,19 +154,8 @@ void Data::addDist(int x, int y, int newDist)
 }
 
 unsigned int Data::size() const
-//Returns number of teams in the program
-//Complexity: O(t) where t = number of teams
-{return masterVect.size();
-    int UNFINISHED;
-//    int teamCount = 0;  //Tracks how many teams are in the program
-
-//    //Loop through every stadium
-//    for (unsigned int x = 0; x < masterVect.size(); x++)
-//    {
-//        teamCount += masterVect.at(x).teamVect.size();
-//    }
-//    return teamCount;
-}
+//Returns number of stadiums in the program
+{return masterVect.size();}
 
 void Data::importSQL()
 //Fill data structures with information from SQL database
@@ -411,6 +400,143 @@ bool Data::exportSQL()
         qDebug() << "Data::exportSQL(): Cannot access database";
         return false;
     }
+}
+
+bool Data::importTXT(QString path)
+//Import from a text file (Really just resets to defaults for devs)
+{
+    QFile file(path);       //QFile to read from
+    QTextStream fin(&file); //Text stream for data reading
+    QString str;            //Stores strings
+    int stadNum;            //Stadium index number
+    StadObj newStadObj;     //Stadium object
+    TeamObj newTeamObj;     //Team object
+    bool failure = true;    //Failure condition
+
+    //Check to make sure that the file opens
+    if(!file.open(QFile::ReadOnly | QFile::Text))
+    {
+        qDebug("Data::importTXT(): File did not open");
+    }
+    else
+    {
+        failure = false;
+
+        //Clear out data
+        masterVect.clear();
+
+        while(!fin.atEnd())
+        {
+            stadNum = fin.readLine().toInt();
+            newStadObj.name = fin.readLine();
+            newTeamObj.stadNum = stadNum;
+            newTeamObj.name = fin.readLine();
+            newTeamObj.league = fin.readLine();
+            newStadObj.address = fin.readLine();
+            newStadObj.address += " " + fin.readLine();
+            newStadObj.phone = fin.readLine();
+            fin.read(9);//skip "Opened - "
+            newStadObj.opened = fin.readLine();
+            fin.read(11); //skip "Capacity - "
+            str = fin.readLine();
+            str.remove(QChar(','));
+            newStadObj.capacity = str.toInt();
+            newStadObj.grass = fin.readLine();
+            newStadObj.type = fin.readLine();
+            fin.readLine();
+            masterVect.push_back(newStadObj);
+            masterVect.at(stadNum).teamVect.push_back(newTeamObj);
+        }
+    }
+    file.flush();
+    file.close();
+
+    if (!failure)
+    {
+        //Import default souvenirs into each stadium
+        for (unsigned int x = 0; x < masterVect.size(); x++)
+        {
+            addSouv(x,"Baseball Cap",23.99);
+            addSouv(x,"Baseball Bat",45.39);
+            addSouv(x,"Team Pennant",15.99);
+            addSouv(x,"Autographed Baseball",19.99);
+            addSouv(x,"Team Jersey",85.99);
+        }
+        //Add default distances into distance matrix
+        matrix.resize(masterVect.size());
+        for (unsigned int x = 0; x < masterVect.size(); x++)
+        {
+            matrix[x].resize(masterVect.size());
+        }
+        addDist(10,9,2070);  addDist(10,11,1390);
+        addDist(10,15,680); addDist(10,6,680);
+        addDist(15,0,6); addDist(15,0,-1);
+        addDist(15,6,0); addDist(15,17,650);
+        addDist(6,17,650); addDist(15,21,340);
+        addDist(6,21,340); addDist(15,0,340);
+        addDist(6,0,340); addDist(21,0,0);
+        addDist(21,11,1500); addDist(0,11,1500);
+        addDist(21,26,110); addDist(0,26,110);
+        addDist(26,17,300); addDist(26,20,830);
+        addDist(1,9,210); addDist(1,8,90);
+        addDist(1,13,240); addDist(1,29,240);
+        addDist(2,23,1255); addDist(2,14,195);
+        addDist(2,8,195); addDist(2,9,430);
+        addDist(3,4,460); addDist(3,28,740);
+        addDist(3,5,230); addDist(3,17,870);
+        addDist(3,20,650); addDist(4,29,415);
+        addDist(4,13,415); addDist(4,16,235);
+        addDist(4,3,460); addDist(4,20,560);
+        addDist(5,16,680); addDist(5,12,790);
+        addDist(5,23,965); addDist(5,17,1115);
+        addDist(5,3,230); addDist(7,19,90);
+        addDist(7,25,0); addDist(7,23,930);
+        addDist(7,28,560); addDist(7,27,195);
+        addDist(8,27,115); addDist(8,22,225);
+        addDist(8,1,90); addDist(9,2,430);
+        addDist(9,27,225); addDist(9,1,210);
+        addDist(9,24,430); addDist(9,10,2070);
+        addDist(11,24,300); addDist(11,16,465);
+        addDist(11,21,1500); addDist(11,0,1500);
+        addDist(11,10,1390); addDist(12,22,790);
+        addDist(12,23,210); addDist(12,5,790);
+        addDist(13,1,240); addDist(13,22,250);
+        addDist(13,4,415); addDist(13,24,80);
+        addDist(13,29,0); addDist(14,2,195);
+        addDist(14,19,80); addDist(14,27,315);
+        addDist(14,18,0); addDist(16,22,310);
+        addDist(16,5,680); addDist(16,4,235);
+        addDist(16,11,465); addDist(17,20,580);
+        addDist(17,3,870); addDist(17,5,1115);
+        addDist(17,26,300); addDist(17,6,650);
+        addDist(17,15,650); addDist(18,2,195);
+        addDist(18,19,80); addDist(18,27,315);
+        addDist(18,14,0); addDist(19,14,80);
+        addDist(19,18,80); addDist(19,7,90);
+        addDist(19,25,90); addDist(20,4,560);
+        addDist(20,3,650); addDist(20,17,580);
+        addDist(20,26,830); addDist(22,8,225);
+        addDist(22,27,260); addDist(22,12,790);
+        addDist(22,28,375); addDist(22,16,310);
+        addDist(22,13,250); addDist(22,19,250);
+        addDist(23,7,930); addDist(23,25,930);
+        addDist(23,2,1255); addDist(23,5,965);
+        addDist(23,12,210); addDist(23,28,600);
+        addDist(24,9,430); addDist(24,29,80);
+        addDist(24,13,80); addDist(24,11,300);
+        addDist(25,7,0); addDist(25,19,90);
+        addDist(25,23,930); addDist(25,28,560);
+        addDist(25,27,195); addDist(27,9,225);
+        addDist(27,14,315); addDist(27,18,315);
+        addDist(27,7,195); addDist(27,25,195);
+        addDist(27,22,260); addDist(27,8,115);
+        addDist(28,7,560); addDist(28,25,560);
+        addDist(28,23,600); addDist(28,3,740);
+        addDist(28,22,375); addDist(29,13,0);
+        addDist(29,24,80); addDist(29,1,240);
+        addDist(29,22,250); addDist(29,4,415);
+    }
+    return !failure;
 }
 
 QString Data::getStadName(int stadNum) const

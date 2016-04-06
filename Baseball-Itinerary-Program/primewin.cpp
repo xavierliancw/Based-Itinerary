@@ -16,10 +16,20 @@ PrimeWin::PrimeWin(QWidget *parent, int dummyVarForNow) :
 {
     ui->setupUi(this);
 
+    //Data initializations
+    dirmodel = new QFileSystemModel(this);  //Model of file directory
+    QString dir = QDir::currentPath();      //Path to executable
+    dir.resize(dir.lastIndexOf("/build"));  //Truncate executable folder
+    dirmodel->setRootPath(dir);             //Activate model
+
     //GUI display initializations
+    ui->dataFileBrowser->setModel(dirmodel);    //Activate tree view
     ui->stackWidg->setCurrentIndex(0);
     ui->adminLoginBt->hide();
     ui->startInfoBt->setFocus();
+    ui->dataFileBrowser->resizeColumnToContents(0);
+
+
 
     //Keystroke to pull up admin login window
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return),
@@ -63,7 +73,9 @@ void PrimeWin::refreshHome()
             }
             //Add stadNum to hidden first col
             ui->homeStadTbl
-              ->setItem(ui->homeStadTbl->rowCount()-1,0,new QTableWidgetItem(QString::number(x)));
+              ->setItem(ui->homeStadTbl
+                        ->rowCount()-1,0,
+                        new QTableWidgetItem(QString::number(x)));
 
             //If there are teams here
             if (data.teamSize(x) != 0)
@@ -91,7 +103,9 @@ void PrimeWin::refreshHome()
 
             //Add stadium name to fourth col
             ui->homeStadTbl
-              ->setItem(ui->homeStadTbl->rowCount()-1,3,new QTableWidgetItem(data.getStadName(x)));
+              ->setItem(ui->homeStadTbl
+                        ->rowCount()-1,3,
+                        new QTableWidgetItem(data.getStadName(x)));
 
             //If there are teams here, add the team name
             if (data.teamSize(x) != 0)
@@ -176,9 +190,10 @@ void PrimeWin::catchLoginStatus(bool status)
 //Index 2 = itinerary page
 //Index 3 = summary page
 //Index 4 = admin home page
+//Index 5 = index management page
 /*======================================================================*/
 
-//Index0==================================================================
+//Index0 - Start Page=====================================================
 void PrimeWin::on_startInfoBt_clicked()
 //Index 0 to 1
 {
@@ -212,7 +227,7 @@ void PrimeWin::on_homeStadTbl_itemSelectionChanged()
 //Refreshes home page when the home page's table selection changes
 {refreshHomeDetails();}
 
-//Index1==================================================================
+//Index1 - Home Page======================================================
 void PrimeWin::on_homeBackBt_clicked()
 //Index 1 to 0
 {ui->stackWidg->setCurrentIndex(0);}
@@ -221,11 +236,11 @@ void PrimeWin::on_homePlanTripBt_clicked()
 //Index 1 to 2
 {ui->stackWidg->setCurrentIndex(2);}
 
-//Index2==================================================================
+//Index2 - Itinerary Page=================================================
 
-//Index3==================================================================
+//Index3 - Summary Page===================================================
 
-//Index4==================================================================
+//Index4 - Admin Page=====================================================
 void PrimeWin::on_adminRestartBt_clicked()
 //Exports to SQL database then restarts program
 {
@@ -243,7 +258,51 @@ void PrimeWin::on_adminRestartBt_clicked()
         QMessageBox::critical(this, tr("SQL Export Failure"),
                               tr("Failed to export data.\n"
                                  "Restart has been aborted."),
-                              QMessageBox::Close);
+                              QMessageBox::Ok);
+    }
+}
 
+void PrimeWin::on_adminBaseBt_clicked()
+//Index 4 to 5
+{
+    ui->stackWidg->setCurrentIndex(5);
+}
+
+//Index5 - Database Management Page=======================================
+void PrimeWin::on_dataBackBt_clicked()
+//Index 5 to 4
+{
+    ui->stackWidg->setCurrentIndex(4);
+}
+
+void PrimeWin::on_dataTxtBt_clicked()
+//Imports a text file and overwrites the entire data structure
+{
+    QString selection = dirmodel
+            ->fileInfo(ui->dataFileBrowser
+                       ->currentIndex()).absoluteFilePath();
+
+    //Validate that selection is a text file
+    if (selection.right(4) == ".txt")
+    {
+        if (!data.importTXT(selection))
+        {
+            QMessageBox::warning(this, tr("Cannot Overwrite"),
+                                 tr("File did not open."),
+                                 QMessageBox::Ok);
+        }
+        else
+        {
+            QMessageBox::information(this, tr("Data Overwritten"),
+                                     tr("Data overwritten."),
+                                     QMessageBox::Ok);
+        }
+    }
+    else
+    {
+        QMessageBox::warning(this, tr("Cannot Overwrite"),
+                             tr("Invalid selection.\n"
+                                "Only text files can be imported.\n"),
+                             QMessageBox::Ok);
     }
 }

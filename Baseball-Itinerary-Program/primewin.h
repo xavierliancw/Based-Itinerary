@@ -9,6 +9,7 @@
 #include <QDir>
 #include <QProcess>
 #include <QMessageBox>
+#include <QFileSystemModel>
 
 #include "datastructures.h"
 #include "adminlogin.h"
@@ -42,6 +43,7 @@ private slots:
 //Index 2 = itinerary page
 //Index 3 = summary page
 //Index 4 = admin home page
+//Index 5 = database management page
 /*======================================================================*/
 //Index0==================================================================
     void on_startInfoBt_clicked();
@@ -64,9 +66,18 @@ private slots:
 //Index4==================================================================
     void on_adminRestartBt_clicked();
 
+    void on_adminBaseBt_clicked();
+
+//Index5==================================================================
+    void on_dataBackBt_clicked();
+
+    void on_dataTxtBt_clicked();
+
 private:
-    Ui::PrimeWin *ui;
-    Data data;
+    Ui::PrimeWin *ui;           //User interface
+
+    Data data;                  //Interface for all data structures
+    QFileSystemModel *dirmodel; //Model of file directory
 };
 
 #endif // PRIMEWIN_H
