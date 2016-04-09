@@ -588,3 +588,108 @@ QString Data::getSouvName(int stadNum, int souvNum) const
 
 double Data::getSouvPrice(int stadNum, int souvNum) const
 {return masterVect.at(stadNum).souvVect.at(souvNum).price;}
+
+void ItinObj::pushCart(int souvNum, int qty)
+//Pushes a souvenir to the cart at the current stadium
+{
+    itinSouvList.push_back(souvNum);
+    itinSouvQuant.push_back(qty);
+}
+
+void ItinObj::delCart(int souvNum)
+//Deletes a souvenir from the cart
+{
+    bool found = false; //Validation boolean
+
+    //Look for the souvenir in the itinerary
+    for (unsigned int x = 0; x < itinSouvList.size(); x++)
+    {
+        //If the souvenir in question is found
+        if (itinSouvList.at(x) == souvNum)
+        {
+            //Delete it
+            std::vector<int>::iterator it = itinSouvList.begin() + x;
+            itinSouvList.erase(it);
+            itinSouvQuant.erase(it);
+
+            //Skip exception
+            found = true;
+
+            //Exit loop
+            x = itinSouvList.size();
+        }
+    }
+    //Throw an exception if souvenir is not found
+    if (!found)
+    {
+        //THROW AN EXCEPTION HERE
+        qDebug() << "Cannot find souvenir in cart to delete";
+    }
+}
+
+void ItinObj::chgQty(int souvNum, int newQty)
+//Changes the quantity of the indexed souvenir
+{
+    bool found = false; //Validation boolean
+
+    //Look for the souvenir in the itinerary
+    for (unsigned int x = 0; x < itinSouvList.size(); x++)
+    {
+        //If the souvenir in question is found
+        if (itinSouvList.at(x) == souvNum)
+        {
+            //Change its quantity
+            itinSouvQuant.at(x) = newQty;
+
+            //Skip exception
+            found = true;
+
+            //Exit loop
+            x = itinSouvList.size();
+        }
+    }
+    //Throw an exception if souvenir is not found
+    if (!found)
+    {
+        //THROW AN EXCEPTION HERE
+        qDebug() << "Cannot find souvenir in cart to change";
+    }
+}
+
+int ItinObj::getStadNum() const
+//Returns stadium number
+{return stadNum;}
+
+int ItinObj::getCartSize() const
+//Returns the size of the shopping cart at the current stadium
+{return itinSouvList.size();}
+
+int ItinObj::getSouvNumAt(int index) const
+//Returns the souvenir at index
+{return itinSouvList.at(index);}
+
+int ItinObj::getQtyFor(int souvNum) const
+//Returns the quantity of the souvenir bought
+{
+    int quantity = -1;   //Quantity of a souvenir in the cart
+
+    //Search for souvenir in itin
+    for (unsigned int x = 0; x < itinSouvList.size(); x++)
+    {
+        //If the souvenir is found, prep to return its quantity
+        if (souvNum == itinSouvList.at(x))
+        {
+            quantity = itinSouvQuant.at(x);
+            x = itinSouvList.size(); //Leave loop
+        }
+    }
+
+    //Throw an exception if souvenir isn't found
+    if (quantity < 0)
+    {
+        //THROW AN EXCEPTION HERE
+        qDebug() << "Cannot find souvenir in cart";
+    }
+
+    return quantity;
+}

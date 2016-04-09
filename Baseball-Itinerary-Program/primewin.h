@@ -76,6 +76,8 @@ private slots:
 private:
     Ui::PrimeWin *ui;           //User interface
 
+    std::list<ItinObj> itinList;
+
     Data data;                  //Interface for all data structures
     QFileSystemModel *dirmodel; //Model of file directory
 };

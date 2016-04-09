@@ -47,8 +47,21 @@ public:
 /*======================================================================*/
 class ItinObj
 {
-    int NOTIMPLEMENTED()
-    {int unimplemented;int NOTIMPLEMENTED;return unimplemented;}
+public:
+    void pushCart(int souvNum, int qty);//Pushes a souv into the cart
+    void delCart(int souvNum);          //Removes a souv from the cart
+    void chgQty(int souvNum, int newQty); //Changes qty of souv in cart
+
+    int getStadNum() const;             //Returns stadNum
+    int getCartSize() const;            //Gets size of shopping cart
+    int getSouvNumAt(int index) const;  //Gets souvNum at index
+    int getQtyFor(int souvNum) const;   //Returns quantity of a souv
+
+private:
+    int stadNum;                    //current stadium
+
+    std::vector<int> itinSouvList;  //list of souviners bought
+    std::vector<int> itinSouvQuant; //quantity of each souviner
 };
 /*======================================================================*/
 /*************************************************************************
