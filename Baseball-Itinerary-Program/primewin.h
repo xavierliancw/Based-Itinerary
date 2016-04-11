@@ -59,6 +59,7 @@ private slots:
 
     void on_homePlanTripBt_clicked();
 
+    void on_homeNationalCB_toggled(bool checked);
 //Index2==================================================================
 
 //Index3==================================================================
@@ -73,8 +74,12 @@ private slots:
 
     void on_dataTxtBt_clicked();
 
+
+
 private:
     Ui::PrimeWin *ui;           //User interface
+
+    std::list<ItinObj> itinList;
 
     Data data;                  //Interface for all data structures
     QFileSystemModel *dirmodel; //Model of file directory
