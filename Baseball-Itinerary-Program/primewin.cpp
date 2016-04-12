@@ -331,6 +331,51 @@ void PrimeWin::on_homeAmericanCB_toggled(bool checked)
     }// end else
 }//end void on_homeAmericanCB_toggled(bool checked)
 
+void PrimeWin::on_homeTurfCB_toggled(bool checked)
+{
+    //IF-This if statement will look for the checkbox that we made is checked
+    //   and if it is then it will look for all stadiums that use natural grass
+    //   and filter them out.
+    if(checked)
+    {
+        //FOR-Loops through each item of each table to find the items in the
+        //    homeStadTble to filter out.
+
+        for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
+        {
+            //This QString will be used to find our vector index.
+            QString strIndex = ui->homeStadTbl->item(i, 0)->text();
+
+            int vecIndex = strIndex.toInt();    //Convert strIndex to an int.
+
+            //IF-The item at the given index has 'grass' then it will filter it
+            //   out the grass.
+            if(data.getStadGrass(vecIndex) == "Astro Turf")
+            {
+                ui->homeStadTbl->setRowHidden(i, true);
+            }// if(data.getStadGrass(vecIndex) == "Astro Turf")
+
+        }// end for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
+
+    }// end if(checked)
+    else
+    {
+        //FOR LOOP- This loop will traverse the homeStadTbl
+        for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
+        {
+            //IF- if the row at the given index is hidden then here
+            //    it will 'unhide' the row.
+            if(ui->homeStadTbl->isRowHidden(i))
+            {
+                ui->homeStadTbl->setRowHidden(i, false);
+            }// end if(ui->homeStadTbl->isRowHidden(i))
+
+        }// end for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
+
+    }// end else
+
+}// end void PrimeWin::on_homeTurfCB_toggled(bool checked)
+
 //Index2 - Itinerary Page=================================================
 void PrimeWin::on_itinStartOverBt_clicked()
 //Index 2 to 0
@@ -515,3 +560,5 @@ void PrimeWin::on_dataTxtBt_clicked()
                              QMessageBox::Ok);
     }
 }
+
+

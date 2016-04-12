@@ -66,6 +66,8 @@ private slots:
     void on_homeNationalCB_toggled(bool checked);
 
     void on_homeAmericanCB_toggled(bool checked);
+
+    void on_homeTurfCB_toggled(bool checked);
 //Index2==================================================================
     void on_itinStartOverBt_clicked();
 
