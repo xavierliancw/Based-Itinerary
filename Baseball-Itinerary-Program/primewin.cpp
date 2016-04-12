@@ -281,6 +281,49 @@ void PrimeWin::on_homeNationalCB_toggled(bool checked)
 }// end void PrimeWin::on_homeNationalCB_toggled(bool checked)
 
 
+
+void PrimeWin::on_homeAmericanCB_toggled(bool checked)
+{
+    //IF - Checks to see if our Checkbox is checked. If it is then
+    //     it will filter out all National League teams. Else it will
+    //     revert the table back to its original state.
+    if(checked)
+    {
+        //FOR LOOP- This will loop through the table.
+        for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
+        {
+            //This QString will be used to find our vector index.
+            QString strIndex = ui->homeStadTbl->item(i, 0)->text();
+
+            int vecIndex = strIndex.toInt();    //Convert strIndex to an int.
+
+            //IF - Here we find if the team league at the team indicated then
+            //     it will hide all the rows that are National League team.
+            if(data.getTeamLeague(vecIndex, 0)=="National")
+            {
+                ui->homeStadTbl->setRowHidden(i, true);
+            } //end if(data.getTeamLeague(vecIndex, 0)=="American")
+
+        } //end  for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
+
+    } // end if(checked)
+    else
+    {
+        //FOR LOOP- This loop will traverse the homeStadTbl
+        for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
+        {
+            //IF- if the row at the given index is hidden then here
+            //    it will 'unhide' the row.
+            if(ui->homeStadTbl->isRowHidden(i))
+            {
+                ui->homeStadTbl->setRowHidden(i, false);
+            }// end if(ui->homeStadTbl->isRowHidden(i))
+
+        }// end for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
+
+    }// end else
+}//end void on_homeAmericanCB_toggled(bool checked)
+
 //Index2 - Itinerary Page=================================================
 void PrimeWin::on_itinStartOverBt_clicked()
 //Index 2 to 0
@@ -451,3 +494,4 @@ void PrimeWin::on_dataTxtBt_clicked()
                              QMessageBox::Ok);
     }
 }
+
