@@ -33,6 +33,9 @@ public:
     //Refreshes detail labels on the home page (Index 1)
     void refreshHomeDetails();
 
+    //Refreshes the view of the itinerary
+    void refreshItin();
+
 public slots:
     void catchLoginStatus(bool status); //Catches login signal
 
