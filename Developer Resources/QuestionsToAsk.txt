@@ -1,6 +1,11 @@
+UNANSWERED QUESTIONS:
+
 During the presentation demo, are you going to ask us to move a team to a new stadium in Nevada, or some state that doesn't have a stadium?
 
 What functions do you want our Big O papers to go over?
+
+
+ANSWERED QUESTIONS:
 
 Will our programs have to handle a case where there will be two or more teams that share one stadium?
 	NO

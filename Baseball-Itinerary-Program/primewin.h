@@ -14,6 +14,7 @@
 #include "datastructures.h"
 #include "adminlogin.h"
 #include "customimplementations.h"
+#include "editdistances.h"
 
 namespace Ui {
 class PrimeWin;
@@ -36,6 +37,8 @@ public:
 
 public slots:
     void catchLoginStatus(bool status); //Catches login signal
+
+    void catchDataUpdate(Data caughtThis);
 
 private slots:
 /*PAGE INDEX============================================================*/
@@ -75,11 +78,12 @@ private slots:
 
     void on_adminBaseBt_clicked();
 
+    void on_adminDistBt_clicked();
+
 //Index5==================================================================
     void on_dataBackBt_clicked();
 
     void on_dataTxtBt_clicked();
-
 
 private:
     Ui::PrimeWin *ui;           //User interface
