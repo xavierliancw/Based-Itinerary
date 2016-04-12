@@ -1,18 +1,22 @@
-We're going to ask again, just to be absolutely sure. Does the program need to be able to handle a case where there will be two or more teams that share one stadium?
+During the presentation demo, are you going to ask us to move a team to a new stadium in Nevada, or some state that doesn't have a stadium?
+
+What functions do you want our Big O papers to go over?
+
+Will our programs have to handle a case where there will be two or more teams that share one stadium?
+	NO
 
 Since teams can move to new stadiums, will we have to handle adding and deleting flight routes? For example, what if the Angels move to Nevada's new stadium, "Vegas Park"?
+	Be able to handle adding, deleting, and modifying flight paths (#32)
 
 Let's say the Blue Jays move to New York, and Rogers Centre gets demolished. Would the program just delete the flight routes to Ontario, Canada?
-
-(If not deleting flight routes)
-So the airport at Ontario would still be a fylable location, right? Dijkstra's, Prim's, and Kruskal's algorithms would still factor in Ontario's airport, right?. There's just no stadium there to visit.
-
-(If deleting flight routes)
-Would you show us the most effective way of removing from an adjacency matrix?
+	Answered above
 
 For number 1 under "Planning a vacation," the one that says "choose Dodgers as the starting stadium," do you mean choose ONE other stadium to visit, so when you're on your way there, you'll also just visit any stadiums that are coincidentally along the way? 
 So for example, if I wanted to go to Safeco Field in Washington, would the trip also involve visiting Dodger Stadium, Angels Stadium, AT&T Park, and O.co Coliseum as well?
+	Just be able to calculate shortest distance from Dodgers to one other stadium
 
 So if we use Qt's built in sort function, which runs in O(nlogn), but we don't know how Qt is sorting, how would we write that down in our Big O analysis (since nlogn would be the program's largest complexity, and you'd probably expect that on the Big O analysis)? Would we just write something like "Qt's sort runs in O(nlogn)?"
+	Can't use Qt's inbuilt sort
 
 Are we allowed to use a text file to import and export our data for persistence?
+	Yes
