@@ -13,6 +13,7 @@
 
 #include "datastructures.h"
 #include "adminlogin.h"
+#include "customimplementations.h"
 
 namespace Ui {
 class PrimeWin;
@@ -63,6 +64,9 @@ private slots:
 
     void on_homeAmericanCB_toggled(bool checked);
 //Index2==================================================================
+    void on_itinStartOverBt_clicked();
+
+    void on_itinOptimizeBt_clicked();
 
 //Index3==================================================================
 
@@ -75,9 +79,6 @@ private slots:
     void on_dataBackBt_clicked();
 
     void on_dataTxtBt_clicked();
-
-
-
 
 
 private:
