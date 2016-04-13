@@ -35,13 +35,18 @@ public:
     //Refreshes detail labels on the home page (Index 1)
     void refreshHomeDetails();
 
-    //Refreshes the view of the itinerary (Index 2)
+    //Refreshes the view of the itinerary builder (Index 2)
+    void refreshItinBuilder();
+
+    //Refreshes the itineray view (Index 2)
     void refreshItin();
 
 public slots:
     void catchLoginStatus(bool status); //Catches login signal
 
     void catchDataUpdate(Data caughtThis);
+
+    void catchAddItin();
 
 private slots:
 /*PAGE INDEX============================================================*/
