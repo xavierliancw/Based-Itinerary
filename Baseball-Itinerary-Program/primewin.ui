@@ -840,7 +840,12 @@
              </column>
              <column>
               <property name="text">
-               <string>Bookmark?</string>
+               <string>Team Name</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Add to Itinerary</string>
               </property>
              </column>
             </widget>

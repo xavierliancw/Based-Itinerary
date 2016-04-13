@@ -34,7 +34,7 @@ public:
     //Refreshes detail labels on the home page (Index 1)
     void refreshHomeDetails();
 
-    //Refreshes the view of the itinerary
+    //Refreshes the view of the itinerary (Index 2)
     void refreshItin();
 
 public slots:

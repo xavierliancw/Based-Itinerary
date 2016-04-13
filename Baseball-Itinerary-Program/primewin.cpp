@@ -176,11 +176,14 @@ void PrimeWin::refreshHomeDetails()
 }
 
 void PrimeWin::refreshItin()
+//Refreshes the view of the itinerary (Index 2)
 {
     for(unsigned int i = 0; i < data.size(); i ++)
     {
         ui->tableWidget->insertRow(ui->tableWidget->rowCount());
         ui->tableWidget->setItem(i, 0, new QTableWidgetItem(data.getStadName(i)));
+        ui->tableWidget->setItem(i, 1, new QTableWidgetItem(data.getTeamName(i,0)));
+        ui->tableWidget->setItem(i, 2, new QTableWidgetItem(QString::number(0)));
     }
 }
 
@@ -251,8 +254,6 @@ void PrimeWin::on_homePlanTripBt_clicked()
     ui->stackWidg->setCurrentIndex(2);
 }
 
-//Toggles a filter to filter out American League teams and only
-//displays American league teams.
 void PrimeWin::on_homeNationalCB_toggled(bool checked)
 {
     //IF - Checks to see if our Checkbox is checked. If it is then
