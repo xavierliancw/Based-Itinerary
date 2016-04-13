@@ -8,3 +8,6 @@ Members:
 - Ryan Nguyen
 - Stephen Lastimosa
 - Xavier Lian (Scrum Master)
+
+Want to work on an issue for this repository?  
+Follow the steps here: [Waffle-Git Branching Tutorial](https://github.com/waffleio/waffle.io/wiki/Recommended-Workflow-Using-Pull-Requests-&-Automatic-Work-Tracking)

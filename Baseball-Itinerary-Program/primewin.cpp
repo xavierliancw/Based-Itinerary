@@ -16,6 +16,9 @@ PrimeWin::PrimeWin(QWidget *parent, int dummyVarForNow) :
 {
     ui->setupUi(this);
 
+    //Import data from SQL
+    data.importSQL();
+
     //Data initializations
     dirmodel = new QFileSystemModel(this);  //Model of file directory
     QString dir = QDir::currentPath();      //Path to executable
@@ -28,8 +31,8 @@ PrimeWin::PrimeWin(QWidget *parent, int dummyVarForNow) :
     ui->adminLoginBt->hide();
     ui->startInfoBt->setFocus();
     ui->dataFileBrowser->resizeColumnToContents(0);
-
-
+    ui->adminStadTbl->horizontalHeader()
+            ->setDefaultAlignment(Qt::AlignLeft);
 
     //Keystroke to pull up admin login window
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return),
@@ -175,14 +178,200 @@ void PrimeWin::refreshHomeDetails()
     ui->homeTypeLbl->setText(data.getStadType(stadNum));
 }
 
+void PrimeWin::refreshAdminTbl()
+//Refreshes admin stadium table
+{
+    QSignalBlocker stopSignalsFrom(ui->adminStadTbl);
+    QTableWidgetItem *item; //Item to populate table cell
+
+    //Reset and setup table
+    ui->adminStadTbl->clear();
+    ui->adminStadTbl->setRowCount(0);
+    ui->adminStadTbl->setColumnCount(11);
+
+    //Name column headings
+    ui->adminStadTbl->setHorizontalHeaderLabels
+            (QStringList() << "#" << "Stadium" << "Team" << "League"
+             << "Phone" << "Address" << "Capacity" << "Turf" << "Opened"
+             << "Type" << "Revenue");
+
+    //Loop to populate table
+    for (unsigned int x = 0; x < data.size(); x++)
+    {
+        //Add a row
+        ui->adminStadTbl->insertRow(ui->adminStadTbl->rowCount());
+
+        //Populate first column with stadNums
+        item = new QTableWidgetItem;
+        item->setData(0,QString::number(x));
+        ui->adminStadTbl->setItem(x,0,item);
+
+        //Populate second column with stadName
+        item = new QTableWidgetItem;
+        item->setData(0,data.getStadName(x));
+        ui->adminStadTbl->setItem(x,1,item);
+
+        //Populate third column with team name
+        item = new QTableWidgetItem;
+        item->setData(0,data.getTeamName(x));
+        ui->adminStadTbl->setItem(x,2,item);
+
+        //Populate fourth column with team league
+        item = new QTableWidgetItem;
+        item->setData(0,data.getTeamLeague(x));
+        ui->adminStadTbl->setItem(x,3,item);
+
+        //Populate fifth column with the phone number
+        item = new QTableWidgetItem;
+        item->setData(0,data.getStadPhone(x));
+        ui->adminStadTbl->setItem(x,4,item);
+
+        //Populate sixth column with address
+        item = new QTableWidgetItem;
+        item->setData(0,data.getStadAddress(x));
+        ui->adminStadTbl->setItem(x,5,item);
+
+        //Populate seventh column with capacity
+        item = new QTableWidgetItem;
+        item->setData(0,QString::number(data.getStadCapactiy(x)));
+        ui->adminStadTbl->setItem(x,6,item);
+
+        //Populate eigth column with grass type
+        item = new QTableWidgetItem;
+        item->setData(0,data.getStadGrass(x));
+        ui->adminStadTbl->setItem(x,7,item);
+
+        //Populate ninth column with opening date
+        item = new QTableWidgetItem;
+        item->setData(0,data.getStadOpened(x));
+        ui->adminStadTbl->setItem(x,8,item);
+
+        //Poplate tenth column with stadium type
+        item = new QTableWidgetItem;
+        item->setData(0,data.getStadType(x));
+        ui->adminStadTbl->setItem(x,9,item);
+
+        //Populate eleventh column with park revenue
+        int NOTDONE;
+        item = new QTableWidgetItem;
+        item->setData(0,"$REVENUE");
+        ui->adminStadTbl->setItem(x,10,item);
+    }
+    ui->adminStadTbl->resizeColumnsToContents();
+    stopSignalsFrom.unblock();
+}
+
+QString PrimeWin::phoneCheck(QString phone)
+//Validates phone numbers and returns a formatted number
+{
+    QString bareNumber;     //Cleaned up input
+    bool hasPlus = false;   //Determines if there's a plus or not
+    bool morePlus = false;  //Determines if there are duplicate + signs
+    bool throwGen = false;  //Determines if generic error is necessary
+
+    //Iterate through all characters, keeping only + and numbers
+    for(QString::iterator it = phone.begin(); it != phone.end(); it++)
+    {
+        if (*it == '0' || *it == '1' || *it == '2' || *it == '3'
+            || *it == '4' || *it == '5' || *it == '6' || *it == '7'
+            || *it == '8' || *it == '9' || *it == '+')
+        {
+            bareNumber += *it;
+
+            //If there's a plus, flag it
+            if (*it == '+')
+            {
+                //If hasPlus is already true, then mark flag duplicate
+                if (hasPlus)
+                {
+                    morePlus = true;
+                }
+                //Otherwise just mark it true
+                else
+                {
+                    hasPlus = true;
+    }   }   }   }
+    //Check if there are duplicate +'s
+    if (morePlus)
+    {
+        QMessageBox::warning(this, tr("Invalid Phone Number"),
+                             tr("There can only be one \"+\" in a "
+                                "phone number."),
+                             QMessageBox::Ok);
+        return "NULL";
+    }
+    //Check if phone number is the correct length if it has a +
+    if (hasPlus && (bareNumber.size() - bareNumber.indexOf("+") == 12
+                    || bareNumber.size() - bareNumber.indexOf("+") == 11))
+    {}//It's good, I'm just too lazy to DeMorganize the conditional
+    //Check if phone number has the correct length if there's no +
+    else if (!hasPlus && (bareNumber.size() == 11 || bareNumber.size() == 10))
+    {}//Same deal
+    else
+    {throwGen = true;}
+
+    //Format the number if nothing's wrong
+    if (!throwGen)
+    {
+        //Insert the start of the area code
+        //If there's a +
+        if (hasPlus)
+        {
+            //If the size is 11
+            if (bareNumber.size() - bareNumber.indexOf("+") == 12)
+            {
+                //Insert space after the first character after the +
+                bareNumber.insert(bareNumber.indexOf("+") + 2, " (");
+            }
+            //If the size is 10
+            else
+            {
+                //Insert ( after the +
+                bareNumber.insert(bareNumber.indexOf("+") + 1, "(");
+            }
+        }
+        //If there's no +
+        else
+        {
+            //If size is 11
+            if (bareNumber.size() == 11)
+            {
+                bareNumber.insert(1, " (");
+            }
+            //If size is 10
+            else
+            {
+                bareNumber.insert(0, "(");
+            }
+        }
+        //Finish area code
+        bareNumber.insert(bareNumber.indexOf("(") + 4, ") ");
+        //Add the dash
+        bareNumber.insert(bareNumber.lastIndexOf(" ") + 4,"-");
+        return bareNumber;
+    }
+    //Otherwise throw the generic error
+    else
+    {
+        QMessageBox::warning(this, tr("Invalid Phone Number"),
+                             tr("Phone number is not valid."),
+                             QMessageBox::Ok);
+        return "NULL";
+    }
+}
+
 /*PUBLIC SLOTS==========================================================*/
 void PrimeWin::catchLoginStatus(bool status)
 //Catches signal to see if login is good or not
 {
     //Change page to admin home page if status is true
     if (status)
-    {ui->stackWidg->setCurrentIndex(4);}
+    {refreshAdminTbl();ui->stackWidg->setCurrentIndex(4);}
 }
+
+void PrimeWin::catchDataUpdate(Data caughtThis)
+//Catches signal to update data structures
+{data = caughtThis;}
 
 /*PAGE INDEX============================================================*/
 //Index 0 = start page
@@ -280,6 +469,49 @@ void PrimeWin::on_homeNationalCB_toggled(bool checked)
     }// end else
 }// end void PrimeWin::on_homeNationalCB_toggled(bool checked)
 
+
+
+void PrimeWin::on_homeAmericanCB_toggled(bool checked)
+{
+    //IF - Checks to see if our Checkbox is checked. If it is then
+    //     it will filter out all National League teams. Else it will
+    //     revert the table back to its original state.
+    if(checked)
+    {
+        //FOR LOOP- This will loop through the table.
+        for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
+        {
+            //This QString will be used to find our vector index.
+            QString strIndex = ui->homeStadTbl->item(i, 0)->text();
+
+            int vecIndex = strIndex.toInt();    //Convert strIndex to an int.
+
+            //IF - Here we find if the team league at the team indicated then
+            //     it will hide all the rows that are National League team.
+            if(data.getTeamLeague(vecIndex, 0)=="National")
+            {
+                ui->homeStadTbl->setRowHidden(i, true);
+            } //end if(data.getTeamLeague(vecIndex, 0)=="American")
+
+        } //end  for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
+
+    } // end if(checked)
+    else
+    {
+        //FOR LOOP- This loop will traverse the homeStadTbl
+        for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
+        {
+            //IF- if the row at the given index is hidden then here
+            //    it will 'unhide' the row.
+            if(ui->homeStadTbl->isRowHidden(i))
+            {
+                ui->homeStadTbl->setRowHidden(i, false);
+            }// end if(ui->homeStadTbl->isRowHidden(i))
+
+        }// end for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
+
+    }// end else
+}//end void on_homeAmericanCB_toggled(bool checked)
 
 //Index2 - Itinerary Page=================================================
 void PrimeWin::on_itinStartOverBt_clicked()
@@ -413,10 +645,114 @@ void PrimeWin::on_adminBaseBt_clicked()
     ui->stackWidg->setCurrentIndex(5);
 }
 
+void PrimeWin::on_adminDistBt_clicked()
+//Opens distance editing dialog
+{
+    //Construct new dialog
+    editdistances newDistDialog(this,data);
+
+    //Line main window up to catch newDistDialog's signal
+    connect(&newDistDialog,SIGNAL(throwUpdatedData(Data)),
+            this,SLOT(catchDataUpdate(Data)));
+
+    //Display the dialog
+    newDistDialog.exec();
+}
+
+void PrimeWin::on_adminStadTbl_cellChanged(int row, int column)
+//Applies edits from the admin table to the data structure
+{
+    QString input;
+    QIntValidator validate(1,1000000,NULL);
+    int valid = 0;
+
+    //Grab the input
+    input = ui->adminStadTbl->item(row,column)->text();
+
+    //Depending on column selected, make appropriate data changes
+    switch (column)
+    {
+    case 0://StadNum
+        QMessageBox::warning(this, tr("Editing Error"),
+                             tr("Editing stadium numbers is forbidden."),
+                             QMessageBox::Ok);
+        break;
+    case 1://Stadium
+        data.modStadName(row,input);
+        break;
+    case 2://Team
+        data.modTeam(row,input);
+        break;
+    case 3://League
+        //Validate league
+        input = input.simplified();
+        input.replace(" ","");
+        input = input.toLower();
+        if (input == "national" || input == "american")
+        {
+            input[0] = input[0].toUpper();
+            data.modLeague(row,input);
+        }
+        //If neither national nor american, throw error
+        else
+        {
+            QMessageBox::warning(this, tr("Editing Error"),
+                                 tr("League can only be \"National\" "
+                                    "or \"American\"."),
+                                 QMessageBox::Ok);
+        }
+        break;
+    case 4://Phone
+        if (phoneCheck(input) != "NULL")
+        {
+            data.modStadPhone(row,phoneCheck(input));
+        }
+        break;
+    case 5://Address
+        data.modStadAddress(row,input);
+        break;
+    case 6://Capacity
+        //Validate input
+        valid = validate.validate(input,valid);
+        if (valid == 0)
+        {
+            QMessageBox::warning(this, tr("Editing Error"),
+                                 tr("Invalid capacity.\n"
+                                    "Must be between 0 & 1,000,001."),
+                                 QMessageBox::Ok);
+        }
+        else
+        {
+            data.modStadCapacity(row,input.toInt());
+        }
+        break;
+    case 7://Turf
+        data.modStadGrass(row,input);
+        break;
+    case 8://Opened
+        data.modStadOpened(row,input);
+        break;
+    case 9://Type
+        data.modStadType(row,input);
+        break;
+    case 10://Revenue
+        int UNIMPLEMENTED;
+        qDebug() << "REVENUE EDITING IS UNIMPLEMENTED";
+        break;
+    default:
+        QMessageBox::critical(this, tr("Editing Critical Error"),
+                              tr("Column switch case defaulted!"),
+                              QMessageBox::Ok);
+        break;
+    }
+    refreshAdminTbl();
+}
+
 //Index5 - Database Management Page=======================================
 void PrimeWin::on_dataBackBt_clicked()
 //Index 5 to 4
 {
+    refreshAdminTbl();
     ui->stackWidg->setCurrentIndex(4);
 }
 
