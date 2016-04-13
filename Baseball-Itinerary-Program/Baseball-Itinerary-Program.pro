@@ -17,12 +17,15 @@ SOURCES += main.cpp\
         primewin.cpp \
     adminlogin.cpp \
     datastructures.cpp \
-    customimplementations.cpp
+    customimplementations.cpp \
+    editdistances.cpp
 
 HEADERS  += primewin.h \
     adminlogin.h \
     datastructures.h \
-    customimplementations.h
+    customimplementations.h \
+    editdistances.h
 
 FORMS    += primewin.ui \
-    adminlogin.ui
+    adminlogin.ui \
+    editdistances.ui

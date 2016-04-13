@@ -100,10 +100,8 @@ public:
     void modSouvName();
     void modSouvPrice();
 
-    //Adds a new distance into both sides of the distance matrix
+    //Changes a value in the matrix and its symmetrical counterpart
     void addDist(int x, int y, int newDist);
-    void modDist();
-    void delDist();
 
     //Returns number of stadiums in the program
     unsigned int size() const;
@@ -124,9 +122,13 @@ public:
     QString getSouvName(int stadNum, int souvNum) const;
     double getSouvPrice(int stadNum, int souvNum) const;
 
-    double getDistBetween() const;
+    //Returns distance between two stadiums
+    int getDistBetween(unsigned int here, unsigned int there) const;
 
     int getMST() const;
+
+    //Fill data structures with information from SQL database
+    void importSQL();
 
     //Export contents of all databases to SQL database
     bool exportSQL();
@@ -138,8 +140,7 @@ private:
     std::vector<StadObj> masterVect;        //Vector of all stadiums
     std::vector< std::vector<int> > matrix; //2D matrix of all distances
 
-    //Fill data structures with information from SQL database
-    void importSQL();
+
 };
 
 #endif // DATASTRUCTURES_H

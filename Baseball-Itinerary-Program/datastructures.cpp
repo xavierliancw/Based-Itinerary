@@ -2,9 +2,7 @@
 
 Data::Data()
 //Constructor
-{
-    importSQL();
-}
+{}
 
 Data::~Data()
 //Destructor
@@ -146,7 +144,7 @@ void Data::addSouv(int stadNum, QString newName, double newPrice)
 }
 
 void Data::addDist(int x, int y, int newDist)
-//Adds a new distance into both sides of the matrix
+//Changes a value in the matrix and its symmetrical counterpart
 {
     //Fill in the data to there and back
     matrix[x][y] = newDist;
@@ -588,6 +586,10 @@ QString Data::getSouvName(int stadNum, int souvNum) const
 
 double Data::getSouvPrice(int stadNum, int souvNum) const
 {return masterVect.at(stadNum).souvVect.at(souvNum).price;}
+
+int Data::getDistBetween(unsigned int here, unsigned int there) const
+//Returns distance between two stadiums
+{return matrix[here][there];}
 
 void ItinObj::pushCart(int souvNum, int qty)
 //Pushes a souvenir to the cart at the current stadium

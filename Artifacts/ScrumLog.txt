@@ -30,3 +30,8 @@ Scrum Log
 - Opened issues 43 through 47
 - Planning poker for those issues
 - Went over Git-Waffle workflow with everyone
+
+11 April
+- Merged Dijkstra's algorithm implementation into master
+- Resolved pull requests to complete stories #3 and #4
+

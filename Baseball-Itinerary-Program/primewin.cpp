@@ -16,6 +16,9 @@ PrimeWin::PrimeWin(QWidget *parent, int dummyVarForNow) :
 {
     ui->setupUi(this);
 
+    //Import data from SQL
+    data.importSQL();
+
     //Data initializations
     dirmodel = new QFileSystemModel(this);  //Model of file directory
     QString dir = QDir::currentPath();      //Path to executable
@@ -195,6 +198,10 @@ void PrimeWin::catchLoginStatus(bool status)
     if (status)
     {ui->stackWidg->setCurrentIndex(4);}
 }
+
+void PrimeWin::catchDataUpdate(Data caughtThis)
+//Catches signal to update data structures
+{data = caughtThis;}
 
 /*PAGE INDEX============================================================*/
 //Index 0 = start page
@@ -470,6 +477,20 @@ void PrimeWin::on_adminBaseBt_clicked()
     ui->stackWidg->setCurrentIndex(5);
 }
 
+void PrimeWin::on_adminDistBt_clicked()
+//Opens distance editing dialog
+{
+    //Construct new dialog
+    editdistances newDistDialog(this,data);
+
+    //Line main window up to catch newDistDialog's signal
+    connect(&newDistDialog,SIGNAL(throwUpdatedData(Data)),
+            this,SLOT(catchDataUpdate(Data)));
+
+    //Display the dialog
+    newDistDialog.exec();
+}
+
 //Index5 - Database Management Page=======================================
 void PrimeWin::on_dataBackBt_clicked()
 //Index 5 to 4
@@ -508,4 +529,3 @@ void PrimeWin::on_dataTxtBt_clicked()
                              QMessageBox::Ok);
     }
 }
-
