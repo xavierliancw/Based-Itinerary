@@ -178,6 +178,54 @@ void PrimeWin::refreshHomeDetails()
     ui->homeTypeLbl->setText(data.getStadType(stadNum));
 }
 
+void PrimeWin::refreshItinBuilder()
+//Refreshes the view of the itinerary builder (Index 2)
+{
+    //Clear table
+    ui->tableWidget->clear();
+
+    for(unsigned int i = 0; i < data.size(); i ++)
+    {
+        //Create new row
+        ui->tableWidget->insertRow(ui->tableWidget->rowCount());
+        //Put the stadium name in column 1
+        ui->tableWidget->setItem(i, 0,
+                            new QTableWidgetItem(data.getStadName(i)));
+        //Put the team name in colum 2
+        ui->tableWidget->setItem(i, 1,
+                            new QTableWidgetItem(data.getTeamName(i,0)));
+
+        //Create an add button
+        QPushButton *addBt = new QPushButton();
+        addBt->setText("Add");
+        //Set a the button to retrieve the stadium's num
+        addBt->setProperty("stadNum", i);
+        //Connect each button to addItinCatcher
+        connect(addBt, SIGNAL(clicked(bool)),
+                this, SLOT(catchAddItin()));
+        //Put the add button in column 3
+        ui->tableWidget->setCellWidget(i, 2, addBt);
+    }
+
+    ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "Stadium"
+                                               << "Team"
+                                               << "Add/Remove");
+}
+
+void PrimeWin::refreshItin()
+//Refreshes the itineray view (Index 2)
+{
+    //Clear itinerary view
+    ui->listWidget->clear();
+
+    //Populate List
+    for(std::list<ItinObj>::iterator it = itinList.begin();
+        it != itinList.end(); it++)
+    {
+        ui->listWidget->addItem(data.getStadName(it->getStadNum()));
+    }
+}
+
 void PrimeWin::refreshAdminTbl()
 //Refreshes admin stadium table
 {
@@ -373,6 +421,55 @@ void PrimeWin::catchDataUpdate(Data caughtThis)
 //Catches signal to update data structures
 {data = caughtThis;}
 
+void PrimeWin::catchAddItin()
+//Catches signal to update itin
+{
+//    //Block signals to prevent unintended behavior
+//    const QSignalBlocker blockItinTbl(ui->itineraryTbl);
+
+    //Create button object to emululate the button that was pushed
+    QPushButton *addBt = qobject_cast<QPushButton*>(sender());
+
+    //Get the stadium's num from the button's property
+    int stadNum = addBt->property("stadNum").toInt();
+
+    //If adding to itin
+    if (addBt->text() == "Add")
+    {
+        //Add to the itin
+        itinList.push_back(ItinObj(stadNum));
+
+        //?????????show possible souvenirs??????????
+
+        //Change the bt's text to remove
+        addBt->setText("Remove");
+    }
+    //Otherwise, remove from the itin
+    else if (addBt->text() == "Remove")
+    {
+        //Loop until stadium is found
+        for (std::list<ItinObj>::iterator it = itinList.begin();
+             it != itinList.end(); it++)
+        {
+            //Check to see if stadium is found
+            if (it->getStadNum() == stadNum)
+            {
+                //Remove the stadium from the itinerary queue
+                itinList.erase(it);
+
+                //Leave loop
+                it = itinList.end();
+            }
+        }
+
+        //Change the bt's text back to add
+        addBt->setText("Add");
+    }
+
+    refreshItin();
+    //?????????show possible souvenirs??????????
+}
+
 /*PAGE INDEX============================================================*/
 //Index 0 = start page
 //Index 1 = home page
@@ -392,7 +489,10 @@ void PrimeWin::on_startInfoBt_clicked()
 
 void PrimeWin::on_startTripBt_clicked()
 //Index 0 to 2
-{ui->stackWidg->setCurrentIndex(2);}
+{
+    refreshItinBuilder();
+    ui->stackWidg->setCurrentIndex(2);
+}
 
 void PrimeWin::on_adminLoginBt_clicked()
 //Pulls up admin login window
@@ -424,10 +524,11 @@ void PrimeWin::on_homeBackBt_clicked()
 
 void PrimeWin::on_homePlanTripBt_clicked()
 //Index 1 to 2
-{ui->stackWidg->setCurrentIndex(2);}
+{
+    refreshItinBuilder();
+    ui->stackWidg->setCurrentIndex(2);
+}
 
-//Toggles a filter to filter out American League teams and only
-//displays American league teams.
 void PrimeWin::on_homeNationalCB_toggled(bool checked)
 {
     //IF - Checks to see if our Checkbox is checked. If it is then
@@ -469,8 +570,6 @@ void PrimeWin::on_homeNationalCB_toggled(bool checked)
 
     }// end else
 }// end void PrimeWin::on_homeNationalCB_toggled(bool checked)
-
-
 
 void PrimeWin::on_homeAmericanCB_toggled(bool checked)
 {

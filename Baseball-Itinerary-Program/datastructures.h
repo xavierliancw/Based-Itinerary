@@ -48,6 +48,7 @@ public:
 class ItinObj
 {
 public:
+    ItinObj(int stadium);
     void pushCart(int souvNum, int qty);//Pushes a souv into the cart
     void delCart(int souvNum);          //Removes a souv from the cart
     void chgQty(int souvNum, int newQty); //Changes qty of souv in cart
