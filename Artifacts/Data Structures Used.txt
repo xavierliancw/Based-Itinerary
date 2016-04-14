@@ -8,3 +8,6 @@ Reason: The program will use a graph implemented by means of an adjacency matrix
 
 ~DOUBLY LINKED LIST of  of itinerary objects
 Reason: The program will need to reorder the itinerary very often. Since a doubly linked list allows for constant-time data reordering, it is the ideal option.
+
+~MINIMUM HEAP of Dijkstra objects
+Reason: The program's implementation of Dijkstra's algorithm uses a minimum heap to determine the shortest path among other paths in O(1) time. As paths are updated, the heap automatically allows for this constant-time access of the shortest path in O(logn).

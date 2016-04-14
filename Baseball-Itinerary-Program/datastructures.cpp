@@ -2,9 +2,7 @@
 
 Data::Data()
 //Constructor
-{
-    importSQL();
-}
+{}
 
 Data::~Data()
 //Destructor
@@ -80,59 +78,68 @@ void Data::addTeam(int stadNum, QString newTeam, QString newLeague/*LOGOVARIABLE
     masterVect.at(stadNum).teamVect.push_back(addingTeam);
 }
 
-void Data::modTeam(int stadNum, QString oldTeamName, QString newTeamName)
-//Changes name of a team
-{
-    //Search for team at the stadium (data set is naturally miniscule)
-    for (unsigned int x = 0; x < masterVect.at(stadNum).teamVect.size();
-         x++)
-    {
-        //If found, rename the team
-        if (oldTeamName == masterVect.at(stadNum).teamVect.at(x).name)
-        {
-            masterVect.at(stadNum).teamVect.at(x).name = newTeamName;
-        }
-    }
-}
+void Data::modTeam(int stadNum, QString newTeamName)
+//Modifies name of team
+{masterVect.at(stadNum).teamVect.at(0).name = newTeamName;}
 
-void Data::modTeam(int stadNum, QString whichTeam, int newStadNum)
-//Changes home stadium of the team at stadNum
-{
-    TeamObj movingTeam; //Variable to hold the moving team
+void Data::modLeague(int stadNum, QString newLeague)
+//Modifies league of team
+{masterVect.at(stadNum).teamVect.at(0).league = newLeague;}
 
-    //Search for team at the stadium (data set is naturally miniscule)
-    for (unsigned int x = 0; x < masterVect.at(stadNum).teamVect.size();
-         x++)
-    {
-        //If found, remove the team
-        if (whichTeam == masterVect.at(stadNum).teamVect.at(x).name)
-        {
-            movingTeam = masterVect.at(stadNum).teamVect.at(x);
-            masterVect.at(stadNum)
-                    .teamVect.erase(masterVect.at(stadNum)
-                                    .teamVect.begin() + x);
-        }
-    }
-    movingTeam.stadNum = newStadNum;
-    masterVect.at(newStadNum).teamVect.push_back(movingTeam);
-}
+////Legacy implementations
+//void Data::modTeam(int stadNum, QString oldTeamName, QString newTeamName)
+////Changes name of a team
+//{
+//    //Search for team at the stadium (data set is naturally miniscule)
+//    for (unsigned int x = 0; x < masterVect.at(stadNum).teamVect.size();
+//         x++)
+//    {
+//        //If found, rename the team
+//        if (oldTeamName == masterVect.at(stadNum).teamVect.at(x).name)
+//        {
+//            masterVect.at(stadNum).teamVect.at(x).name = newTeamName;
+//        }
+//    }
+//}
 
-void Data::delTeam(int stadNum, QString whichTeam)
-//Deletes a team
-{
-    //Search for team at the stadium (data set is naturally miniscule)
-    for (unsigned int x = 0; x < masterVect.at(stadNum).teamVect.size();
-         x++)
-    {
-        //If found, remove the team
-        if (whichTeam == masterVect.at(stadNum).teamVect.at(x).name)
-        {
-            masterVect.at(stadNum)
-                    .teamVect.erase(masterVect.at(stadNum)
-                                    .teamVect.begin() + x);
-        }
-    }
-}
+//void Data::modTeam(int stadNum, QString whichTeam, int newStadNum)
+////Changes home stadium of the team at stadNum
+//{
+//    TeamObj movingTeam; //Variable to hold the moving team
+
+//    //Search for team at the stadium (data set is naturally miniscule)
+//    for (unsigned int x = 0; x < masterVect.at(stadNum).teamVect.size();
+//         x++)
+//    {
+//        //If found, remove the team
+//        if (whichTeam == masterVect.at(stadNum).teamVect.at(x).name)
+//        {
+//            movingTeam = masterVect.at(stadNum).teamVect.at(x);
+//            masterVect.at(stadNum)
+//                    .teamVect.erase(masterVect.at(stadNum)
+//                                    .teamVect.begin() + x);
+//        }
+//    }
+//    movingTeam.stadNum = newStadNum;
+//    masterVect.at(newStadNum).teamVect.push_back(movingTeam);
+//}
+
+//void Data::delTeam(int stadNum, QString whichTeam)
+////Deletes a team
+//{
+//    //Search for team at the stadium (data set is naturally miniscule)
+//    for (unsigned int x = 0; x < masterVect.at(stadNum).teamVect.size();
+//         x++)
+//    {
+//        //If found, remove the team
+//        if (whichTeam == masterVect.at(stadNum).teamVect.at(x).name)
+//        {
+//            masterVect.at(stadNum)
+//                    .teamVect.erase(masterVect.at(stadNum)
+//                                    .teamVect.begin() + x);
+//        }
+//    }
+//}
 
 void Data::addSouv(int stadNum, QString newName, double newPrice)
 //Adds a souvenir to a stadium
@@ -146,7 +153,7 @@ void Data::addSouv(int stadNum, QString newName, double newPrice)
 }
 
 void Data::addDist(int x, int y, int newDist)
-//Adds a new distance into both sides of the matrix
+//Changes a value in the matrix and its symmetrical counterpart
 {
     //Fill in the data to there and back
     matrix[x][y] = newDist;
@@ -571,6 +578,14 @@ unsigned int Data::teamSize(int stadNum) const
 //Returns number of teams at a stadium
 {return masterVect.at(stadNum).teamVect.size();}
 
+QString Data::getTeamName(int stadNum) const
+//Returns team name
+{return masterVect.at(stadNum).teamVect.at(0).name;}
+
+QString Data::getTeamLeague(int stadNum) const
+//Returns a team's league
+{return masterVect.at(stadNum).teamVect.at(0).league;}
+
 QString Data::getTeamName(int stadNum, int teamIndex) const
 {return masterVect.at(stadNum).teamVect.at(teamIndex).name;}
 
@@ -588,3 +603,112 @@ QString Data::getSouvName(int stadNum, int souvNum) const
 
 double Data::getSouvPrice(int stadNum, int souvNum) const
 {return masterVect.at(stadNum).souvVect.at(souvNum).price;}
+
+int Data::getDistBetween(unsigned int here, unsigned int there) const
+//Returns distance between two stadiums
+{return matrix[here][there];}
+
+void ItinObj::pushCart(int souvNum, int qty)
+//Pushes a souvenir to the cart at the current stadium
+{
+    itinSouvList.push_back(souvNum);
+    itinSouvQuant.push_back(qty);
+}
+
+void ItinObj::delCart(int souvNum)
+//Deletes a souvenir from the cart
+{
+    bool found = false; //Validation boolean
+
+    //Look for the souvenir in the itinerary
+    for (unsigned int x = 0; x < itinSouvList.size(); x++)
+    {
+        //If the souvenir in question is found
+        if (itinSouvList.at(x) == souvNum)
+        {
+            //Delete it
+            std::vector<int>::iterator it = itinSouvList.begin() + x;
+            itinSouvList.erase(it);
+            itinSouvQuant.erase(it);
+
+            //Skip exception
+            found = true;
+
+            //Exit loop
+            x = itinSouvList.size();
+        }
+    }
+    //Throw an exception if souvenir is not found
+    if (!found)
+    {
+        //THROW AN EXCEPTION HERE
+        qDebug() << "Cannot find souvenir in cart to delete";
+    }
+}
+
+void ItinObj::chgQty(int souvNum, int newQty)
+//Changes the quantity of the indexed souvenir
+{
+    bool found = false; //Validation boolean
+
+    //Look for the souvenir in the itinerary
+    for (unsigned int x = 0; x < itinSouvList.size(); x++)
+    {
+        //If the souvenir in question is found
+        if (itinSouvList.at(x) == souvNum)
+        {
+            //Change its quantity
+            itinSouvQuant.at(x) = newQty;
+
+            //Skip exception
+            found = true;
+
+            //Exit loop
+            x = itinSouvList.size();
+        }
+    }
+    //Throw an exception if souvenir is not found
+    if (!found)
+    {
+        //THROW AN EXCEPTION HERE
+        qDebug() << "Cannot find souvenir in cart to change";
+    }
+}
+
+int ItinObj::getStadNum() const
+//Returns stadium number
+{return stadNum;}
+
+int ItinObj::getCartSize() const
+//Returns the size of the shopping cart at the current stadium
+{return itinSouvList.size();}
+
+int ItinObj::getSouvNumAt(int index) const
+//Returns the souvenir at index
+{return itinSouvList.at(index);}
+
+int ItinObj::getQtyFor(int souvNum) const
+//Returns the quantity of the souvenir bought
+{
+    int quantity = -1;   //Quantity of a souvenir in the cart
+
+    //Search for souvenir in itin
+    for (unsigned int x = 0; x < itinSouvList.size(); x++)
+    {
+        //If the souvenir is found, prep to return its quantity
+        if (souvNum == itinSouvList.at(x))
+        {
+            quantity = itinSouvQuant.at(x);
+            x = itinSouvList.size(); //Leave loop
+        }
+    }
+
+    //Throw an exception if souvenir isn't found
+    if (quantity < 0)
+    {
+        //THROW AN EXCEPTION HERE
+        qDebug() << "Cannot find souvenir in cart";
+    }
+
+    return quantity;
+}

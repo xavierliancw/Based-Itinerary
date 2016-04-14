@@ -10,9 +10,12 @@
 #include <QProcess>
 #include <QMessageBox>
 #include <QFileSystemModel>
+#include <QSignalBlocker>
 
 #include "datastructures.h"
 #include "adminlogin.h"
+#include "customimplementations.h"
+#include "editdistances.h"
 
 namespace Ui {
 class PrimeWin;
@@ -33,8 +36,16 @@ public:
     //Refreshes detail labels on the home page (Index 1)
     void refreshHomeDetails();
 
+    //Refreshes admin stadium table
+    void refreshAdminTbl();
+
+    //Validates phone numbers and returns a formatted number
+    QString phoneCheck(QString phone);
+
 public slots:
     void catchLoginStatus(bool status); //Catches login signal
+
+    void catchDataUpdate(Data caughtThis);
 
 private slots:
 /*PAGE INDEX============================================================*/
@@ -59,7 +70,13 @@ private slots:
 
     void on_homePlanTripBt_clicked();
 
+    void on_homeNationalCB_toggled(bool checked);
+
+    void on_homeAmericanCB_toggled(bool checked);
 //Index2==================================================================
+    void on_itinStartOverBt_clicked();
+
+    void on_itinOptimizeBt_clicked();
 
 //Index3==================================================================
 
@@ -68,6 +85,10 @@ private slots:
 
     void on_adminBaseBt_clicked();
 
+    void on_adminDistBt_clicked();
+
+    void on_adminStadTbl_cellChanged(int row, int column);
+
 //Index5==================================================================
     void on_dataBackBt_clicked();
 
@@ -75,6 +96,8 @@ private slots:
 
 private:
     Ui::PrimeWin *ui;           //User interface
+
+    std::list<ItinObj> itinList;
 
     Data data;                  //Interface for all data structures
     QFileSystemModel *dirmodel; //Model of file directory

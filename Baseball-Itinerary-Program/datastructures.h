@@ -47,8 +47,21 @@ public:
 /*======================================================================*/
 class ItinObj
 {
-    int NOTIMPLEMENTED()
-    {int unimplemented;int NOTIMPLEMENTED;return unimplemented;}
+public:
+    void pushCart(int souvNum, int qty);//Pushes a souv into the cart
+    void delCart(int souvNum);          //Removes a souv from the cart
+    void chgQty(int souvNum, int newQty); //Changes qty of souv in cart
+
+    int getStadNum() const;             //Returns stadNum
+    int getCartSize() const;            //Gets size of shopping cart
+    int getSouvNumAt(int index) const;  //Gets souvNum at index
+    int getQtyFor(int souvNum) const;   //Returns quantity of a souv
+
+private:
+    int stadNum;                    //current stadium
+
+    std::vector<int> itinSouvList;  //list of souviners bought
+    std::vector<int> itinSouvQuant; //quantity of each souviner
 };
 /*======================================================================*/
 /*************************************************************************
@@ -78,19 +91,22 @@ public:
     void modStadType(int stadNum, QString newType);
     void delStad(int stadNum);
 
-    void addTeam(int stadNum, QString newTeam, QString newLeague);
-    void modTeam(int stadNum, QString oldTeamName, QString newTeamName);
-    void modTeam(int stadNum, QString whichTeam, int newStadNum);
-    void delTeam(int stadNum, QString whichTeam);
+    //Modifies data pertaining to teams
+    void addTeam(int stadNum, QString newTeam, QString newLeague);//Legacy implementation
+    void modTeam(int stadNum, QString newTeamName);//Legacy implementation
+    void modLeague(int stadNum, QString newLeague);//Legacy implementation
+
+    //Legacy methods
+//    void modTeam(int stadNum, QString oldTeamName, QString newTeamName);
+//    void modTeam(int stadNum, QString whichTeam, int newStadNum);
+//    void delTeam(int stadNum, QString whichTeam);
 
     void addSouv(int stadNum, QString newName, double newPrice);
     void modSouvName();
     void modSouvPrice();
 
-    //Adds a new distance into both sides of the distance matrix
+    //Changes a value in the matrix and its symmetrical counterpart
     void addDist(int x, int y, int newDist);
-    void modDist();
-    void delDist();
 
     //Returns number of stadiums in the program
     unsigned int size() const;
@@ -102,18 +118,24 @@ public:
     QString getStadGrass(int stadNum) const;
     QString getStadType(int stadNum) const;
 
-    //Returns number of teams at a stadium
-    unsigned int teamSize(int stadNum) const;
-    QString getTeamName(int stadNum, int teamIndex) const;
-    QString getTeamLeague(int stadNum, int teamIndex) const;
+    //The following returns information about teams
+    unsigned int teamSize(int stadNum) const;//Vital legacy
+    QString getTeamName(int stadNum) const;//Legacy implementation
+    QString getTeamLeague(int stadNum) const;//Legacy implementation
+    QString getTeamName(int stadNum, int teamIndex) const;//Legacy
+    QString getTeamLeague(int stadNum, int teamIndex) const;//Legacy
     int getTeamStad() const;
 
     QString getSouvName(int stadNum, int souvNum) const;
     double getSouvPrice(int stadNum, int souvNum) const;
 
-    double getDistBetween() const;
+    //Returns distance between two stadiums
+    int getDistBetween(unsigned int here, unsigned int there) const;
 
     int getMST() const;
+
+    //Fill data structures with information from SQL database
+    void importSQL();
 
     //Export contents of all databases to SQL database
     bool exportSQL();
@@ -125,8 +147,7 @@ private:
     std::vector<StadObj> masterVect;        //Vector of all stadiums
     std::vector< std::vector<int> > matrix; //2D matrix of all distances
 
-    //Fill data structures with information from SQL database
-    void importSQL();
+
 };
 
 #endif // DATASTRUCTURES_H
