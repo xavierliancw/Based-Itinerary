@@ -8,6 +8,12 @@ Data::~Data()
 //Destructor
 {}
 
+// Copy vector from master
+void Data::copyVector(std::vector<StadObj>& copy)
+{
+    copy = masterVect;
+}
+
 void Data::addStad(QString name, QString address,
                    QString phone, QString opened, int capacity,
                    QString grass, QString type)

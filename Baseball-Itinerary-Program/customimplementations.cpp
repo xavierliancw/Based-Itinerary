@@ -294,7 +294,7 @@ int MinHeap<data>::rChildOf(int index)
 //========================================================================
 
 /*Dijkstra METHODS*/
-Dijkstra::Dijkstra(const vector <vector<int> > &inMatrix)
+Dijkstra::Dijkstra(const vector<vector<int> > &inMatrix)
 //Construct by copying the matrix
 {
     matrix = inMatrix;

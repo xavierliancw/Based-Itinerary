@@ -79,6 +79,9 @@ public:
     //Default destructor
     ~Data();
 
+    // Copy master vector to prevent altering master
+    void copyVector(std::vector<StadObj>& copy);
+
     //Add a stadium object to the vector
     void addStad(QString name, QString address,
                  QString phone, QString opened, int capacity,
