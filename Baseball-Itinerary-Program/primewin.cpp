@@ -178,6 +178,54 @@ void PrimeWin::refreshHomeDetails()
     ui->homeTypeLbl->setText(data.getStadType(stadNum));
 }
 
+void PrimeWin::refreshItinBuilder()
+//Refreshes the view of the itinerary builder (Index 2)
+{
+    //Clear table
+    ui->tableWidget->clear();
+
+    for(unsigned int i = 0; i < data.size(); i ++)
+    {
+        //Create new row
+        ui->tableWidget->insertRow(ui->tableWidget->rowCount());
+        //Put the stadium name in column 1
+        ui->tableWidget->setItem(i, 0,
+                            new QTableWidgetItem(data.getStadName(i)));
+        //Put the team name in colum 2
+        ui->tableWidget->setItem(i, 1,
+                            new QTableWidgetItem(data.getTeamName(i,0)));
+
+        //Create an add button
+        QPushButton *addBt = new QPushButton();
+        addBt->setText("Add");
+        //Set a the button to retrieve the stadium's num
+        addBt->setProperty("stadNum", i);
+        //Connect each button to addItinCatcher
+        connect(addBt, SIGNAL(clicked(bool)),
+                this, SLOT(catchAddItin()));
+        //Put the add button in column 3
+        ui->tableWidget->setCellWidget(i, 2, addBt);
+    }
+
+    ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "Stadium"
+                                               << "Team"
+                                               << "Add/Remove");
+}
+
+void PrimeWin::refreshItin()
+//Refreshes the itineray view (Index 2)
+{
+    //Clear itinerary view
+    ui->listWidget->clear();
+
+    //Populate List
+    for(std::list<ItinObj>::iterator it = itinList.begin();
+        it != itinList.end(); it++)
+    {
+        ui->listWidget->addItem(data.getStadName(it->getStadNum()));
+    }
+}
+
 void PrimeWin::refreshAdminTbl()
 //Refreshes admin stadium table
 {
@@ -373,6 +421,55 @@ void PrimeWin::catchDataUpdate(Data caughtThis)
 //Catches signal to update data structures
 {data = caughtThis;}
 
+void PrimeWin::catchAddItin()
+//Catches signal to update itin
+{
+//    //Block signals to prevent unintended behavior
+//    const QSignalBlocker blockItinTbl(ui->itineraryTbl);
+
+    //Create button object to emululate the button that was pushed
+    QPushButton *addBt = qobject_cast<QPushButton*>(sender());
+
+    //Get the stadium's num from the button's property
+    int stadNum = addBt->property("stadNum").toInt();
+
+    //If adding to itin
+    if (addBt->text() == "Add")
+    {
+        //Add to the itin
+        itinList.push_back(ItinObj(stadNum));
+
+        //?????????show possible souvenirs??????????
+
+        //Change the bt's text to remove
+        addBt->setText("Remove");
+    }
+    //Otherwise, remove from the itin
+    else if (addBt->text() == "Remove")
+    {
+        //Loop until stadium is found
+        for (std::list<ItinObj>::iterator it = itinList.begin();
+             it != itinList.end(); it++)
+        {
+            //Check to see if stadium is found
+            if (it->getStadNum() == stadNum)
+            {
+                //Remove the stadium from the itinerary queue
+                itinList.erase(it);
+
+                //Leave loop
+                it = itinList.end();
+            }
+        }
+
+        //Change the bt's text back to add
+        addBt->setText("Add");
+    }
+
+    refreshItin();
+    //?????????show possible souvenirs??????????
+}
+
 /*PAGE INDEX============================================================*/
 //Index 0 = start page
 //Index 1 = home page
@@ -392,7 +489,10 @@ void PrimeWin::on_startInfoBt_clicked()
 
 void PrimeWin::on_startTripBt_clicked()
 //Index 0 to 2
-{ui->stackWidg->setCurrentIndex(2);}
+{
+    refreshItinBuilder();
+    ui->stackWidg->setCurrentIndex(2);
+}
 
 void PrimeWin::on_adminLoginBt_clicked()
 //Pulls up admin login window
@@ -418,15 +518,17 @@ void PrimeWin::on_homeStadTbl_itemSelectionChanged()
 
 //Index1 - Home Page======================================================
 void PrimeWin::on_homeBackBt_clicked()
+
 //Index 1 to 0
 {ui->stackWidg->setCurrentIndex(0);}
 
 void PrimeWin::on_homePlanTripBt_clicked()
 //Index 1 to 2
-{ui->stackWidg->setCurrentIndex(2);}
+{
+    refreshItinBuilder();
+    ui->stackWidg->setCurrentIndex(2);
+}
 
-//Toggles a filter to filter out American League teams and only
-//displays American league teams.
 void PrimeWin::on_homeNationalCB_toggled(bool checked)
 {
     //IF - Checks to see if our Checkbox is checked. If it is then
@@ -469,8 +571,6 @@ void PrimeWin::on_homeNationalCB_toggled(bool checked)
     }// end else
 }// end void PrimeWin::on_homeNationalCB_toggled(bool checked)
 
-
-
 void PrimeWin::on_homeAmericanCB_toggled(bool checked)
 {
     //IF - Checks to see if our Checkbox is checked. If it is then
@@ -512,6 +612,209 @@ void PrimeWin::on_homeAmericanCB_toggled(bool checked)
 
     }// end else
 }//end void on_homeAmericanCB_toggled(bool checked)
+
+///* This function swaps two numbers
+//   Arguments :
+//             a, b - the numbers to be swapped
+//   */
+//void PrimeWin::swap(std::vector<StadObj> sortV, int &a, int &b)
+//{
+//    StadObj temp;
+//    temp = sortV[a];
+//    sortV[a] = sortV[b];
+//    sortV[b] = temp;
+//}
+
+///* This function does the quicksort
+//   Arguments :
+//             vector - the array to be sorted
+//             startIndex - index of the first element of the section
+//             endIndex - index of the last element of the section
+//*/
+//void PrimeWin::QuickSort(std::vector<StadObj> sortV, int startIndex, int endIndex)
+//{
+//    StadObj pivot = sortV[startIndex];                  //pivot element is the leftmost element
+//    int splitPoint;
+
+//    if(endIndex > startIndex)                         //if they are equal, it means there is
+//                                                      //only one element and quicksort's job
+//                                                      //here is finished
+//    {
+//        splitPoint = SplitArray(sortV, pivot, startIndex, endIndex);
+//                                                      //SplitArray() returns the position where
+//                                                      //pivot belongs to
+//        sortV[splitPoint] = pivot;
+//        QuickSort(sortV, startIndex, splitPoint-1);   //Quick sort first half
+//        QuickSort(sortV, splitPoint+1, endIndex);    //Quick sort second half
+//    }
+//}
+///* This function splits the array around the pivot
+//   Arguments :
+//             array - the array to be split
+//             pivot - pivot element whose position will be returned
+//             startIndex - index of the first element of the section
+//             endIndex - index of the last element of the section
+//   Returns :
+//           the position of the pivot
+//*/
+//int PrimeWin::SplitArray(std::vector<StadObj> sortV, StadObj pivot, int startIndex, int endIndex)
+//{
+//    int leftBoundary = startIndex;
+//    int rightBoundary = endIndex;
+
+//    while(leftBoundary < rightBoundary)             //shuttle pivot until the boundaries meet
+//    {
+//         while(pivot.name < sortV[rightBoundary].name      //keep moving until a lesser element is found
+//                && rightBoundary > leftBoundary)   //or until the leftBoundary is reached
+//         {
+//              rightBoundary--;                      //move left
+//         }
+
+//         swap(sortV, leftBoundary, rightBoundary);
+
+//         while(pivot.name >= sortV[leftBoundary].name       //keep moving until a greater or equal element is found
+//                && leftBoundary < rightBoundary)   //or until the rightBoundary is reached
+//         {
+//              leftBoundary++;                        //move right
+//         }
+//         swap(sortV, rightBoundary, leftBoundary);
+//    }
+//    return leftBoundary;                              //leftBoundary is the split point because
+//                                                      //the above while loop exits only when
+//                                                      //leftBoundary and rightBoundary are equal
+//}
+
+
+void PrimeWin::InsertionSort (std::vector<StadObj>& sortV)
+{
+     int j;
+     StadObj temp; // stores temporary object for swap
+
+    // FOR - go until i reaches size
+    for (int i = 0; i < sortV.size(); i++)
+    {
+        j = i;
+        // WHILE - while j is greater than 0 and the object.name after j is less than current position
+        while (j > 0 && sortV[j].name < sortV[j-1].name)
+        {
+              temp = sortV[j];          // store for swap
+              sortV[j] = sortV[j-1];    // swap(copy into place)
+              sortV[j-1] = temp;        // store back in where appropriate
+              j--;
+        } // end of while
+    } // end of for
+} // end of method
+
+
+// TOGGLE FOR SORTING ALPHABETICALLY
+void PrimeWin::on_homeNameRd_toggled(bool checked)
+{
+    // Vector to store alphabetical vector
+    std::vector<StadObj> alphaSortedVector;
+
+    data.copyVector(alphaSortedVector); // copies master into new vector
+
+//    QuickSort(alphaSortedVector, 0, alphaSortedVector.size()-1)
+    InsertionSort(alphaSortedVector);
+
+    int missingCompensator = 0; //Compensates for missing teams
+
+    //REFRESH STADIUM TABLE
+    ui->homeStadTbl->clear();
+    ui->homeStadTbl->setRowCount(0);
+    ui->homeStadTbl->setColumnCount(5);
+
+    //Populate the stadium table
+    for (unsigned int x=0;x<data.size();x++)
+    {
+        //Add a row
+        ui->homeStadTbl->insertRow(ui->homeStadTbl->rowCount());
+
+        //Determine if compensation is needed
+        if (data.teamSize(x) > 0)
+        {
+            missingCompensator = 0;
+        }
+        else
+        {
+            missingCompensator = 1;
+        }
+
+        //Loop until all teams at the stadium are added
+        for (unsigned int t=0;t<data.teamSize(x)+missingCompensator;t++)
+        {
+            //Add a new row after listing first team if stad has > 1 team
+            if (t != 0)
+            {
+                ui->homeStadTbl->insertRow(ui->homeStadTbl->rowCount());
+            }
+            //Add stadNum to hidden first col
+            ui->homeStadTbl
+              ->setItem(ui->homeStadTbl
+                        ->rowCount()-1,0,
+                        new QTableWidgetItem(QString::number(x)));
+
+            //If there are teams here
+            if (data.teamSize(x) != 0)
+            {
+                //Add teamNum to hidden second col
+                ui->homeStadTbl
+                        ->setItem(ui->homeStadTbl->rowCount()-1,1,
+                                  new
+                                  QTableWidgetItem(QString::number(t)));
+            }
+            //If there's no team at this stadium
+            else
+            {
+                //Add -1 to hidden second col
+                ui->homeStadTbl
+                        ->setItem(ui->homeStadTbl->rowCount()-1,1,
+                                  new
+                                  QTableWidgetItem(QString::number(-1)));
+            }
+
+            //Add field picture to third col
+            int UNIMPLEMENTED;
+            ui->homeStadTbl->setItem(ui->homeStadTbl->rowCount()-1,2,
+                                     new QTableWidgetItem("NO_PIC"));
+
+            //Add stadium name to fourth col
+            ui->homeStadTbl
+              ->setItem(ui->homeStadTbl
+                        ->rowCount()-1,3,
+                        new QTableWidgetItem(alphaSortedVector.at(x).name));
+
+            //If there are teams here, add the team name
+            if (data.teamSize(x) != 0)
+            {
+                //Add team name to fifth col
+                ui->homeStadTbl
+                        ->setItem(ui->homeStadTbl->rowCount()-1,4,
+                                  new
+                                  QTableWidgetItem(
+                                      alphaSortedVector.at(x).teamVect.at(t).name));
+            }
+            else
+            {
+                ui->homeStadTbl
+                        ->setItem(ui->homeStadTbl->rowCount()-1,4,
+                                  new QTableWidgetItem(""));
+            }
+        }
+    }
+    //Prepare table for viewing
+    ui->homeStadTbl->hideColumn(0);
+    ui->homeStadTbl->hideColumn(1);
+    ui->homeStadTbl->resizeColumnsToContents();
+    ui->homeStadTbl->setFocus();
+
+    //Click on first row to prevent uninitialized labels
+    if (ui->homeStadTbl->rowCount() > 0)
+    {
+        ui->homeStadTbl->selectRow(0);
+        refreshHomeDetails();
+    }
+}
 
 //Index2 - Itinerary Page=================================================
 void PrimeWin::on_itinStartOverBt_clicked()
@@ -787,3 +1090,5 @@ void PrimeWin::on_dataTxtBt_clicked()
                              QMessageBox::Ok);
     }
 }
+
+

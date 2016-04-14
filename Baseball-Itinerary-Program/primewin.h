@@ -36,6 +36,12 @@ public:
     //Refreshes detail labels on the home page (Index 1)
     void refreshHomeDetails();
 
+    //Refreshes the view of the itinerary builder (Index 2)
+    void refreshItinBuilder();
+
+    //Refreshes the itineray view (Index 2)
+    void refreshItin();
+
     //Refreshes admin stadium table
     void refreshAdminTbl();
 
@@ -46,6 +52,8 @@ public slots:
     void catchLoginStatus(bool status); //Catches login signal
 
     void catchDataUpdate(Data caughtThis);
+
+    void catchAddItin();
 
 private slots:
 /*PAGE INDEX============================================================*/
@@ -70,9 +78,20 @@ private slots:
 
     void on_homePlanTripBt_clicked();
 
+
     void on_homeNationalCB_toggled(bool checked);
 
     void on_homeAmericanCB_toggled(bool checked);
+
+
+    // Quicksort Unimplemented and not working
+//    void QuickSort(std::vector<StadObj> sortV, int startIndex, int endIndex);
+//    int SplitArray(std::vector<StadObj> sortV, StadObj pivotValue, int startIndex, int endIndex);
+    void InsertionSort(std::vector<StadObj>& sortV);
+//    void swap(std::vector<StadObj> sortV, int &a, int &b);
+    void on_homeNameRd_toggled(bool checked);
+
+
 //Index2==================================================================
     void on_itinStartOverBt_clicked();
 
@@ -93,6 +112,8 @@ private slots:
     void on_dataBackBt_clicked();
 
     void on_dataTxtBt_clicked();
+
+
 
 private:
     Ui::PrimeWin *ui;           //User interface

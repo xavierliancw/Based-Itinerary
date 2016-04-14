@@ -48,6 +48,7 @@ public:
 class ItinObj
 {
 public:
+    ItinObj(int stadium);
     void pushCart(int souvNum, int qty);//Pushes a souv into the cart
     void delCart(int souvNum);          //Removes a souv from the cart
     void chgQty(int souvNum, int newQty); //Changes qty of souv in cart
@@ -77,6 +78,9 @@ public:
     Data();
     //Default destructor
     ~Data();
+
+    // Copy master vector to prevent altering master
+    void copyVector(std::vector<StadObj>& copy);
 
     //Add a stadium object to the vector
     void addStad(QString name, QString address,
