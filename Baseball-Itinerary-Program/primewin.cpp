@@ -444,7 +444,7 @@ void PrimeWin::on_homeNationalCB_toggled(bool checked)
 
             //IF - Here we find if the team league at the team indicated then
             //     it will hide all the rows that are American League team.
-            if(data.getTeamLeague(vecIndex, 0)=="American")
+            if(data.getTeamLeague(vecIndex, 0).toLower()=="american")
             {
                 ui->homeStadTbl->setRowHidden(i, true);
             } //end if(data.getTeamLeague(vecIndex, 0)=="American")
@@ -461,7 +461,31 @@ void PrimeWin::on_homeNationalCB_toggled(bool checked)
             //    it will 'unhide' the row.
             if(ui->homeStadTbl->isRowHidden(i))
             {
-                ui->homeStadTbl->setRowHidden(i, false);
+                if(ui->homeTurfCB->isChecked())
+                {
+                    if(data.getStadGrass(i).toLower() !="astro turf")
+                    {
+                        ui->homeStadTbl->setRowHidden(i, false);
+                    }
+                }
+                else if(ui->homeSynthCB->isChecked())
+                {
+                    if(data.getStadGrass(i).toLower()!="grass")
+                    {
+                        ui->homeStadTbl->setRowHidden(i, false);
+                    }
+                }
+                else if(ui->homeAmericanCB->isChecked())
+                {
+                    if(data.getTeamLeague(i, 0).toLower()!="national")
+                    {
+                        ui->homeStadTbl->setRowHidden(i, false);
+                    }
+                }
+                else
+                {
+                    ui->homeStadTbl->setRowHidden(i, false);
+                }
             }// end if(ui->homeStadTbl->isRowHidden(i))
 
         }// end for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
@@ -488,7 +512,7 @@ void PrimeWin::on_homeAmericanCB_toggled(bool checked)
 
             //IF - Here we find if the team league at the team indicated then
             //     it will hide all the rows that are National League team.
-            if(data.getTeamLeague(vecIndex, 0)=="National")
+            if(data.getTeamLeague(vecIndex, 0).toLower()=="national")
             {
                 ui->homeStadTbl->setRowHidden(i, true);
             } //end if(data.getTeamLeague(vecIndex, 0)=="American")
@@ -505,7 +529,31 @@ void PrimeWin::on_homeAmericanCB_toggled(bool checked)
             //    it will 'unhide' the row.
             if(ui->homeStadTbl->isRowHidden(i))
             {
-                ui->homeStadTbl->setRowHidden(i, false);
+                if(ui->homeTurfCB->isChecked())
+                {
+                    if(data.getStadGrass(i).toLower() !="astro turf")
+                    {
+                        ui->homeStadTbl->setRowHidden(i, false);
+                    }
+                }
+                else if(ui->homeSynthCB->isChecked())
+                {
+                    if(data.getStadGrass(i).toLower()!="grass")
+                    {
+                        ui->homeStadTbl->setRowHidden(i, false);
+                    }
+                }
+                else if(ui->homeNationalCB->isChecked())
+                {
+                    if(data.getTeamLeague(i, 0).toLower()!="american")
+                    {
+                        ui->homeStadTbl->setRowHidden(i, false);
+                    }
+                }
+                else
+                {
+                    ui->homeStadTbl->setRowHidden(i, false);
+                }
             }// end if(ui->homeStadTbl->isRowHidden(i))
 
         }// end for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
@@ -532,7 +580,7 @@ void PrimeWin::on_homeTurfCB_toggled(bool checked)
 
             //IF-The item at the given index has 'grass' then it will filter it
             //   out the grass.
-            if(data.getStadGrass(vecIndex) == "Astro Turf")
+            if(data.getStadGrass(vecIndex).toLower() == "astro turf")
             {
                 ui->homeStadTbl->setRowHidden(i, true);
             }// if(data.getStadGrass(vecIndex) == "Astro Turf")
@@ -549,7 +597,37 @@ void PrimeWin::on_homeTurfCB_toggled(bool checked)
             //    it will 'unhide' the row.
             if(ui->homeStadTbl->isRowHidden(i))
             {
-                ui->homeStadTbl->setRowHidden(i, false);
+                //IF- if the row at the given index is hidden then here
+                //    it will 'unhide' the row.
+                if(ui->homeStadTbl->isRowHidden(i))
+                {
+                    if(ui->homeNationalCB->isChecked())
+                    {
+                        if(data.getTeamLeague(i, 0).toLower() !="american")
+                        {
+                            ui->homeStadTbl->setRowHidden(i, false);
+                        }
+                    }
+                    else if(ui->homeSynthCB->isChecked())
+                    {
+                        if(data.getStadGrass(i).toLower()!="astro turf")
+                        {
+                            ui->homeStadTbl->setRowHidden(i, false);
+                        }
+                    }
+                    else if(ui->homeAmericanCB->isChecked())
+                    {
+                        if(data.getTeamLeague(i, 0).toLower()!="national")
+                        {
+                            ui->homeStadTbl->setRowHidden(i, false);
+                        }
+                    }
+                    else
+                    {
+                        ui->homeStadTbl->setRowHidden(i, false);
+                    }
+                }// end if(ui->homeStadTbl->isRowHidden(i))
+
             }// end if(ui->homeStadTbl->isRowHidden(i))
 
         }// end for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
@@ -557,6 +635,81 @@ void PrimeWin::on_homeTurfCB_toggled(bool checked)
     }// end else
 
 }// end void PrimeWin::on_homeTurfCB_toggled(bool checked)
+
+
+void PrimeWin::on_homeSynthCB_toggled(bool checked)
+{
+    //IF-This if statement will look for the checkbox that we made is checked
+    //   and if it is then it will look for all stadiums that use natural grass
+    //   and filter them out.
+    if(checked)
+    {
+        //FOR-Loops through each item of each table to find the items in the
+        //    homeStadTble to filter out.
+
+        for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
+        {
+            //This QString will be used to find our vector index.
+            QString strIndex = ui->homeStadTbl->item(i, 0)->text();
+
+            int vecIndex = strIndex.toInt();    //Convert strIndex to an int.
+
+            //IF-The item at the given index has 'grass' then it will filter it
+            //   out the grass.
+            if(data.getStadGrass(vecIndex).toLower() == "grass")
+            {
+                ui->homeStadTbl->setRowHidden(i, true);
+            }// if(data.getStadGrass(vecIndex) == "Astro Turf")
+
+        }// end for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
+
+    }// end if(checked)
+    else
+    {
+        //FOR LOOP- This loop will traverse the homeStadTbl
+        for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
+        {
+            //IF- if the row at the given index is hidden then here
+            //    it will 'unhide' the row.
+            if(ui->homeStadTbl->isRowHidden(i))
+            {
+                //IF- if the row at the given index is hidden then here
+                //    it will 'unhide' the row.
+                if(ui->homeStadTbl->isRowHidden(i))
+                {
+                    if(ui->homeNationalCB->isChecked())
+                    {
+                        if(data.getTeamLeague(i, 0).toLower() !="american")
+                        {
+                            ui->homeStadTbl->setRowHidden(i, false);
+                        }
+                    }
+                    else if(ui->homeTurfCB->isChecked())
+                    {
+                        if(data.getStadGrass(i).toLower()!="astro turf")
+                        {
+                            ui->homeStadTbl->setRowHidden(i, false);
+                        }
+                    }
+                    else if(ui->homeAmericanCB->isChecked())
+                    {
+                        if(data.getTeamLeague(i, 0).toLower()!="national")
+                        {
+                            ui->homeStadTbl->setRowHidden(i, false);
+                        }
+                    }
+                    else
+                    {
+                        ui->homeStadTbl->setRowHidden(i, false);
+                    }
+                }// end if(ui->homeStadTbl->isRowHidden(i))
+
+            }// end if(ui->homeStadTbl->isRowHidden(i))
+
+        }// end for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
+
+    }// end else
+}
 
 //Index2 - Itinerary Page=================================================
 void PrimeWin::on_itinStartOverBt_clicked()
@@ -832,5 +985,6 @@ void PrimeWin::on_dataTxtBt_clicked()
                              QMessageBox::Ok);
     }
 }
+
 
 

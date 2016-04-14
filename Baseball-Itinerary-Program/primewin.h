@@ -96,6 +96,8 @@ private slots:
 
     void on_dataTxtBt_clicked();
 
+    void on_homeSynthCB_toggled(bool checked);
+
 private:
     Ui::PrimeWin *ui;           //User interface
 
