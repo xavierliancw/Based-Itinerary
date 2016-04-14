@@ -1,0 +1,36 @@
+WHEN YOU CREATE A FUNCTION:
+Make sure the FIRST thing you do is move it to a logical location in the code
+For example, if you create a new button in admin page, put the slot for that button under the correct comment heading in primewin.cpp and in primewin.h
+(it would be under the comment line, "//Index4=========...")
+
+
+WORKING WITH GIT:
+~ Pick a story to work on
+~ Follow the instructions from the link on the README
+~ When you think you're done, CREATE A LOCAL BACKUP
+~ Go to GitHub, merge master INTO your branch (not the other way around)
+~ Pull the new changes
+~ Resolve any conflicts
+~ Push up to your branch
+~ Create a pull request
+
+
+WHEN YOU COMMIT:
+Mention your story somewhere in your commit message. E.g. "#10" for issue 10.
+
+
+IF YOU DON'T KNOW HOW TO DO SOMETHING:
+LABEL THE STORY WITH "question" AND ADD A COMMENT. (on waffle)
+Post something in the hangout.
+
+
+IF THERE'S A TASK YOU CAN'T FINISH:
+Label the story "help wanted" and post a comment on waffle
+Post something in the hangout as well.
+
+
+QMESSAGEBOXES LOOK LIKE THIS:
+QMessageBox::warning(this, tr("My Application"),
+                     tr("The document has been modified.\n"
+                        "Do you want to save your changes?"),
+                     QMessageBox::Save | QMessageBox::Discard;

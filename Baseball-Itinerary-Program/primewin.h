@@ -6,8 +6,16 @@
 #include <QShortcut>
 #include <QSqlDatabase>
 #include <QSqlQuery>
+#include <QDir>
+#include <QProcess>
+#include <QMessageBox>
+#include <QFileSystemModel>
+#include <QSignalBlocker>
 
+#include "datastructures.h"
 #include "adminlogin.h"
+#include "customimplementations.h"
+#include "editdistances.h"
 
 namespace Ui {
 class PrimeWin;
@@ -22,8 +30,22 @@ public:
     ~PrimeWin();
     PrimeWin(QWidget *parent, int dummyVarForNow);
 
+    //Refreshes the view of everything on the home page (Index 1)
+    void refreshHome();
+
+    //Refreshes detail labels on the home page (Index 1)
+    void refreshHomeDetails();
+
+    //Refreshes admin stadium table
+    void refreshAdminTbl();
+
+    //Validates phone numbers and returns a formatted number
+    QString phoneCheck(QString phone);
+
 public slots:
-    void catchLoginStatus(bool status);
+    void catchLoginStatus(bool status); //Catches login signal
+
+    void catchDataUpdate(Data caughtThis);
 
 private slots:
 /*PAGE INDEX============================================================*/
@@ -32,6 +54,7 @@ private slots:
 //Index 2 = itinerary page
 //Index 3 = summary page
 //Index 4 = admin home page
+//Index 5 = database management page
 /*======================================================================*/
 //Index0==================================================================
     void on_startInfoBt_clicked();
@@ -40,16 +63,44 @@ private slots:
 
     void on_adminLoginBt_clicked();
 
+    void on_homeStadTbl_itemSelectionChanged();
+
 //Index1==================================================================
     void on_homeBackBt_clicked();
 
     void on_homePlanTripBt_clicked();
 
-//Index2==================================================================
+    void on_homeNationalCB_toggled(bool checked);
 
+    void on_homeAmericanCB_toggled(bool checked);
+//Index2==================================================================
+    void on_itinStartOverBt_clicked();
+
+    void on_itinOptimizeBt_clicked();
+
+//Index3==================================================================
+
+//Index4==================================================================
+    void on_adminRestartBt_clicked();
+
+    void on_adminBaseBt_clicked();
+
+    void on_adminDistBt_clicked();
+
+    void on_adminStadTbl_cellChanged(int row, int column);
+
+//Index5==================================================================
+    void on_dataBackBt_clicked();
+
+    void on_dataTxtBt_clicked();
 
 private:
-    Ui::PrimeWin *ui;
+    Ui::PrimeWin *ui;           //User interface
+
+    std::list<ItinObj> itinList;
+
+    Data data;                  //Interface for all data structures
+    QFileSystemModel *dirmodel; //Model of file directory
 };
 
 #endif // PRIMEWIN_H
