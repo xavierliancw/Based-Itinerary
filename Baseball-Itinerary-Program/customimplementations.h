@@ -111,7 +111,7 @@ private:
 class Dijkstra
 {
 public:
-    Dijkstra(const vector< vector<int> > &inMatrix);  //Constructor
+    Dijkstra(vector<vector<int> > const &inMatrix);  //Constructor
     ~Dijkstra();                                      //Destructor
 
     //Returns map of vertices and their distances from start
@@ -132,7 +132,7 @@ private:
         int operator *() const {return cost;}
         int operator &() const {return vertex;}
     };
-    std::vector< std::vector<int> > matrix; //The matrix of the graph
+    vector< vector<int> > matrix; //The matrix of the graph
     deque<Djobject> swaps;                  //Deque of heap swaps
     vector<int> vertexPath;                 //Parent map
 };
