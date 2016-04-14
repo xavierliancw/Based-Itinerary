@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>829</width>
-    <height>478</height>
+    <width>913</width>
+    <height>563</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QStackedWidget" name="stackWidg">
       <property name="currentIndex">
-       <number>4</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="start">
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -743,7 +743,7 @@
            <enum>QTabWidget::Rounded</enum>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="itinTab">
            <attribute name="title">
@@ -833,6 +833,12 @@
           <layout class="QVBoxLayout" name="verticalLayout_5">
            <item>
             <widget class="QTableWidget" name="tableWidget">
+             <attribute name="horizontalHeaderVisible">
+              <bool>true</bool>
+             </attribute>
+             <attribute name="verticalHeaderVisible">
+              <bool>false</bool>
+             </attribute>
              <column>
               <property name="text">
                <string>Stadium Name</string>
@@ -840,7 +846,12 @@
              </column>
              <column>
               <property name="text">
-               <string>Bookmark?</string>
+               <string>Team Name</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Add to Itinerary</string>
               </property>
              </column>
             </widget>
