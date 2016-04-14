@@ -92,10 +92,15 @@ public:
     void modStadType(int stadNum, QString newType);
     void delStad(int stadNum);
 
-    void addTeam(int stadNum, QString newTeam, QString newLeague);
-    void modTeam(int stadNum, QString oldTeamName, QString newTeamName);
-    void modTeam(int stadNum, QString whichTeam, int newStadNum);
-    void delTeam(int stadNum, QString whichTeam);
+    //Modifies data pertaining to teams
+    void addTeam(int stadNum, QString newTeam, QString newLeague);//Legacy implementation
+    void modTeam(int stadNum, QString newTeamName);//Legacy implementation
+    void modLeague(int stadNum, QString newLeague);//Legacy implementation
+
+    //Legacy methods
+//    void modTeam(int stadNum, QString oldTeamName, QString newTeamName);
+//    void modTeam(int stadNum, QString whichTeam, int newStadNum);
+//    void delTeam(int stadNum, QString whichTeam);
 
     void addSouv(int stadNum, QString newName, double newPrice);
     void modSouvName();
@@ -114,10 +119,12 @@ public:
     QString getStadGrass(int stadNum) const;
     QString getStadType(int stadNum) const;
 
-    //Returns number of teams at a stadium
-    unsigned int teamSize(int stadNum) const;
-    QString getTeamName(int stadNum, int teamIndex) const;
-    QString getTeamLeague(int stadNum, int teamIndex) const;
+    //The following returns information about teams
+    unsigned int teamSize(int stadNum) const;//Vital legacy
+    QString getTeamName(int stadNum) const;//Legacy implementation
+    QString getTeamLeague(int stadNum) const;//Legacy implementation
+    QString getTeamName(int stadNum, int teamIndex) const;//Legacy
+    QString getTeamLeague(int stadNum, int teamIndex) const;//Legacy
     int getTeamStad() const;
 
     QString getSouvName(int stadNum, int souvNum) const;

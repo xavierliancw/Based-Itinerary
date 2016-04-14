@@ -10,6 +10,7 @@
 #include <QProcess>
 #include <QMessageBox>
 #include <QFileSystemModel>
+#include <QSignalBlocker>
 
 #include "datastructures.h"
 #include "adminlogin.h"
@@ -40,6 +41,12 @@ public:
 
     //Refreshes the itineray view (Index 2)
     void refreshItin();
+
+    //Refreshes admin stadium table
+    void refreshAdminTbl();
+
+    //Validates phone numbers and returns a formatted number
+    QString phoneCheck(QString phone);
 
 public slots:
     void catchLoginStatus(bool status); //Catches login signal
@@ -87,6 +94,8 @@ private slots:
     void on_adminBaseBt_clicked();
 
     void on_adminDistBt_clicked();
+
+    void on_adminStadTbl_cellChanged(int row, int column);
 
 //Index5==================================================================
     void on_dataBackBt_clicked();

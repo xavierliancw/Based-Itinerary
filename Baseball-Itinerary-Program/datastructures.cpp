@@ -78,59 +78,68 @@ void Data::addTeam(int stadNum, QString newTeam, QString newLeague/*LOGOVARIABLE
     masterVect.at(stadNum).teamVect.push_back(addingTeam);
 }
 
-void Data::modTeam(int stadNum, QString oldTeamName, QString newTeamName)
-//Changes name of a team
-{
-    //Search for team at the stadium (data set is naturally miniscule)
-    for (unsigned int x = 0; x < masterVect.at(stadNum).teamVect.size();
-         x++)
-    {
-        //If found, rename the team
-        if (oldTeamName == masterVect.at(stadNum).teamVect.at(x).name)
-        {
-            masterVect.at(stadNum).teamVect.at(x).name = newTeamName;
-        }
-    }
-}
+void Data::modTeam(int stadNum, QString newTeamName)
+//Modifies name of team
+{masterVect.at(stadNum).teamVect.at(0).name = newTeamName;}
 
-void Data::modTeam(int stadNum, QString whichTeam, int newStadNum)
-//Changes home stadium of the team at stadNum
-{
-    TeamObj movingTeam; //Variable to hold the moving team
+void Data::modLeague(int stadNum, QString newLeague)
+//Modifies league of team
+{masterVect.at(stadNum).teamVect.at(0).league = newLeague;}
 
-    //Search for team at the stadium (data set is naturally miniscule)
-    for (unsigned int x = 0; x < masterVect.at(stadNum).teamVect.size();
-         x++)
-    {
-        //If found, remove the team
-        if (whichTeam == masterVect.at(stadNum).teamVect.at(x).name)
-        {
-            movingTeam = masterVect.at(stadNum).teamVect.at(x);
-            masterVect.at(stadNum)
-                    .teamVect.erase(masterVect.at(stadNum)
-                                    .teamVect.begin() + x);
-        }
-    }
-    movingTeam.stadNum = newStadNum;
-    masterVect.at(newStadNum).teamVect.push_back(movingTeam);
-}
+////Legacy implementations
+//void Data::modTeam(int stadNum, QString oldTeamName, QString newTeamName)
+////Changes name of a team
+//{
+//    //Search for team at the stadium (data set is naturally miniscule)
+//    for (unsigned int x = 0; x < masterVect.at(stadNum).teamVect.size();
+//         x++)
+//    {
+//        //If found, rename the team
+//        if (oldTeamName == masterVect.at(stadNum).teamVect.at(x).name)
+//        {
+//            masterVect.at(stadNum).teamVect.at(x).name = newTeamName;
+//        }
+//    }
+//}
 
-void Data::delTeam(int stadNum, QString whichTeam)
-//Deletes a team
-{
-    //Search for team at the stadium (data set is naturally miniscule)
-    for (unsigned int x = 0; x < masterVect.at(stadNum).teamVect.size();
-         x++)
-    {
-        //If found, remove the team
-        if (whichTeam == masterVect.at(stadNum).teamVect.at(x).name)
-        {
-            masterVect.at(stadNum)
-                    .teamVect.erase(masterVect.at(stadNum)
-                                    .teamVect.begin() + x);
-        }
-    }
-}
+//void Data::modTeam(int stadNum, QString whichTeam, int newStadNum)
+////Changes home stadium of the team at stadNum
+//{
+//    TeamObj movingTeam; //Variable to hold the moving team
+
+//    //Search for team at the stadium (data set is naturally miniscule)
+//    for (unsigned int x = 0; x < masterVect.at(stadNum).teamVect.size();
+//         x++)
+//    {
+//        //If found, remove the team
+//        if (whichTeam == masterVect.at(stadNum).teamVect.at(x).name)
+//        {
+//            movingTeam = masterVect.at(stadNum).teamVect.at(x);
+//            masterVect.at(stadNum)
+//                    .teamVect.erase(masterVect.at(stadNum)
+//                                    .teamVect.begin() + x);
+//        }
+//    }
+//    movingTeam.stadNum = newStadNum;
+//    masterVect.at(newStadNum).teamVect.push_back(movingTeam);
+//}
+
+//void Data::delTeam(int stadNum, QString whichTeam)
+////Deletes a team
+//{
+//    //Search for team at the stadium (data set is naturally miniscule)
+//    for (unsigned int x = 0; x < masterVect.at(stadNum).teamVect.size();
+//         x++)
+//    {
+//        //If found, remove the team
+//        if (whichTeam == masterVect.at(stadNum).teamVect.at(x).name)
+//        {
+//            masterVect.at(stadNum)
+//                    .teamVect.erase(masterVect.at(stadNum)
+//                                    .teamVect.begin() + x);
+//        }
+//    }
+//}
 
 void Data::addSouv(int stadNum, QString newName, double newPrice)
 //Adds a souvenir to a stadium
@@ -568,6 +577,14 @@ QString Data::getStadType(int stadNum) const
 unsigned int Data::teamSize(int stadNum) const
 //Returns number of teams at a stadium
 {return masterVect.at(stadNum).teamVect.size();}
+
+QString Data::getTeamName(int stadNum) const
+//Returns team name
+{return masterVect.at(stadNum).teamVect.at(0).name;}
+
+QString Data::getTeamLeague(int stadNum) const
+//Returns a team's league
+{return masterVect.at(stadNum).teamVect.at(0).league;}
 
 QString Data::getTeamName(int stadNum, int teamIndex) const
 {return masterVect.at(stadNum).teamVect.at(teamIndex).name;}
