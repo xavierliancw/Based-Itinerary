@@ -33,8 +33,17 @@ public:
     //Refreshes the view of everything on the home page (Index 1)
     void refreshHome();
 
+    //Refreshes the home table based on the vector passed in (Index 1)
+    void refreshHomeTbl(vector<int> stadNumOrder);
+
     //Refreshes detail labels on the home page (Index 1)
     void refreshHomeDetails();
+
+    //Refreshes the view of the itinerary builder (Index 2)
+    void refreshItinBuilder();
+
+    //Refreshes the itineray view (Index 2)
+    void refreshItin();
 
     //Refreshes admin stadium table
     void refreshAdminTbl();
@@ -46,6 +55,8 @@ public slots:
     void catchLoginStatus(bool status); //Catches login signal
 
     void catchDataUpdate(Data caughtThis);
+
+    void catchAddItin();
 
 private slots:
 /*PAGE INDEX============================================================*/
@@ -74,7 +85,13 @@ private slots:
 
     void on_homeAmericanCB_toggled(bool checked);
 
+    void on_homeSynthCB_toggled(bool checked);
+
     void on_homeTurfCB_toggled(bool checked);
+
+    void on_homeNameRd_toggled(bool checked);
+
+
 //Index2==================================================================
     void on_itinStartOverBt_clicked();
 
@@ -96,7 +113,10 @@ private slots:
 
     void on_dataTxtBt_clicked();
 
-    void on_homeSynthCB_toggled(bool checked);
+
+
+
+
 
 private:
     Ui::PrimeWin *ui;           //User interface
