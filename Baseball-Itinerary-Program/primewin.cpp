@@ -224,6 +224,7 @@ void PrimeWin::refreshHomeDetails()
         teams += data.getTeamName(stadNum,x) + "\n";
     }
     ui->homeTeamLbl->setText(teams);
+    ui->homeLeagueLbl->setText(data.getTeamLeague(stadNum) + " League");
     ui->homePhoneLbl->setText(data.getStadPhone(stadNum));
     address.resize(address.indexOf(","));   //Cut off city and zip
     ui->homeAddressLbl->setText(address);
@@ -971,5 +972,3 @@ void PrimeWin::on_dataTxtBt_clicked()
                              QMessageBox::Ok);
     }
 }
-
-
