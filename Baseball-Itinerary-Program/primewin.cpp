@@ -142,6 +142,64 @@ void PrimeWin::refreshHome()
     }
 }
 
+void PrimeWin::refreshHomeTbl(vector<int> stadNumOrder)
+//Redraws table on home page, ordering based on stadNumOrder
+//Complexity: O(n)
+{
+    QSignalBlocker stopSignalsFrom(ui->homeStadTbl);
+    QTableWidgetItem *item;
+    vector<int>::iterator it = stadNumOrder.begin();
+
+    //REFRESH STADIUM TABLE
+    ui->homeStadTbl->clear();
+    ui->homeStadTbl->setRowCount(0);
+    ui->homeStadTbl->setColumnCount(4);
+
+    //Populate the stadium table
+    for (unsigned int x = 0; x < stadNumOrder.size(); x++)
+    {
+        //Add a row
+        ui->homeStadTbl->insertRow(ui->homeStadTbl->rowCount());
+
+        //First col has hidden stadNum
+        item = new QTableWidgetItem;
+        item->setData(0,QString::number(*it));
+        ui->homeStadTbl->setItem(x,0,item);
+
+        //Second col has field pic
+        int UNIMPLEMENTED;
+        //item = new QTableWidgetItem;
+        //item->setData(0,data.getPicOrSomething(*it));
+        ui->homeStadTbl->setItem(x,1,new QTableWidgetItem("NO_PIC"));
+
+        //Third col has stadium name
+        item = new QTableWidgetItem;
+        item->setData(0,data.getStadName(*it));
+        ui->homeStadTbl->setItem(x,2,item);
+
+        //Fourth col has team name
+        item = new QTableWidgetItem;
+        item->setData(0,data.getTeamName(*it));
+        ui->homeStadTbl->setItem(x,3,item);
+
+        //Advance iterator
+        it++;
+    }
+    //Prepare table for viewing
+    ui->homeStadTbl->hideColumn(0);
+    ui->homeStadTbl->showColumn(1); //Not sure why this is needed
+
+    ui->homeStadTbl->resizeColumnsToContents();
+
+    //Click on first row to prevent uninitialized labels
+    if (ui->homeStadTbl->rowCount() > 0)
+    {
+        ui->homeStadTbl->selectRow(0);
+        refreshHomeDetails();
+    }
+    stopSignalsFrom.unblock();
+}
+
 void PrimeWin::refreshHomeDetails()
 //Refreshes detail labels on the home page (Index 1)
 {
@@ -161,7 +219,7 @@ void PrimeWin::refreshHomeDetails()
 
     //Set labels and modify variables if necessary
     ui->homeStadzLbl->setText(data.getStadName(stadNum));
-    for (unsigned int x=0;x<data.teamSize(stadNum);x++)
+    for (unsigned int x = 0; x < data.teamSize(stadNum); x++)
     {
         teams += data.getTeamName(stadNum,x) + "\n";
     }
@@ -353,7 +411,8 @@ QString PrimeWin::phoneCheck(QString phone)
                     || bareNumber.size() - bareNumber.indexOf("+") == 11))
     {}//It's good, I'm just too lazy to DeMorganize the conditional
     //Check if phone number has the correct length if there's no +
-    else if (!hasPlus && (bareNumber.size() == 11 || bareNumber.size() == 10))
+    else if (!hasPlus && (bareNumber.size() == 11
+                          || bareNumber.size() == 10))
     {}//Same deal
     else
     {throwGen = true;}
@@ -440,6 +499,7 @@ void PrimeWin::catchAddItin()
         itinList.push_back(ItinObj(stadNum));
 
         //?????????show possible souvenirs??????????
+        int UNIMPLEMENTED;
 
         //Change the bt's text to remove
         addBt->setText("Remove");
@@ -613,206 +673,27 @@ void PrimeWin::on_homeAmericanCB_toggled(bool checked)
     }// end else
 }//end void on_homeAmericanCB_toggled(bool checked)
 
-///* This function swaps two numbers
-//   Arguments :
-//             a, b - the numbers to be swapped
-//   */
-//void PrimeWin::swap(std::vector<StadObj> sortV, int &a, int &b)
-//{
-//    StadObj temp;
-//    temp = sortV[a];
-//    sortV[a] = sortV[b];
-//    sortV[b] = temp;
-//}
-
-///* This function does the quicksort
-//   Arguments :
-//             vector - the array to be sorted
-//             startIndex - index of the first element of the section
-//             endIndex - index of the last element of the section
-//*/
-//void PrimeWin::QuickSort(std::vector<StadObj> sortV, int startIndex, int endIndex)
-//{
-//    StadObj pivot = sortV[startIndex];                  //pivot element is the leftmost element
-//    int splitPoint;
-
-//    if(endIndex > startIndex)                         //if they are equal, it means there is
-//                                                      //only one element and quicksort's job
-//                                                      //here is finished
-//    {
-//        splitPoint = SplitArray(sortV, pivot, startIndex, endIndex);
-//                                                      //SplitArray() returns the position where
-//                                                      //pivot belongs to
-//        sortV[splitPoint] = pivot;
-//        QuickSort(sortV, startIndex, splitPoint-1);   //Quick sort first half
-//        QuickSort(sortV, splitPoint+1, endIndex);    //Quick sort second half
-//    }
-//}
-///* This function splits the array around the pivot
-//   Arguments :
-//             array - the array to be split
-//             pivot - pivot element whose position will be returned
-//             startIndex - index of the first element of the section
-//             endIndex - index of the last element of the section
-//   Returns :
-//           the position of the pivot
-//*/
-//int PrimeWin::SplitArray(std::vector<StadObj> sortV, StadObj pivot, int startIndex, int endIndex)
-//{
-//    int leftBoundary = startIndex;
-//    int rightBoundary = endIndex;
-
-//    while(leftBoundary < rightBoundary)             //shuttle pivot until the boundaries meet
-//    {
-//         while(pivot.name < sortV[rightBoundary].name      //keep moving until a lesser element is found
-//                && rightBoundary > leftBoundary)   //or until the leftBoundary is reached
-//         {
-//              rightBoundary--;                      //move left
-//         }
-
-//         swap(sortV, leftBoundary, rightBoundary);
-
-//         while(pivot.name >= sortV[leftBoundary].name       //keep moving until a greater or equal element is found
-//                && leftBoundary < rightBoundary)   //or until the rightBoundary is reached
-//         {
-//              leftBoundary++;                        //move right
-//         }
-//         swap(sortV, rightBoundary, leftBoundary);
-//    }
-//    return leftBoundary;                              //leftBoundary is the split point because
-//                                                      //the above while loop exits only when
-//                                                      //leftBoundary and rightBoundary are equal
-//}
-
-
-void PrimeWin::InsertionSort (std::vector<StadObj>& sortV)
-{
-     int j;
-     StadObj temp; // stores temporary object for swap
-
-    // FOR - go until i reaches size
-    for (int i = 0; i < sortV.size(); i++)
-    {
-        j = i;
-        // WHILE - while j is greater than 0 and the object.name after j is less than current position
-        while (j > 0 && sortV[j].name < sortV[j-1].name)
-        {
-              temp = sortV[j];          // store for swap
-              sortV[j] = sortV[j-1];    // swap(copy into place)
-              sortV[j-1] = temp;        // store back in where appropriate
-              j--;
-        } // end of while
-    } // end of for
-} // end of method
-
-
-// TOGGLE FOR SORTING ALPHABETICALLY
 void PrimeWin::on_homeNameRd_toggled(bool checked)
+//Sorts home's stadium table alphabetically by stadium name
+//Complexity: O(n^2)
 {
-    // Vector to store alphabetical vector
-    std::vector<StadObj> alphaSortedVector;
-
-    data.copyVector(alphaSortedVector); // copies master into new vector
-
-//    QuickSort(alphaSortedVector, 0, alphaSortedVector.size()-1)
-    InsertionSort(alphaSortedVector);
-
-    int missingCompensator = 0; //Compensates for missing teams
-
-    //REFRESH STADIUM TABLE
-    ui->homeStadTbl->clear();
-    ui->homeStadTbl->setRowCount(0);
-    ui->homeStadTbl->setColumnCount(5);
-
-    //Populate the stadium table
-    for (unsigned int x=0;x<data.size();x++)
+    //Perform sort when radio toggle is checked
+    if (checked)
     {
-        //Add a row
-        ui->homeStadTbl->insertRow(ui->homeStadTbl->rowCount());
+        vector<int> stadNums;   //Vector of stadNums to be sorted
+        CustomSorts use(data);  //Sorting class
 
-        //Determine if compensation is needed
-        if (data.teamSize(x) > 0)
+        //Create a list of stadNums to match the order the table is in now
+        for (int x = 0; x < ui->homeStadTbl->rowCount(); x++)
         {
-            missingCompensator = 0;
+            stadNums.push_back(ui->homeStadTbl
+                               ->item(x,0)->text().toInt());
         }
-        else
-        {
-            missingCompensator = 1;
-        }
+        //Ask insertion sort to reorder the stadiums
+        stadNums = use.InsertionSort(stadNums);
 
-        //Loop until all teams at the stadium are added
-        for (unsigned int t=0;t<data.teamSize(x)+missingCompensator;t++)
-        {
-            //Add a new row after listing first team if stad has > 1 team
-            if (t != 0)
-            {
-                ui->homeStadTbl->insertRow(ui->homeStadTbl->rowCount());
-            }
-            //Add stadNum to hidden first col
-            ui->homeStadTbl
-              ->setItem(ui->homeStadTbl
-                        ->rowCount()-1,0,
-                        new QTableWidgetItem(QString::number(x)));
-
-            //If there are teams here
-            if (data.teamSize(x) != 0)
-            {
-                //Add teamNum to hidden second col
-                ui->homeStadTbl
-                        ->setItem(ui->homeStadTbl->rowCount()-1,1,
-                                  new
-                                  QTableWidgetItem(QString::number(t)));
-            }
-            //If there's no team at this stadium
-            else
-            {
-                //Add -1 to hidden second col
-                ui->homeStadTbl
-                        ->setItem(ui->homeStadTbl->rowCount()-1,1,
-                                  new
-                                  QTableWidgetItem(QString::number(-1)));
-            }
-
-            //Add field picture to third col
-            int UNIMPLEMENTED;
-            ui->homeStadTbl->setItem(ui->homeStadTbl->rowCount()-1,2,
-                                     new QTableWidgetItem("NO_PIC"));
-
-            //Add stadium name to fourth col
-            ui->homeStadTbl
-              ->setItem(ui->homeStadTbl
-                        ->rowCount()-1,3,
-                        new QTableWidgetItem(alphaSortedVector.at(x).name));
-
-            //If there are teams here, add the team name
-            if (data.teamSize(x) != 0)
-            {
-                //Add team name to fifth col
-                ui->homeStadTbl
-                        ->setItem(ui->homeStadTbl->rowCount()-1,4,
-                                  new
-                                  QTableWidgetItem(
-                                      alphaSortedVector.at(x).teamVect.at(t).name));
-            }
-            else
-            {
-                ui->homeStadTbl
-                        ->setItem(ui->homeStadTbl->rowCount()-1,4,
-                                  new QTableWidgetItem(""));
-            }
-        }
-    }
-    //Prepare table for viewing
-    ui->homeStadTbl->hideColumn(0);
-    ui->homeStadTbl->hideColumn(1);
-    ui->homeStadTbl->resizeColumnsToContents();
-    ui->homeStadTbl->setFocus();
-
-    //Click on first row to prevent uninitialized labels
-    if (ui->homeStadTbl->rowCount() > 0)
-    {
-        ui->homeStadTbl->selectRow(0);
-        refreshHomeDetails();
+        //Refresh home table
+        refreshHomeTbl(stadNums);
     }
 }
 
