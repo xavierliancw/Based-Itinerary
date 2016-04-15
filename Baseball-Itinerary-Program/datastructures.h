@@ -3,6 +3,7 @@
 
 #include <QDebug>
 #include <vector>
+#include <list>
 #include <QString>
 #include <QSqlDatabase>
 #include <QSqlQuery>
@@ -136,6 +137,14 @@ public:
     //Returns distance between two stadiums
     int getDistBetween(unsigned int here, unsigned int there) const;
 
+    //Returns the 2D matrix
+    std::vector< std::vector<int> > getMatrix() const;
+    //Blarmos
+    void initializeStuff();
+
+    //Returns adjacency list
+    std::vector< std::list< std::pair<int,int> > > getAdjList() const;
+
     int getMST() const;
 
     //Fill data structures with information from SQL database
@@ -150,6 +159,9 @@ public:
 private:
     std::vector<StadObj> masterVect;        //Vector of all stadiums
     std::vector< std::vector<int> > matrix; //2D matrix of all distances
+
+    //Adjacency list representation of the 2D matrix
+    std::vector< std::list< std::pair<int,int> > > adjList;
 
 
 };

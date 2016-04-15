@@ -132,33 +132,33 @@ private:
  * using namespace std;
  * ----------------------------------------------------------------------
  ************************************************************************/
-//class Dijkstra
-//{
-//public:
-//    Dijkstra(vector<vector<int> > const &inMatrix);  //Constructor
-//    ~Dijkstra();                                      //Destructor
+class Dijkstra
+{
+public:
+    Dijkstra(Data inData);  //Constructor
+    ~Dijkstra();                                      //Destructor
 
-//    //Returns map of vertices and their distances from start
-//    std::vector<int> getDistanceMap(int start);
+    //Returns map of vertices and their distances from start
+    std::vector<int> getDistanceMap(int start);
 
-//    //Returns map of parents to show paths to take
-//    std::vector<int> getVertexPath() const;
+    //Returns map of parents to show paths to take
+    std::vector<int> getVertexPath() const;
 
-//private:
-//    //Djikstra object
-//    class Djobject
-//    {
-//    public:
-//        int vertex;
-//        int cost;
+private:
+    //Djikstra object
+    class Djobject
+    {
+    public:
+        int vertex;
+        int cost;
 
-//        //Overloaded operators
-//        int operator *() const {return cost;}
-//        int operator &() const {return vertex;}
-//    };
-//    vector< vector<int> > matrix; //The matrix of the graph
-//    deque<Djobject> swaps;                  //Deque of heap swaps
-//    vector<int> vertexPath;                 //Parent map
-//};
+        //Overloaded operators
+        int operator *() const {return cost;}
+        int operator &() const {return vertex;}
+    };
+    Data data;
+    deque<Djobject> swaps;                  //Deque of heap swaps
+    vector<int> vertexPath;                 //Parent map
+};
 
 #endif // CUSTOMIMPLEMENTATIONS_H

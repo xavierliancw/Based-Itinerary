@@ -158,12 +158,62 @@ void Data::addSouv(int stadNum, QString newName, double newPrice)
     masterVect.at(stadNum).souvVect.push_back(newSouv);
 }
 
-void Data::addDist(int x, int y, int newDist)
-//Changes a value in the matrix and its symmetrical counterpart
+struct list_pair_sort_compare_instructions
+//Instructs list.sort() functions to sort using the cost
 {
+    bool operator()(const std::pair<int,int> &left,
+                    const std::pair<int,int> &right)
+    {return left.second < right.second;}
+};
+
+void Data::addDist(int x, int y, int newDist)
+//Changes data in matrix and modifies adjacency list
+//Complexity: O(nlogn)
+{
+    //Declare an iterator for adjList
+    std::list< std::pair<int,int> >::iterator it = adjList.at(x).begin();
+
     //Fill in the data to there and back
     matrix[x][y] = newDist;
     matrix[y][x] = newDist;
+
+    //If adding a new distance
+    if (newDist != -1)
+    {
+        //See if y already exists in the list at x
+        while ((*it).first != y && !adjList.at(x).empty()
+               && it != adjList.at(x).end())
+        {
+            it++;
+        }
+        //If it is at the end, that means y isn't in the list, so push
+        if (it == adjList.at(x).end())
+        {
+            adjList.at(x).push_back(std::make_pair(y,newDist));
+        }
+        //Otherwise, just modify the cost of y
+        else
+        {
+            (*it).second = newDist;
+        }
+        //Now re-sort the list
+        adjList.at(x).sort(list_pair_sort_compare_instructions());
+    }
+    //Otherwise delete the distance from the list
+    else if (!adjList.at(x).empty())
+    {
+
+        //Look for the y coordinate in the list
+        while ((*it).first != y && it != adjList.at(x).end())
+        {
+            it++;
+        }
+        //Erase it, but only if it's not at the end
+        if (it != adjList.at(x).end())
+        {
+            adjList.at(x).erase(it);
+        }
+    }
 }
 
 unsigned int Data::size() const
@@ -172,6 +222,7 @@ unsigned int Data::size() const
 
 void Data::importSQL()
 //Fill data structures with information from SQL database
+//Complexity: O(e^2) where e = number of edges
 {
     //Determine path to APPDATA folder
     QString dir = QDir::currentPath();
@@ -228,6 +279,7 @@ void Data::importSQL()
         //Import distances
         int y = 0;
         matrix.resize(masterVect.size());
+        adjList.resize(masterVect.size());
         for (unsigned int x = 0; x < masterVect.size(); x++)
         {
             matrix[x].resize(masterVect.size());
@@ -613,6 +665,32 @@ double Data::getSouvPrice(int stadNum, int souvNum) const
 int Data::getDistBetween(unsigned int here, unsigned int there) const
 //Returns distance between two stadiums
 {return matrix[here][there];}
+
+std::vector< std::vector<int> > Data::getMatrix() const
+//Returns the 2D matrix
+{return matrix;}
+
+void Data::initializeStuff()
+{int TEMPORARYDELETELATER;
+    //create 8x8 matrix
+    matrix.resize(8);
+    for (int x =0; x < 8; x++)
+    {
+        matrix.at(x).resize(8);
+    }
+    for (int x = 0; x < 8; x++)
+    {
+        for (int y = 0; y < 8; y++)
+        {
+            matrix[x][y] = -1;
+        }
+    }
+    adjList.resize(8);
+}
+
+std::vector< std::list< std::pair<int,int> > > Data::getAdjList() const
+//Returns adjacency list
+{return adjList;}
 
 ItinObj::ItinObj(int stadium)
 {

@@ -710,94 +710,149 @@ void PrimeWin::on_itinOptimizeBt_clicked()
 //Optimizes order of the itinerary
 {
     int UNFINISHED;//Needs a list of itinObjects
-//    //Needs a matrix to pass in
+    //Needs a matrix to pass in
+//    std::vector< std::vector<int> > matrix = data.getMatrix();
 
-//    //Let's say itinerary is 2,3,6,1
-//    itin.push_back(2);
-//    itin.push_back(3);
-//    itin.push_back(6);
-//    itin.push_back(1);
 
-//    Dijkstra pathFind(matrix);  //Dijkstra's algorithm
-//    std::deque<int> optimized;  //Optimized order of stadNums
-//    std::vector<int> djMap;     //Map of costs to visit each stadium
-//    int totalTripDist = 0;      //Total trip distance
-//    int shortest;               //Stores current shortest distance
-//    int nextStad;               //Stores next stad to visit
+    std::vector< std::vector<int> > matrix;
+    //create 8x8 matrix
+    matrix.resize(8);
+    for (int x =0; x < 8; x++)
+    {
+        matrix.at(x).resize(8);
+    }
+    for (int x = 0; x < 8; x++)
+    {
+        for (int y = 0; y < 8; y++)
+        {
+            matrix[x][y] = -1;
+        }
+    }
+    matrix[1][0] = 3;
+    matrix[0][1] = 3;
+    matrix[2][0] = 1;
+    matrix[0][2] = 1;
+    matrix[3][0] = 3;
+    matrix[0][3] = 3;
+    matrix[2][1] = 3;
+    matrix[1][2] = 3;
+    matrix[3][1] = 7;
+    matrix[1][3] = 7;
+    matrix[4][2] = 3;
+    matrix[2][4] = 3;
+    matrix[5][1] = 8;
+    matrix[1][5] = 8;
+    matrix[6][2] = 9;
+    matrix[2][6] = 9;
+    matrix[6][5] = 7;
+    matrix[5][6] = 7;
+    matrix[7][4] = 9;
+    matrix[4][7] = 9;
 
-//    //Create and initialize a list iterator
-//    std::list<int>::iterator it = itin.begin();
+    Data test;
+    test.initializeStuff();
 
-//    //Struct to represent a stadium in the itinerary
-//    struct visitObj
-//    {
-//        bool visited;   //If visited
-//        bool valid;     //If in itinerary
-//    };
+    test.addDist(1,0,3);
+    test.addDist(2,0,1);
+    test.addDist(3,0,3);
+    test.addDist(2,1,3);
+    test.addDist(3,1,7);
+    test.addDist(4,2,3);
+    test.addDist(5,1,8);
+    test.addDist(6,2,9);
+    test.addDist(6,5,7);
+    test.addDist(7,4,9);
 
-//    //Array of visited booleans where index is stadNum
-//    visitObj visitAr[matrix.size()];
+    //Let's say itinerary is 2,3,6,1
+    std::list<int> itin;
+    itin.push_back(2);
+    itin.push_back(3);
+    itin.push_back(6);
+    itin.push_back(1);
 
-//    //Initialize the array to the uninitialized states
-//    for (unsigned int x = 0; x < matrix.size(); x++)
-//    {
-//        visitAr[x].visited = false;
-//        visitAr[x].valid = false;
-//    }
+    Dijkstra pathFind(test);  //Dijkstra's algorithm
+    std::deque<int> optimized;  //Optimized order of stadNums
+    std::vector<int> djMap;     //Map of costs to visit each stadium
+    int totalTripDist = 0;      //Total trip distance
+    int shortest;               //Stores current shortest distance
+    int nextStad;               //Stores next stad to visit
 
-//    //Make stadiums in the itin valid within the array
-//    for (it = itin.begin(); it != itin.end(); it++)
-//    {
-//        visitAr[*it].valid = true;
-//    }
+    //Create and initialize a list iterator
+    std::list<int>::iterator it = itin.begin();
 
-//    //Reset itin iterator
-//    it = itin.begin();
+    //Struct to represent a stadium in the itinerary
+    struct visitObj
+    {
+        bool visited;   //If visited
+        bool valid;     //If in itinerary
+    };
 
-//    //Mark current true (visited) in the hash map, visiting itin's first
-//    visitAr[*it].visited = true;
+    //Array of visited booleans where index is stadNum
+    visitObj visitAr[matrix.size()];
 
-//    //Add it to the NEW itinerary
-//    optimized.push_back(*it);
+    //Initialize the array to the uninitialized states
+    for (unsigned int x = 0; x < matrix.size(); x++)
+    {
+        visitAr[x].visited = false;
+        visitAr[x].valid = false;
+    }
 
-//    //Build the optimized itinerary
-//    for (int i = 0; i < (int)itin.size() - 1; i++)
-//    {
-//        //Call Dijkstra's on the last stadium on the optimized itinerary
-//        djMap = pathFind.getDistanceMap(optimized.back());
+    //Make stadiums in the itin valid within the array
+    for (it = itin.begin(); it != itin.end(); it++)
+    {
+        visitAr[*it].valid = true;
+    }
 
-//        //Reinitialize temporary values
-//        shortest = INT_MAX;
-//        nextStad = -1;
+    //Reset itin iterator
+    it = itin.begin();
 
-//        //Find next stad in the itin that has the shortest dist
-//        for (int x = 0; x < matrix.size(); x++)
-//        {
-//            //If stad is in the itin & not visited & it has a shorter dist
-//            if (visitAr[x].valid && !visitAr[x].visited && djMap[x] < shortest)
-//            {
-//                //Update shortest and the next stad to visit
-//                shortest = djMap[x];
-//                nextStad = x;
-//            }
-//        }
-//        //Add that distance to a running total
-//        totalTripDist += shortest;
+    //Mark current true (visited) in the hash map, visiting itin's first
+    visitAr[*it].visited = true;
 
-//        //Mark it as visited on the visited array
-//        visitAr[nextStad].visited = true;
+    //Add it to the NEW itinerary
+    optimized.push_back(*it);
 
-//        //Add it to the NEW itinerary
-//        optimized.push_back(nextStad);
-//    }
+    //Build the optimized itinerary
+    for (int i = 0; i < (int)itin.size() - 1; i++)
+    {
+        //Call Dijkstra's on the last stadium on the optimized itinerary
+        djMap = pathFind.getDistanceMap(optimized.back());
+for (int x = 0; x < 8; x++)
+{
+    qDebug() << "djmap" << djMap[x];
+}
+        //Reinitialize temporary values
+        shortest = INT_MAX;
+        nextStad = -1;
 
-//    //Return new itinerary and the total distance travelled
-//    qDebug() << "OPTIMAL";
-//    for (int x = 0; x < optimized.size(); x++)
-//    {
-//        qDebug() << optimized[x];
-//    }
-//    qDebug() << totalTripDist;
+        //Find next stad in the itin that has the shortest dist
+        for (int x = 0; x < matrix.size(); x++)
+        {
+            //If stad is in the itin & not visited & it has a shorter dist
+            if (visitAr[x].valid && !visitAr[x].visited && djMap[x] < shortest)
+            {
+                //Update shortest and the next stad to visit
+                shortest = djMap[x];qDebug() << djMap[x] << "HALKJR";
+                nextStad = x;
+            }
+        }
+        //Add that distance to a running total
+        totalTripDist += shortest;
+
+        //Mark it as visited on the visited array
+        visitAr[nextStad].visited = true;
+
+        //Add it to the NEW itinerary
+        optimized.push_back(nextStad);
+    }
+
+    //Return new itinerary and the total distance travelled
+    qDebug() << "OPTIMAL";
+    for (int x = 0; x < optimized.size(); x++)
+    {
+        qDebug() << optimized[x];
+    }
+    qDebug() << "total trip distance is" << totalTripDist;
 }
 
 //Index3 - Summary Page===================================================
