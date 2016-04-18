@@ -85,7 +85,12 @@ private slots:
 
     void on_homeAmericanCB_toggled(bool checked);
 
+    void on_homeSynthCB_toggled(bool checked);
+
+    void on_homeTurfCB_toggled(bool checked);
+
     void on_homeNameRd_toggled(bool checked);
+
 
 //Index2==================================================================
     void on_itinStartOverBt_clicked();
@@ -107,6 +112,9 @@ private slots:
     void on_dataBackBt_clicked();
 
     void on_dataTxtBt_clicked();
+
+
+
 
 
 
