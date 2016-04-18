@@ -48,6 +48,7 @@ public:
 class ItinObj
 {
 public:
+    ItinObj(int stadium);
     void pushCart(int souvNum, int qty);//Pushes a souv into the cart
     void delCart(int souvNum);          //Removes a souv from the cart
     void chgQty(int souvNum, int newQty); //Changes qty of souv in cart
@@ -78,6 +79,9 @@ public:
     //Default destructor
     ~Data();
 
+    //Copy master vector to prevent altering master
+    void copyVector(std::vector<StadObj>& copy);
+
     //Add a stadium object to the vector
     void addStad(QString name, QString address,
                  QString phone, QString opened, int capacity,
@@ -102,6 +106,7 @@ public:
 //    void delTeam(int stadNum, QString whichTeam);
 
     void addSouv(int stadNum, QString newName, double newPrice);
+    void deleteSouv(int stadNum, int souvNum);
     void modSouvName();
     void modSouvPrice();
 
@@ -128,6 +133,7 @@ public:
 
     QString getSouvName(int stadNum, int souvNum) const;
     double getSouvPrice(int stadNum, int souvNum) const;
+    int    getSouvListSize(int stadNum) const;
 
     //Returns distance between two stadiums
     int getDistBetween(unsigned int here, unsigned int there) const;

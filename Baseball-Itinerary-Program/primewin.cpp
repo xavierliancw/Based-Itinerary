@@ -142,6 +142,64 @@ void PrimeWin::refreshHome()
     }
 }
 
+void PrimeWin::refreshHomeTbl(vector<int> stadNumOrder)
+//Redraws table on home page, ordering based on stadNumOrder
+//Complexity: O(n)
+{
+    QSignalBlocker stopSignalsFrom(ui->homeStadTbl);
+    QTableWidgetItem *item;
+    vector<int>::iterator it = stadNumOrder.begin();
+
+    //REFRESH STADIUM TABLE
+    ui->homeStadTbl->clear();
+    ui->homeStadTbl->setRowCount(0);
+    ui->homeStadTbl->setColumnCount(4);
+
+    //Populate the stadium table
+    for (unsigned int x = 0; x < stadNumOrder.size(); x++)
+    {
+        //Add a row
+        ui->homeStadTbl->insertRow(ui->homeStadTbl->rowCount());
+
+        //First col has hidden stadNum
+        item = new QTableWidgetItem;
+        item->setData(0,QString::number(*it));
+        ui->homeStadTbl->setItem(x,0,item);
+
+        //Second col has field pic
+        int UNIMPLEMENTED;
+        //item = new QTableWidgetItem;
+        //item->setData(0,data.getPicOrSomething(*it));
+        ui->homeStadTbl->setItem(x,1,new QTableWidgetItem("NO_PIC"));
+
+        //Third col has stadium name
+        item = new QTableWidgetItem;
+        item->setData(0,data.getStadName(*it));
+        ui->homeStadTbl->setItem(x,2,item);
+
+        //Fourth col has team name
+        item = new QTableWidgetItem;
+        item->setData(0,data.getTeamName(*it));
+        ui->homeStadTbl->setItem(x,3,item);
+
+        //Advance iterator
+        it++;
+    }
+    //Prepare table for viewing
+    ui->homeStadTbl->hideColumn(0);
+    ui->homeStadTbl->showColumn(1); //Not sure why this is needed
+
+    ui->homeStadTbl->resizeColumnsToContents();
+
+    //Click on first row to prevent uninitialized labels
+    if (ui->homeStadTbl->rowCount() > 0)
+    {
+        ui->homeStadTbl->selectRow(0);
+        refreshHomeDetails();
+    }
+    stopSignalsFrom.unblock();
+}
+
 void PrimeWin::refreshHomeDetails()
 //Refreshes detail labels on the home page (Index 1)
 {
@@ -161,11 +219,12 @@ void PrimeWin::refreshHomeDetails()
 
     //Set labels and modify variables if necessary
     ui->homeStadzLbl->setText(data.getStadName(stadNum));
-    for (unsigned int x=0;x<data.teamSize(stadNum);x++)
+    for (unsigned int x = 0; x < data.teamSize(stadNum); x++)
     {
         teams += data.getTeamName(stadNum,x) + "\n";
     }
     ui->homeTeamLbl->setText(teams);
+    ui->homeLeagueLbl->setText(data.getTeamLeague(stadNum) + " League");
     ui->homePhoneLbl->setText(data.getStadPhone(stadNum));
     address.resize(address.indexOf(","));   //Cut off city and zip
     ui->homeAddressLbl->setText(address);
@@ -176,6 +235,54 @@ void PrimeWin::refreshHomeDetails()
     ui->homeCapLbl->setText(capacity);
     ui->homeTurfLbl->setText(data.getStadGrass(stadNum));
     ui->homeTypeLbl->setText(data.getStadType(stadNum));
+}
+
+void PrimeWin::refreshItinBuilder()
+//Refreshes the view of the itinerary builder (Index 2)
+{
+    //Clear table
+    ui->tableWidget->clear();
+
+    for(unsigned int i = 0; i < data.size(); i ++)
+    {
+        //Create new row
+        ui->tableWidget->insertRow(ui->tableWidget->rowCount());
+        //Put the stadium name in column 1
+        ui->tableWidget->setItem(i, 0,
+                            new QTableWidgetItem(data.getStadName(i)));
+        //Put the team name in colum 2
+        ui->tableWidget->setItem(i, 1,
+                            new QTableWidgetItem(data.getTeamName(i,0)));
+
+        //Create an add button
+        QPushButton *addBt = new QPushButton();
+        addBt->setText("Add");
+        //Set a the button to retrieve the stadium's num
+        addBt->setProperty("stadNum", i);
+        //Connect each button to addItinCatcher
+        connect(addBt, SIGNAL(clicked(bool)),
+                this, SLOT(catchAddItin()));
+        //Put the add button in column 3
+        ui->tableWidget->setCellWidget(i, 2, addBt);
+    }
+
+    ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "Stadium"
+                                               << "Team"
+                                               << "Add/Remove");
+}
+
+void PrimeWin::refreshItin()
+//Refreshes the itineray view (Index 2)
+{
+    //Clear itinerary view
+    ui->listWidget->clear();
+
+    //Populate List
+    for(std::list<ItinObj>::iterator it = itinList.begin();
+        it != itinList.end(); it++)
+    {
+        ui->listWidget->addItem(data.getStadName(it->getStadNum()));
+    }
 }
 
 void PrimeWin::refreshAdminTbl()
@@ -305,7 +412,8 @@ QString PrimeWin::phoneCheck(QString phone)
                     || bareNumber.size() - bareNumber.indexOf("+") == 11))
     {}//It's good, I'm just too lazy to DeMorganize the conditional
     //Check if phone number has the correct length if there's no +
-    else if (!hasPlus && (bareNumber.size() == 11 || bareNumber.size() == 10))
+    else if (!hasPlus && (bareNumber.size() == 11
+                          || bareNumber.size() == 10))
     {}//Same deal
     else
     {throwGen = true;}
@@ -371,7 +479,59 @@ void PrimeWin::catchLoginStatus(bool status)
 
 void PrimeWin::catchDataUpdate(Data caughtThis)
 //Catches signal to update data structures
-{data = caughtThis;}
+{
+    data = caughtThis;
+}
+
+void PrimeWin::catchAddItin()
+//Catches signal to update itin
+{
+//    //Block signals to prevent unintended behavior
+//    const QSignalBlocker blockItinTbl(ui->itineraryTbl);
+
+    //Create button object to emululate the button that was pushed
+    QPushButton *addBt = qobject_cast<QPushButton*>(sender());
+
+    //Get the stadium's num from the button's property
+    int stadNum = addBt->property("stadNum").toInt();
+
+    //If adding to itin
+    if (addBt->text() == "Add")
+    {
+        //Add to the itin
+        itinList.push_back(ItinObj(stadNum));
+
+        //?????????show possible souvenirs??????????
+        int UNIMPLEMENTED;
+
+        //Change the bt's text to remove
+        addBt->setText("Remove");
+    }
+    //Otherwise, remove from the itin
+    else if (addBt->text() == "Remove")
+    {
+        //Loop until stadium is found
+        for (std::list<ItinObj>::iterator it = itinList.begin();
+             it != itinList.end(); it++)
+        {
+            //Check to see if stadium is found
+            if (it->getStadNum() == stadNum)
+            {
+                //Remove the stadium from the itinerary queue
+                itinList.erase(it);
+
+                //Leave loop
+                it = itinList.end();
+            }
+        }
+
+        //Change the bt's text back to add
+        addBt->setText("Add");
+    }
+
+    refreshItin();
+    //?????????show possible souvenirs??????????
+}
 
 /*PAGE INDEX============================================================*/
 //Index 0 = start page
@@ -392,7 +552,10 @@ void PrimeWin::on_startInfoBt_clicked()
 
 void PrimeWin::on_startTripBt_clicked()
 //Index 0 to 2
-{ui->stackWidg->setCurrentIndex(2);}
+{
+    refreshItinBuilder();
+    ui->stackWidg->setCurrentIndex(2);
+}
 
 void PrimeWin::on_adminLoginBt_clicked()
 //Pulls up admin login window
@@ -418,15 +581,17 @@ void PrimeWin::on_homeStadTbl_itemSelectionChanged()
 
 //Index1 - Home Page======================================================
 void PrimeWin::on_homeBackBt_clicked()
+
 //Index 1 to 0
 {ui->stackWidg->setCurrentIndex(0);}
 
 void PrimeWin::on_homePlanTripBt_clicked()
 //Index 1 to 2
-{ui->stackWidg->setCurrentIndex(2);}
+{
+    refreshItinBuilder();
+    ui->stackWidg->setCurrentIndex(2);
+}
 
-//Toggles a filter to filter out American League teams and only
-//displays American league teams.
 void PrimeWin::on_homeNationalCB_toggled(bool checked)
 {
     //IF - Checks to see if our Checkbox is checked. If it is then
@@ -469,8 +634,6 @@ void PrimeWin::on_homeNationalCB_toggled(bool checked)
     }// end else
 }// end void PrimeWin::on_homeNationalCB_toggled(bool checked)
 
-
-
 void PrimeWin::on_homeAmericanCB_toggled(bool checked)
 {
     //IF - Checks to see if our Checkbox is checked. If it is then
@@ -512,6 +675,30 @@ void PrimeWin::on_homeAmericanCB_toggled(bool checked)
 
     }// end else
 }//end void on_homeAmericanCB_toggled(bool checked)
+
+void PrimeWin::on_homeNameRd_toggled(bool checked)
+//Sorts home's stadium table alphabetically by stadium name
+//Complexity: O(n^2)
+{
+    //Perform sort when radio toggle is checked
+    if (checked)
+    {
+        vector<int> stadNums;   //Vector of stadNums to be sorted
+        CustomSorts use(data);  //Sorting class
+
+        //Create a list of stadNums to match the order the table is in now
+        for (int x = 0; x < ui->homeStadTbl->rowCount(); x++)
+        {
+            stadNums.push_back(ui->homeStadTbl
+                               ->item(x,0)->text().toInt());
+        }
+        //Ask insertion sort to reorder the stadiums
+        stadNums = use.InsertionSort(stadNums);
+
+        //Refresh home table
+        refreshHomeTbl(stadNums);
+    }
+}
 
 //Index2 - Itinerary Page=================================================
 void PrimeWin::on_itinStartOverBt_clicked()
@@ -787,3 +974,82 @@ void PrimeWin::on_dataTxtBt_clicked()
                              QMessageBox::Ok);
     }
 }
+
+// refreshes souvenir table (admin page)
+void PrimeWin::refreshSouvenirTableAdmin()
+{
+    int stadNum = ui->adminStadTbl->item(ui->adminStadTbl->currentRow(),0)->text().toInt();
+    QTableWidget *widget = ui->adminSouvTable;
+
+    //REFRESH SOUVENIR TABLE
+    widget->clear();
+    widget->setRowCount(0);
+    widget->setColumnCount(2);
+    widget->setHorizontalHeaderLabels(QStringList() << "Item Name" << "Price");
+    QTableWidgetItem *item; //Item to populate table cell
+
+    //Loop to populate table
+    for (unsigned int x = 0; x < data.getSouvListSize(stadNum); x++)
+    {
+        //Add a row
+        widget->insertRow(widget->rowCount());
+
+        //Populate second column with souvName
+        item = new QTableWidgetItem;
+        item->setData(0,data.getSouvName(stadNum, x));
+        widget->setItem(x,0,item);
+
+        //Populate third column with souvPrice
+        item = new QTableWidgetItem;
+        item->setData(0,data.getSouvPrice(stadNum, x));
+        widget->setItem(x,1,item);
+    }
+    widget->resizeColumnsToContents();
+}
+
+// when an index is selected, the bottom panel will display a list of souvenirs
+// that corresponds to its stadium
+void PrimeWin::on_adminStadTbl_itemSelectionChanged()
+{ refreshSouvenirTableAdmin(); }
+
+// on Add New Souvenir Button
+void PrimeWin::on_pushButton_9_clicked()
+{
+    //Construct new dialog
+    // also pass in data object so we can access data structures
+    addSouvDialog newAddSouvWin(data, this);
+    connect(&newAddSouvWin,SIGNAL(throwNewSouvData(Data)),
+            this,SLOT(catchNewSouvenirData(Data)));
+    newAddSouvWin.exec();
+}
+
+// process new souvenir data
+void PrimeWin::catchNewSouvenirData(Data caughtData)
+{data = caughtData;}
+
+void PrimeWin::on_adminBackBtn_clicked()
+{ ui->adminHome->hide();  ui->start->show();}
+
+// on Delete Souvenir Button
+void PrimeWin::on_deleteSouvBtn_clicked()
+{
+   // get selected row
+   int stadNum = ui->adminStadTbl->selectionModel()->currentIndex().row();
+   int itemNum = ui->adminSouvTable->selectionModel()->currentIndex().row();
+
+   // error checking
+   if(stadNum != -1 && itemNum != -1)
+   {
+          // delete souvenir
+          data.deleteSouv(stadNum, itemNum);
+          refreshSouvenirTableAdmin();
+   }
+   else
+   {
+       //notify admin to make a selection on souvenir
+       QMessageBox::information(this, tr("Error"),
+                            tr("Please select a stadium and a souvenir to remove."),
+                            QMessageBox::Ok);
+   }
+}
+

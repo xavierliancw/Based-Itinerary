@@ -8,6 +8,12 @@ Data::~Data()
 //Destructor
 {}
 
+// Copy vector from master
+void Data::copyVector(std::vector<StadObj>& copy)
+{
+    copy = masterVect;
+}
+
 void Data::addStad(QString name, QString address,
                    QString phone, QString opened, int capacity,
                    QString grass, QString type)
@@ -150,6 +156,21 @@ void Data::addSouv(int stadNum, QString newName, double newPrice)
     newSouv.price = newPrice;
 
     masterVect.at(stadNum).souvVect.push_back(newSouv);
+}
+
+void Data::deleteSouv(int stadNum, int souvNum)
+// removes a souvenir object from souvVect
+{
+    // erase element if possible
+    if(souvNum <= this->getSouvListSize(stadNum))
+    {
+        masterVect.at(stadNum).souvVect.erase(masterVect.at(stadNum).souvVect.begin()+souvNum);
+    }
+    else
+    {
+        qDebug() << "Error: Can't remove souvenir *** Out of Range ***";
+    }
+
 }
 
 void Data::addDist(int x, int y, int newDist)
@@ -604,9 +625,19 @@ QString Data::getSouvName(int stadNum, int souvNum) const
 double Data::getSouvPrice(int stadNum, int souvNum) const
 {return masterVect.at(stadNum).souvVect.at(souvNum).price;}
 
+int Data::getSouvListSize(int stadNum) const
+{return masterVect.at(stadNum).souvVect.size();}
+
 int Data::getDistBetween(unsigned int here, unsigned int there) const
 //Returns distance between two stadiums
 {return matrix[here][there];}
+
+ItinObj::ItinObj(int stadium)
+{
+    stadNum = stadium;
+    itinSouvList.clear();
+    itinSouvQuant.clear();
+}
 
 void ItinObj::pushCart(int souvNum, int qty)
 //Pushes a souvenir to the cart at the current stadium

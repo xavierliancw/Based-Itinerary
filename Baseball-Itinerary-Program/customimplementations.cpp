@@ -1,5 +1,41 @@
 #include "customimplementations.h"
 
+/*CustomSorts METHODS*/
+CustomSorts::CustomSorts(Data dataIn)
+//Constructor
+{data = dataIn;}
+
+CustomSorts::~CustomSorts()
+//Destructor
+{}
+
+vector<int> CustomSorts::InsertionSort(vector<int> sortThese)
+//Insertion sort
+//Complexity: O(n^2)
+{
+     int j;     //LCV
+     int temp;  //Holds swapping variable
+
+    //Loop until i reaches sortThese's size
+    for (int i = 0; i < (int)sortThese.size(); i++)
+    {
+        j = i;
+
+        //While j is greater than 0 and j is less that its postdecessor
+        while (j > 0
+               && data.getStadName(sortThese.at(j))
+               < data.getStadName(sortThese.at(j - 1)))
+        {
+              temp = sortThese[j];              //Store for swap
+              sortThese[j] = sortThese[j-1];    //Do the swap
+              sortThese[j-1] = temp;            //Finish the swap
+              j--;
+        }
+    }
+    return sortThese;
+}
+//========================================================================
+
 /*MinHeap METHODS*/
 template<class data>
 MinHeap<data>::MinHeap()
@@ -294,117 +330,117 @@ int MinHeap<data>::rChildOf(int index)
 //========================================================================
 
 /*Dijkstra METHODS*/
-Dijkstra::Dijkstra(const vector <vector<int> > &inMatrix)
-//Construct by copying the matrix
-{
-    matrix = inMatrix;
-}
-Dijkstra::~Dijkstra()
-//Destructor
-{}
+//Dijkstra::Dijkstra(const vector<vector<int> > &inMatrix)
+////Construct by copying the matrix
+//{
+//    matrix = inMatrix;
+//}
+//Dijkstra::~Dijkstra()
+////Destructor
+//{}
 
-std::vector<int> Dijkstra::getDistanceMap(int start)
-//Run Dijktra's algorithm on the starting vertex and return cost map
-//Complexity: O(nlogn)
-{
-    Djobject djnode;            //Algorithm object for vertex and cost
-    MinHeap<Djobject> djheap;   //Min heap of Djobjects
-    std::vector<int> djmap;     //Map of heap: djmap[vertex] = heap index
-    std::vector<int> distMap;   //Distances from start to each vertex
-    int current = start;        //Current vertex
-    int holdSwap;               //Helps update djmap
+//std::vector<int> Dijkstra::getDistanceMap(int start)
+////Run Dijktra's algorithm on the starting vertex and return cost map
+////Complexity: O(nlogn)
+//{
+//    Djobject djnode;            //Algorithm object for vertex and cost
+//    MinHeap<Djobject> djheap;   //Min heap of Djobjects
+//    std::vector<int> djmap;     //Map of heap: djmap[vertex] = heap index
+//    std::vector<int> distMap;   //Distances from start to each vertex
+//    int current = start;        //Current vertex
+//    int holdSwap;               //Helps update djmap
 
-    //Initialize heap
-    for (unsigned int x = 0; x < matrix.size(); x++)
-    {
-        //Create a vertex
-        djnode.vertex = x;
+//    //Initialize heap
+//    for (unsigned int x = 0; x < matrix.size(); x++)
+//    {
+//        //Create a vertex
+//        djnode.vertex = x;
 
-        //Initialize starting node with 0 cost
-        if (x == (unsigned int)start)
-        {
-            //This keeps the starting vertex at the top of the heap
-            djnode.cost = 0;
-        }
-        //Otherwise, give it maximum cost (undetermined cost)
-        else
-        {
-            djnode.cost = INT_MAX;
-        }
-        djheap.push(djnode);
-    }
-    //Initialize map where djmap[vertex] = location index within djheap
-    djmap.resize(djheap.size());
-    for (unsigned int x = 0; x < djmap.size(); x++)
-    {
-        djmap.at(djheap.at(x).vertex) = x;
-    }
-    //Initialize distance map and reset parent map
-    distMap.resize(matrix.size());
-    distMap[start] = start;
-    vertexPath.clear();
-    vertexPath.resize(matrix.size());
-    vertexPath.push_back(-1);
+//        //Initialize starting node with 0 cost
+//        if (x == (unsigned int)start)
+//        {
+//            //This keeps the starting vertex at the top of the heap
+//            djnode.cost = 0;
+//        }
+//        //Otherwise, give it maximum cost (undetermined cost)
+//        else
+//        {
+//            djnode.cost = INT_MAX;
+//        }
+//        djheap.push(djnode);
+//    }
+//    //Initialize map where djmap[vertex] = location index within djheap
+//    djmap.resize(djheap.size());
+//    for (unsigned int x = 0; x < djmap.size(); x++)
+//    {
+//        djmap.at(djheap.at(x).vertex) = x;
+//    }
+//    //Initialize distance map and reset parent map
+//    distMap.resize(matrix.size());
+//    distMap[start] = start;
+//    vertexPath.clear();
+//    vertexPath.resize(matrix.size());
+//    vertexPath.push_back(-1);
 
-    //Algorighm execution until all vertex costs are calculated O(n)
-    while(!djheap.empty())
-    {
-        //Update current
-        current = djheap.getMin().vertex;
+//    //Algorighm execution until all vertex costs are calculated O(n)
+//    while(!djheap.empty())
+//    {
+//        //Update current
+//        current = djheap.getMin().vertex;
 
-        //Add the cost of the vertex to the distance map
-        distMap[current] = djheap.getMin().cost;
+//        //Add the cost of the vertex to the distance map
+//        distMap[current] = djheap.getMin().cost;
 
-        //Pop current off the heap and eliminate it from heap
-        swaps = djheap.popRoot();
+//        //Pop current off the heap and eliminate it from heap
+//        swaps = djheap.popRoot();
 
-        //Update the map O(logn)
-        while (!swaps.empty())
-        {
-            holdSwap = djmap[swaps.at(0).vertex];
-            djmap[swaps.at(0).vertex] = djmap[swaps.at(1).vertex];
-            djmap[swaps.at(1).vertex] = holdSwap;
-            swaps.pop_front();
-            swaps.pop_front();
-        }
-        //Mark the current vertex to indicate that it's not in the heap
-        djmap[current] = -1;
+//        //Update the map O(logn)
+//        while (!swaps.empty())
+//        {
+//            holdSwap = djmap[swaps.at(0).vertex];
+//            djmap[swaps.at(0).vertex] = djmap[swaps.at(1).vertex];
+//            djmap[swaps.at(1).vertex] = holdSwap;
+//            swaps.pop_front();
+//            swaps.pop_front();
+//        }
+//        //Mark the current vertex to indicate that it's not in the heap
+//        djmap[current] = -1;
 
-        //Explore neighbors of current vertex
-        for (unsigned int x = 0; x < matrix.size(); x++)//UHHHH THIS ACTUALLY MAKES IT O(n^2)
-        {
-            //If the vertex in the heap exists and the edge exists
-            if (djmap[x] >= 0 && matrix[x][current] >= 0)
-            {
-                //If cost back to start is less than the cost in the heap
-                if (matrix[x][current]+ distMap[current]
-                    < djheap.at(djmap[x]).cost)
-                {
-                    //Create an updated djobject
-                    djnode = djheap.at(djmap[x]);
-                    djnode.cost = matrix[x][current] + distMap[current];
+//        //Explore neighbors of current vertex
+//        for (unsigned int x = 0; x < matrix.size(); x++)//UHHHH THIS ACTUALLY MAKES IT O(n^2)
+//        {
+//            //If the vertex in the heap exists and the edge exists
+//            if (djmap[x] >= 0 && matrix[x][current] >= 0)
+//            {
+//                //If cost back to start is less than the cost in the heap
+//                if (matrix[x][current]+ distMap[current]
+//                    < djheap.at(djmap[x]).cost)
+//                {
+//                    //Create an updated djobject
+//                    djnode = djheap.at(djmap[x]);
+//                    djnode.cost = matrix[x][current] + distMap[current];
 
-                    //Update heap and map O(logn)
-                    swaps.clear();
-                    swaps = djheap.replace(djmap[x],djnode);
-                    while (!swaps.empty())
-                    {
-                        holdSwap = djmap[swaps.at(0).vertex];
-                        djmap[swaps.at(0).vertex]
-                                = djmap[swaps.at(1).vertex];
-                        djmap[swaps.at(1).vertex] = holdSwap;
-                        swaps.pop_front();
-                        swaps.pop_front();
-                    }
-                    //Parent of newly updated vertex is current
-                    vertexPath.at(x) = current;
-                }
-            }
-        }
-    }
-    return distMap;
-}
+//                    //Update heap and map O(logn)
+//                    swaps.clear();
+//                    swaps = djheap.replace(djmap[x],djnode);
+//                    while (!swaps.empty())
+//                    {
+//                        holdSwap = djmap[swaps.at(0).vertex];
+//                        djmap[swaps.at(0).vertex]
+//                                = djmap[swaps.at(1).vertex];
+//                        djmap[swaps.at(1).vertex] = holdSwap;
+//                        swaps.pop_front();
+//                        swaps.pop_front();
+//                    }
+//                    //Parent of newly updated vertex is current
+//                    vertexPath.at(x) = current;
+//                }
+//            }
+//        }
+//    }
+//    return distMap;
+//}
 
-//Returns map of parents to show paths to take
-std::vector<int> Dijkstra::getVertexPath() const
-{return vertexPath;}
+////Returns map of parents to show paths to take
+//std::vector<int> Dijkstra::getVertexPath() const
+//{return vertexPath;}
