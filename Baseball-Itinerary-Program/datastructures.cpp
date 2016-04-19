@@ -158,6 +158,21 @@ void Data::addSouv(int stadNum, QString newName, double newPrice)
     masterVect.at(stadNum).souvVect.push_back(newSouv);
 }
 
+void Data::deleteSouv(int stadNum, int souvNum)
+// removes a souvenir object from souvVect
+{
+    // erase element if possible
+    if(souvNum <= this->getSouvListSize(stadNum))
+    {
+        masterVect.at(stadNum).souvVect.erase(masterVect.at(stadNum).souvVect.begin()+souvNum);
+    }
+    else
+    {
+        qDebug() << "Error: Can't remove souvenir *** Out of Range ***";
+    }
+
+}
+
 void Data::addDist(int x, int y, int newDist)
 //Changes a value in the matrix and its symmetrical counterpart
 {
@@ -609,6 +624,9 @@ QString Data::getSouvName(int stadNum, int souvNum) const
 
 double Data::getSouvPrice(int stadNum, int souvNum) const
 {return masterVect.at(stadNum).souvVect.at(souvNum).price;}
+
+int Data::getSouvListSize(int stadNum) const
+{return masterVect.at(stadNum).souvVect.size();}
 
 int Data::getDistBetween(unsigned int here, unsigned int there) const
 //Returns distance between two stadiums

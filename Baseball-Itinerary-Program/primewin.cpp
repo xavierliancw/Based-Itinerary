@@ -479,7 +479,9 @@ void PrimeWin::catchLoginStatus(bool status)
 
 void PrimeWin::catchDataUpdate(Data caughtThis)
 //Catches signal to update data structures
-{data = caughtThis;}
+{
+    data = caughtThis;
+}
 
 void PrimeWin::catchAddItin()
 //Catches signal to update itin
@@ -530,6 +532,7 @@ void PrimeWin::catchAddItin()
     refreshItin();
     //?????????show possible souvenirs??????????
 }
+
 
 /*PAGE INDEX============================================================*/
 //Index 0 = start page
@@ -723,6 +726,7 @@ void PrimeWin::on_homeAmericanCB_toggled(bool checked)
 }//end void on_homeAmericanCB_toggled(bool checked)
 
 
+
 void PrimeWin::on_homeTurfCB_toggled(bool checked)
 {
     //IF-This if statement will look for the checkbox that we made is checked
@@ -895,7 +899,6 @@ void PrimeWin::on_homeNameRd_toggled(bool checked)
         //Refresh home table
         refreshHomeTbl(stadNums);
     }
-
 }
 
 //Index2 - Itinerary Page=================================================
@@ -1172,3 +1175,82 @@ void PrimeWin::on_dataTxtBt_clicked()
                              QMessageBox::Ok);
     }
 }
+
+// refreshes souvenir table (admin page)
+void PrimeWin::refreshSouvenirTableAdmin()
+{
+    int stadNum = ui->adminStadTbl->item(ui->adminStadTbl->currentRow(),0)->text().toInt();
+    QTableWidget *widget = ui->adminSouvTable;
+
+    //REFRESH SOUVENIR TABLE
+    widget->clear();
+    widget->setRowCount(0);
+    widget->setColumnCount(2);
+    widget->setHorizontalHeaderLabels(QStringList() << "Item Name" << "Price");
+    QTableWidgetItem *item; //Item to populate table cell
+
+    //Loop to populate table
+    for (unsigned int x = 0; x < data.getSouvListSize(stadNum); x++)
+    {
+        //Add a row
+        widget->insertRow(widget->rowCount());
+
+        //Populate second column with souvName
+        item = new QTableWidgetItem;
+        item->setData(0,data.getSouvName(stadNum, x));
+        widget->setItem(x,0,item);
+
+        //Populate third column with souvPrice
+        item = new QTableWidgetItem;
+        item->setData(0,data.getSouvPrice(stadNum, x));
+        widget->setItem(x,1,item);
+    }
+    widget->resizeColumnsToContents();
+}
+
+// when an index is selected, the bottom panel will display a list of souvenirs
+// that corresponds to its stadium
+void PrimeWin::on_adminStadTbl_itemSelectionChanged()
+{ refreshSouvenirTableAdmin(); }
+
+// on Add New Souvenir Button
+void PrimeWin::on_pushButton_9_clicked()
+{
+    //Construct new dialog
+    // also pass in data object so we can access data structures
+    addSouvDialog newAddSouvWin(data, this);
+    connect(&newAddSouvWin,SIGNAL(throwNewSouvData(Data)),
+            this,SLOT(catchNewSouvenirData(Data)));
+    newAddSouvWin.exec();
+}
+
+// process new souvenir data
+void PrimeWin::catchNewSouvenirData(Data caughtData)
+{data = caughtData;}
+
+void PrimeWin::on_adminBackBtn_clicked()
+{ ui->adminHome->hide();  ui->start->show();}
+
+// on Delete Souvenir Button
+void PrimeWin::on_deleteSouvBtn_clicked()
+{
+   // get selected row
+   int stadNum = ui->adminStadTbl->selectionModel()->currentIndex().row();
+   int itemNum = ui->adminSouvTable->selectionModel()->currentIndex().row();
+
+   // error checking
+   if(stadNum != -1 && itemNum != -1)
+   {
+          // delete souvenir
+          data.deleteSouv(stadNum, itemNum);
+          refreshSouvenirTableAdmin();
+   }
+   else
+   {
+       //notify admin to make a selection on souvenir
+       QMessageBox::information(this, tr("Error"),
+                            tr("Please select a stadium and a souvenir to remove."),
+                            QMessageBox::Ok);
+   }
+}
+
