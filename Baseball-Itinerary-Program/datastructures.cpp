@@ -166,6 +166,21 @@ struct list_pair_sort_compare_instructions
     {return left.second < right.second;}
 };
 
+void Data::deleteSouv(int stadNum, int souvNum)
+// removes a souvenir object from souvVect
+{
+    // erase element if possible
+    if(souvNum <= this->getSouvListSize(stadNum))
+    {
+        masterVect.at(stadNum).souvVect.erase(masterVect.at(stadNum).souvVect.begin()+souvNum);
+    }
+    else
+    {
+        qDebug() << "Error: Can't remove souvenir *** Out of Range ***";
+    }
+
+}
+
 void Data::addDist(int x, int y, int newDist)
 //Changes data in matrix and modifies adjacency list
 //Complexity: O(nlogn)
@@ -177,15 +192,15 @@ void Data::addDist(int x, int y, int newDist)
     matrix[x][y] = newDist;
     matrix[y][x] = newDist;
 
+    //See if y already exists in the list at x
+    while ((*it).first != y && !adjList.at(x).empty()
+           && it != adjList.at(x).end())
+    {
+        it++;
+    }
     //If adding a new distance
     if (newDist != -1)
     {
-        //See if y already exists in the list at x
-        while ((*it).first != y && !adjList.at(x).empty()
-               && it != adjList.at(x).end())
-        {
-            it++;
-        }
         //If it is at the end, that means y isn't in the list, so push
         if (it == adjList.at(x).end())
         {
@@ -200,19 +215,9 @@ void Data::addDist(int x, int y, int newDist)
         adjList.at(x).sort(list_pair_sort_compare_instructions());
     }
     //Otherwise delete the distance from the list
-    else if (!adjList.at(x).empty())
+    else if (!adjList.at(x).empty() && it != adjList.at(x).end())
     {
-
-        //Look for the y coordinate in the list
-        while ((*it).first != y && it != adjList.at(x).end())
-        {
-            it++;
-        }
-        //Erase it, but only if it's not at the end
-        if (it != adjList.at(x).end())
-        {
-            adjList.at(x).erase(it);
-        }
+        adjList.at(x).erase(it);
     }
 }
 
@@ -604,6 +609,71 @@ bool Data::importTXT(QString path)
     return !failure;
 }
 
+deque<int> Data::askDijkstra(int startingVertex)
+//Uses Dijkstra's algorithm to calculate paths to all other vertices
+{try{
+    vector<int> parentMap;  //Vector that maps discovery lineage
+    deque<int> distMap;     //Deque of dists from start to all other verts
+    MinMeap meap;           //Minimum heap to help algorithm execution
+    int current;            //Current vertex
+    list< pair<int,int> >::iterator it;
+
+
+    //Initialize heap
+    for (int x = 0; x < (int)matrix.size(); x++)
+    {
+        //Initialize starting vertex with 0 cost
+        if (x == startingVertex)
+        {
+            meap.push(make_pair(x,0));
+        }
+        //Otherwise give all other vertices maximum cost
+        else
+        {
+            meap.push(make_pair(x,INT_MAX));
+        }
+    }
+    //Initialize distance map and  parent map
+    distMap.resize(matrix.size());
+    distMap.at(startingVertex) = 0;    //IM" NOT SO RUSURESURE ABOUT THIS
+    parentMap.resize(matrix.size());
+    parentMap.at(startingVertex) = -1;  //Start has no parent
+
+    //Algorithm execution until all vertex costs are calculated
+    while (!meap.empty())
+    {
+        //Update current
+        current = meap.getMin().first;qDebug() << "current =" << current;
+
+        //Pop current off the heap
+        meap.popRoot();qDebug() << "popped min";
+
+        //Explore neighbors of current vertex
+        it = adjList.at(current).begin();
+        while (it != adjList.at(current).end())
+        {qDebug() << "It is pointing to" << (*it).first << "with cost" << (*it).second;
+            qDebug() << "distmap[current] =" << distMap[current];
+            //If start to neighbor total cost is less than heap's cost
+            if ((*it).second + distMap[current]
+                < meap.mapQuery((*it).first).second)
+            {qDebug() << "it + distMap is better than meap's" << meap.mapQuery((*it).first).second;
+                //Update heap with new, better cost
+                meap.reKey((*it).first,(*it).second + distMap[current]);
+
+                //Parent of newly updated vertex is current
+                parentMap.at((*it).first) = current;
+            }
+            it++;
+        }
+        qDebug() << "heap looks like";
+        for (int x = 0; x < meap.size(); x++)
+        {
+            qDebug() << x << "-" << meap.at(x).first << "-" << meap.at(x).second;
+        }
+    }qDebug() << "Dijkstra complete";
+    return distMap;
+}catch (exception const& ex) {qDebug() << "Exception: " << ex.what();}}
+
 QString Data::getStadName(int stadNum) const
 //Returns name of stadium at stadNum
 {return masterVect.at(stadNum).name;}
@@ -661,6 +731,9 @@ QString Data::getSouvName(int stadNum, int souvNum) const
 
 double Data::getSouvPrice(int stadNum, int souvNum) const
 {return masterVect.at(stadNum).souvVect.at(souvNum).price;}
+
+int Data::getSouvListSize(int stadNum) const
+{return masterVect.at(stadNum).souvVect.size();}
 
 int Data::getDistBetween(unsigned int here, unsigned int there) const
 //Returns distance between two stadiums

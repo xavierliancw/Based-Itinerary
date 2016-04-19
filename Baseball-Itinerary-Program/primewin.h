@@ -16,6 +16,7 @@
 #include "adminlogin.h"
 #include "customimplementations.h"
 #include "editdistances.h"
+#include "addsouvdialog.h"
 
 namespace Ui {
 class PrimeWin;
@@ -85,6 +86,10 @@ private slots:
 
     void on_homeAmericanCB_toggled(bool checked);
 
+    void on_homeSynthCB_toggled(bool checked);
+
+    void on_homeTurfCB_toggled(bool checked);
+
     void on_homeNameRd_toggled(bool checked);
 
 //Index2==================================================================
@@ -103,18 +108,30 @@ private slots:
 
     void on_adminStadTbl_cellChanged(int row, int column);
 
+    void refreshSouvenirTableAdmin();
+
+    void on_adminStadTbl_itemSelectionChanged();
+
+    // on Add New Souvenir Button
+    void on_pushButton_9_clicked();
+
+    void on_adminBackBtn_clicked();
+
+    // Catch data from Add New Souv Button
+    void catchNewSouvenirData(Data caughtData);
+
+    void on_deleteSouvBtn_clicked();
+
 //Index5==================================================================
     void on_dataBackBt_clicked();
 
     void on_dataTxtBt_clicked();
 
 
-
 private:
     Ui::PrimeWin *ui;           //User interface
 
     std::list<ItinObj> itinList;
-
     Data data;                  //Interface for all data structures
     QFileSystemModel *dirmodel; //Model of file directory
 };

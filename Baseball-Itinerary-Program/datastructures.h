@@ -107,6 +107,7 @@ public:
 //    void delTeam(int stadNum, QString whichTeam);
 
     void addSouv(int stadNum, QString newName, double newPrice);
+    void deleteSouv(int stadNum, int souvNum);
     void modSouvName();
     void modSouvPrice();
 
@@ -133,6 +134,7 @@ public:
 
     QString getSouvName(int stadNum, int souvNum) const;
     double getSouvPrice(int stadNum, int souvNum) const;
+    int    getSouvListSize(int stadNum) const;
 
     //Returns distance between two stadiums
     int getDistBetween(unsigned int here, unsigned int there) const;
