@@ -35,3 +35,9 @@ Scrum Log
 - Merged Dijkstra's algorithm implementation into master
 - Resolved pull requests to complete stories #3 and #4
 
+13 April
+- Fixed GitHub problems on some computers
+
+18 April
+- CHECKPOINT 1 (Positive client response)
+- Closed story #16

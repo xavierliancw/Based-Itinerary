@@ -548,6 +548,11 @@ void PrimeWin::on_startInfoBt_clicked()
 //Index 0 to 1
 {
     refreshHome();
+    ui->homeNameRd->setChecked(true);
+    ui->homeAmericanCB->setChecked(true);
+    ui->homeNationalCB->setChecked(true);
+    ui->homeTurfCB->setChecked(true);
+    ui->homeSynthCB->setChecked(true);
     ui->stackWidg->setCurrentIndex(1);
 }
 
@@ -884,20 +889,28 @@ void PrimeWin::on_homeNameRd_toggled(bool checked)
     //Perform sort when radio toggle is checked
     if (checked)
     {
-        vector<int> stadNums;   //Vector of stadNums to be sorted
-        CustomSorts use(data);  //Sorting class
+        SortObj object;             //Object to be pushed into sortThese
+        vector<SortObj> sortThese;  //Vector of stadiums to be sorted
+        vector<int> stadNumOrder;   //Vector of stadNums
+        CustomSorts use;          //Sorting class
 
         //Create a list of stadNums to match the order the table is in now
         for (int x = 0; x < ui->homeStadTbl->rowCount(); x++)
         {
-            stadNums.push_back(ui->homeStadTbl
-                               ->item(x,0)->text().toInt());
+            object.stadNum = ui->homeStadTbl->item(x,0)->text().toInt();
+            object.sortee = ui->homeStadTbl->item(x,2)->text();
+            sortThese.push_back(object);
         }
         //Ask insertion sort to reorder the stadiums
-        stadNums = use.InsertionSort(stadNums);
+        sortThese = use.InsertionSort(sortThese);
 
+        //Build a vector of just stadNums that mirrors sortThese
+        for (int x = 0; x < (int)sortThese.size(); x++)
+        {
+            stadNumOrder.push_back(sortThese.at(x).stadNum);
+        }
         //Refresh home table
-        refreshHomeTbl(stadNums);
+        refreshHomeTbl(stadNumOrder);
     }
 }
 
@@ -917,65 +930,64 @@ void PrimeWin::on_itinOptimizeBt_clicked()
 //    std::vector< std::vector<int> > matrix = data.getMatrix();
 
 
-    std::vector< std::vector<int> > matrix;
-    //create 8x8 matrix
-    matrix.resize(8);
-    for (int x =0; x < 8; x++)
-    {
-        matrix.at(x).resize(8);
-    }
-    for (int x = 0; x < 8; x++)
-    {
-        for (int y = 0; y < 8; y++)
-        {
-            matrix[x][y] = -1;
-        }
-    }
-    matrix[1][0] = 3;
-    matrix[0][1] = 3;
-    matrix[2][0] = 1;
-    matrix[0][2] = 1;
-    matrix[3][0] = 3;
-    matrix[0][3] = 3;
-    matrix[2][1] = 3;
-    matrix[1][2] = 3;
-    matrix[3][1] = 7;
-    matrix[1][3] = 7;
-    matrix[4][2] = 3;
-    matrix[2][4] = 3;
-    matrix[5][1] = 8;
-    matrix[1][5] = 8;
-    matrix[6][2] = 9;
-    matrix[2][6] = 9;
-    matrix[6][5] = 7;
-    matrix[5][6] = 7;
-    matrix[7][4] = 9;
-    matrix[4][7] = 9;
+//    std::vector< std::vector<int> > matrix;
+//    //create 8x8 matrix
+//    matrix.resize(8);
+//    for (int x =0; x < 8; x++)
+//    {
+//        matrix.at(x).resize(8);
+//    }
+//    for (int x = 0; x < 8; x++)
+//    {
+//        for (int y = 0; y < 8; y++)
+//        {
+//            matrix[x][y] = -1;
+//        }
+//    }
+//    matrix[1][0] = 3;
+//    matrix[0][1] = 3;
+//    matrix[2][0] = 1;
+//    matrix[0][2] = 1;
+//    matrix[3][0] = 3;
+//    matrix[0][3] = 3;
+//    matrix[2][1] = 3;
+//    matrix[1][2] = 3;
+//    matrix[3][1] = 7;
+//    matrix[1][3] = 7;
+//    matrix[4][2] = 3;
+//    matrix[2][4] = 3;
+//    matrix[5][1] = 8;
+//    matrix[1][5] = 8;
+//    matrix[6][2] = 9;
+//    matrix[2][6] = 9;
+//    matrix[6][5] = 7;
+//    matrix[5][6] = 7;
+//    matrix[7][4] = 9;
+//    matrix[4][7] = 9;
 
-    Data test;
-    test.initializeStuff();
+//    Data test;
+//    test.initializeStuff();
 
-    test.addDist(1,0,3);
-    test.addDist(2,0,1);
-    test.addDist(3,0,3);
-    test.addDist(2,1,3);
-    test.addDist(3,1,7);
-    test.addDist(4,2,3);
-    test.addDist(5,1,8);
-    test.addDist(6,2,9);
-    test.addDist(6,5,7);
-    test.addDist(7,4,9);
+//    test.addDist(1,0,3);
+//    test.addDist(2,0,1);
+//    test.addDist(3,0,3);
+//    test.addDist(2,1,3);
+//    test.addDist(3,1,7);
+//    test.addDist(4,2,3);
+//    test.addDist(5,1,8);
+//    test.addDist(6,2,9);
+//    test.addDist(6,5,7);
+//    test.addDist(7,4,9);
 
     //Let's say itinerary is 2,3,6,1
     std::list<int> itin;
-    itin.push_back(2);
-    itin.push_back(3);
-    itin.push_back(6);
-    itin.push_back(1);
+    itin.push_back(21);//dodgers
+    itin.push_back(10);//safeco
+//    itin.push_back(6);
+//    itin.push_back(1);
 
-    Dijkstra pathFind(test);  //Dijkstra's algorithm
     std::deque<int> optimized;  //Optimized order of stadNums
-    std::vector<int> djMap;     //Map of costs to visit each stadium
+    std::deque<int> djMap;     //Map of costs to visit each stadium
     int totalTripDist = 0;      //Total trip distance
     int shortest;               //Stores current shortest distance
     int nextStad;               //Stores next stad to visit
@@ -991,10 +1003,10 @@ void PrimeWin::on_itinOptimizeBt_clicked()
     };
 
     //Array of visited booleans where index is stadNum
-    visitObj visitAr[matrix.size()];
+    visitObj visitAr[data.size()];
 
     //Initialize the array to the uninitialized states
-    for (unsigned int x = 0; x < matrix.size(); x++)
+    for (unsigned int x = 0; x < data.size(); x++)
     {
         visitAr[x].visited = false;
         visitAr[x].valid = false;
@@ -1018,24 +1030,23 @@ void PrimeWin::on_itinOptimizeBt_clicked()
     //Build the optimized itinerary
     for (int i = 0; i < (int)itin.size() - 1; i++)
     {
+        try{
         //Call Dijkstra's on the last stadium on the optimized itinerary
-        djMap = pathFind.getDistanceMap(optimized.back());
-for (int x = 0; x < 8; x++)
-{
-    qDebug() << "djmap" << djMap[x];
-}
+        djMap = data.askDijkstra(optimized.back());
+        }catch (exception const& ex) {qDebug() << "Exception: " << ex.what();}
+
         //Reinitialize temporary values
         shortest = INT_MAX;
         nextStad = -1;
 
         //Find next stad in the itin that has the shortest dist
-        for (int x = 0; x < matrix.size(); x++)
+        for (int x = 0; x < data.size(); x++)
         {
             //If stad is in the itin & not visited & it has a shorter dist
             if (visitAr[x].valid && !visitAr[x].visited && djMap[x] < shortest)
             {
                 //Update shortest and the next stad to visit
-                shortest = djMap[x];qDebug() << djMap[x] << "HALKJR";
+                shortest = djMap[x];
                 nextStad = x;
             }
         }

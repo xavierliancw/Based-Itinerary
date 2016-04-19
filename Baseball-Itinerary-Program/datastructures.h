@@ -9,9 +9,12 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDir>
-
+#include <deque>
 #include <QFile>
 #include <QTextStream>
+
+#include "customimplementations.h"
+using namespace std;
 
 class TeamObj
 {
@@ -157,6 +160,8 @@ public:
 
     //Import from a text file (Really just resets to defaults for devs)
     bool importTXT(QString path);
+
+    deque<int> askDijkstra(int startingVertex);
 
 private:
     std::vector<StadObj> masterVect;        //Vector of all stadiums

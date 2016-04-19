@@ -6,8 +6,9 @@
 #include <sstream>
 #include <vector>
 #include <cstddef>
-
-#include "datastructures.h"
+#include <QString>
+#include <utility>
+#include <QDebug>
 using namespace std;
 
 /*************************************************************************
@@ -15,150 +16,83 @@ using namespace std;
  * ----------------------------------------------------------------------
  * This class stores all methods implemented by developers used for
  * sorting data.
+ * The SortObj class is a helper class that will associate a stadNum
+ * with whatever data that needs to be sorted (for now it's just QString
+ * but maybe someone could make it a template *hint *HINT) ¯\_(ツ)_/¯
  * ----------------------------------------------------------------------
  * PRE-REQUISITES
  * ----------------------------------------------------------------------
  * #include <vector>
  * using namespace std;
  ************************************************************************/
+class SortObj   //Objects to sort that also store an associated stadNum
+{
+public:
+    int stadNum;
+    QString sortee;
+
+    //Dereference to get the value to be sorted
+    QString operator *() const {return sortee;}
+    //Pointer operator to get stadNum
+    int operator &() const {return stadNum;}
+};
 class CustomSorts
 {
 public:
-    CustomSorts(Data dataIn);
+    CustomSorts();
     ~CustomSorts();
 
     //Insertion sort
-    vector<int> InsertionSort(vector<int> sortThese);
-private:
-    Data data;
+    vector<SortObj> InsertionSort(vector<SortObj> sortThese);
 };
 /*************************************************************************
- * MinHeap (custom) -single object dereference comparator-
+ * MinMeap (Minimum Binary Heap with Map Parallel) (Int Specific)
  * ----------------------------------------------------------------------
- * This class implements a minimum heap data structure through use of a
- * deque.
- * This is a custom implementation with the following modifications:
- *
- *  - Minimum comparison is based on the dereference operator (*). That
- *    is, when comparing some <data> against some other <data>, this heap
- *    will compare the dereferenced values against each other.
- *
- *      - e.g.: data first;    //First variable being compared
- *              data second;   //Second variable being compared
- *
- *              //This heap will compare like this
- *              if (*first < *second) {...
- *
- *    And since this implementation only uses one template, IT IS
- *    RECOMMENDED to initialize this custom heap with a custom object
- *    that has overloaded its * operator to obtain the intended values.
- *
- *  - There is an overloaded replace function that additionally accepts
- *    an index as a parameter. This allows for replacement of specific
- *    data within the heap instead of the traditional root pop then new
- *    data push.
- *
- *  - That overloaded replace function, root popping, and both heap
- *    restoring functions all return a deque that contains a list of
- *    steps the heap took to reorder itself. For example, if this heap
- *    swapped the contents of index 0 with the contents of index 2, then
- *    swapped the contents index 2 with the contents of index 5
- *    (0<->2,2<->5), the returning deque would look like:
- *    [<data> from 2], [<data> from 0], [<data> from 5], [<data> from 2]
- *
- *  - The function that restores the heap property upwards can start
- *    at any given index
+ * This class implements a minimum binary heap using a deque.
+ * There's another parallel vector that tracks the location of each key
+ * in the heap so that key retrieval is O(1).
+ * This MinMeap stores a heap of value-key pairs and will maintain heap
+ * order by comparing the latter variable in the pair variable.
  * ----------------------------------------------------------------------
  * PRE-REQUISITES
  * ----------------------------------------------------------------------
  * #include <deque>
+ * #include <utility>
  * #include <stdexcept>
- * #include <string>
  * #include <sstream>
  * using namespace std;
  ************************************************************************/
-template<class data>
-class MinHeap
+class MinMeap
 {
 public:
-    MinHeap();  //Constructor
-    ~MinHeap(); //Destructor
+    MinMeap();  //Constructor
+    ~MinMeap(); //Destructor
 
-    void push(data addThis);    //Adds new data
-    deque<data> popRoot();      //Pops the root
+    void push(pair<int,int> newData);           //Adds new data
+    void popRoot();                             //Pops the root
 
-    void clear();                                   //Clears out heap
-    void replace(data withThis);                    //Pops root, adds new
-    deque<data> replace(int index, data withThis);  //Specific replacement
-    void heapify(data heapThis);                    //Unimplemented
-    void merge(MinHeap a, MinHeap b);               //Unimplemented
-    void meld(MinHeap a, MinHeap b);                //Unimplemented
+    void clear();                               //Clears out heap
+    void replace(pair<int,int> newData);        //Pops root, adds new
+    void reKey(int thisData, int newKey);       //Key replacement
 
-    data getMin() const;                //Returns data at root
-    data at(unsigned int index) const;  //Returns data at heap index
-    int size() const;                   //Returns size of heap
-    bool empty() const;                 //Returns if heap is empty
+    pair<int,int> getMin() const;               //Returns data at root
+    pair<int,int> at(unsigned int index) const; //Returns index data
+    pair<int,int> mapQuery(int data) const;     //Returns data's pair
+    int size() const;                           //Returns size of heap
+    bool empty() const;                         //Returns if heap is empty
 
 private:
-    deque<data> heap;   //Deque to handle heap
-    deque<data> swaps;  //Queue of swaps that occured
+    deque< pair<int,int> > heap;   //Deque to handle heap
+    deque<int> meap;	//Heap map where key is index & data is location
 
-    deque<data> bubbleUp(unsigned int index);   //Restore heap upward
-    deque<data> bubbleDown();                   //Restore heap downward
-    int parentOf(int index);                    //Get parent index
-    int lChildOf(int index);                    //Get left child index
-    int rChildOf(int index);                    //Get right child index
+    void bubbleUp(unsigned int index);   //Restore heap upward
+    void bubbleDown();                   //Restore heap downward
+    int parentOf(int index);             //Get parent index
+    int lChildOf(int index);             //Get left child index
+    int rChildOf(int index);             //Get right child index
 };
-/*************************************************************************
- * Dijkstra
- * ----------------------------------------------------------------------
- * This is an implementation of Dijkstra's algorithm.
- * This object must be constructed with a 2D matrix implemented through
- * a nested vector of ints.
- * This implementation requires a custom minimum heap that can return
- * the swaps it makes to regain heap order, and can also compare two
- * values using an overloaded * operator.
- * Through use of the custom minimum heap, this implementation is able
- * to run Dijkstra's algorithm with a complexity of O(ElogV) where E
- * is the number of edges in the matrix, and V is the number of vertices
- * in the matrix.
- * ----------------------------------------------------------------------
- * PRE-REQUISITES
- *
- * - A 2D adjacency matrix that uses a nested vector of ints
- * - A custom minumum heap
- * #include <vector>
- * #include <cstddef>
- * using namespace std;
- * ----------------------------------------------------------------------
- ************************************************************************/
-class Dijkstra
-{
-public:
-    Dijkstra(Data inData);  //Constructor
-    ~Dijkstra();                                      //Destructor
 
-    //Returns map of vertices and their distances from start
-    std::vector<int> getDistanceMap(int start);
 
-    //Returns map of parents to show paths to take
-    std::vector<int> getVertexPath() const;
 
-private:
-    //Djikstra object
-    class Djobject
-    {
-    public:
-        int vertex;
-        int cost;
-
-        //Overloaded operators
-        int operator *() const {return cost;}
-        int operator &() const {return vertex;}
-    };
-    Data data;
-    deque<Djobject> swaps;                  //Deque of heap swaps
-    vector<int> vertexPath;                 //Parent map
-};
 
 #endif // CUSTOMIMPLEMENTATIONS_H
