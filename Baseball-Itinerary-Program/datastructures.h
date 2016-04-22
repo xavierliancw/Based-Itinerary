@@ -144,8 +144,6 @@ public:
 
     //Returns the 2D matrix
     std::vector< std::vector<int> > getMatrix() const;
-    //Blarmos
-    void initializeStuff();
 
     //Returns adjacency list
     std::vector< std::list< std::pair<int,int> > > getAdjList() const;

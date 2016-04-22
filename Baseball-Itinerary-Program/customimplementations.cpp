@@ -34,9 +34,14 @@ vector<SortObj> CustomSorts::InsertionSort(vector<SortObj> sortThese)
 }
 //========================================================================
 /*MinMeap METHODS*/
-MinMeap::MinMeap()
+MinMeap::MinMeap(unsigned int meapInitSize)
 //Constructor
-{}
+{
+    for (int x = 0; x < (int)meapInitSize; x++)
+    {
+        meap.push_back(-1);
+    }
+}
 
 MinMeap::~MinMeap()
 //Destructor
@@ -48,12 +53,6 @@ void MinMeap::push(pair<int,int> newData)
 {
 	//Push new key-pair into the back of the heap
     heap.push_back(newData);
-
-    //Increase the size of the meap if necessary
-    if (newData.first >= (int)meap.size())
-    {
-    	meap.resize(newData.first + 1);
-    }
 
     //Meap's index holds heap's location
     meap.at((newData).first) = heap.size() - 1;
@@ -69,8 +68,12 @@ void MinMeap::popRoot()
 	//Update the map to indicate that the value doesn't exist anymore
 	meap.at(heap.front().first) = -1;
 
-    //Pop the front of the heap
-	heap.pop_front();
+    //Move the last value up to the front
+    meap.at(heap.back().first) = 0;
+
+    //Move the last value of the heap to the front and pop the end
+    heap.front() = heap.back();
+    heap.pop_back();
 
 	//Restore heap order
 	bubbleDown();
@@ -252,7 +255,7 @@ void MinMeap::reKey(int thisData, int newKey)
 	{
 		//Validate that thisData is valid
 		if (thisData >= 0)
-		{qDebug() << "rekeying" << thisData << "with new key" << newKey << "heap.at(thisData).first =" << heap.at(meap.at(thisData)).first;
+		{
 			heap.at(meap.at(thisData)).second = newKey;
 			bubbleUp(meap.at(thisData));
 		}
@@ -333,13 +336,29 @@ pair<int,int> MinMeap::mapQuery(int data) const
         ostringstream convert;
         convert << data;
         if (heap.empty())
-        {
-            message += "Heap is empty";
-        }
+        {message += "Heap is empty";}
         else
-        {
-            message += "Data" + convert.str() + " does not exist in heap";
-        }
+        {message += "Data " + convert.str() + " does not exist in heap";}
+        throw out_of_range(message);
+    }
+}
+
+bool MinMeap::thisDataExists(int data) const
+//Returns if data exists within the heap or not
+{
+    //Validate
+    if (data >= 0 && data < (int)meap.size())
+    {
+        if (meap.at(data) == -1)
+        {return false;} else {return true;}
+    }
+    //Throw an exception
+    else
+    {
+        string message = "MinHeap<>::thisDataExists(): ";
+        ostringstream convert;
+        convert << data;
+        message += convert.str() + " is out of the range of the map";
         throw out_of_range(message);
     }
 }

@@ -611,13 +611,13 @@ bool Data::importTXT(QString path)
 
 deque<int> Data::askDijkstra(int startingVertex)
 //Uses Dijkstra's algorithm to calculate paths to all other vertices
-{try{
-    vector<int> parentMap;  //Vector that maps discovery lineage
-    deque<int> distMap;     //Deque of dists from start to all other verts
-    MinMeap meap;           //Minimum heap to help algorithm execution
-    int current;            //Current vertex
+//Complexity: O(elogv) where e = number of edges, v = number of vertices
+{
+    vector<int> parentMap;      //Vector that maps discovery lineage
+    deque<int> distMap;         //Distances from start to all other verts
+    MinMeap meap(matrix.size());//Minimum heap to help algorithm execution
+    int current;                //Current vertex
     list< pair<int,int> >::iterator it;
-
 
     //Initialize heap
     for (int x = 0; x < (int)matrix.size(); x++)
@@ -635,28 +635,32 @@ deque<int> Data::askDijkstra(int startingVertex)
     }
     //Initialize distance map and  parent map
     distMap.resize(matrix.size());
-    distMap.at(startingVertex) = 0;    //IM" NOT SO RUSURESURE ABOUT THIS
     parentMap.resize(matrix.size());
     parentMap.at(startingVertex) = -1;  //Start has no parent
 
     //Algorithm execution until all vertex costs are calculated
     while (!meap.empty())
     {
-        //Update current
-        current = meap.getMin().first;qDebug() << "current =" << current;
+        //Update current from the top of the heap
+        current = meap.getMin().first;
+
+        //Record its distance to the source as well
+        distMap.at(current) = meap.getMin().second;
 
         //Pop current off the heap
-        meap.popRoot();qDebug() << "popped min";
+        meap.popRoot();
 
         //Explore neighbors of current vertex
         it = adjList.at(current).begin();
         while (it != adjList.at(current).end())
-        {qDebug() << "It is pointing to" << (*it).first << "with cost" << (*it).second;
-            qDebug() << "distmap[current] =" << distMap[current];
-            //If start to neighbor total cost is less than heap's cost
-            if ((*it).second + distMap[current]
+        {
+            //If the heap isn't empty, the data exists in the heap, and
+            //  the the total cost from start to data is less than
+            //  the cost heap has for that data
+            if (!meap.empty() && meap.thisDataExists((*it).first)
+                && (*it).second + distMap[current]
                 < meap.mapQuery((*it).first).second)
-            {qDebug() << "it + distMap is better than meap's" << meap.mapQuery((*it).first).second;
+            {
                 //Update heap with new, better cost
                 meap.reKey((*it).first,(*it).second + distMap[current]);
 
@@ -665,14 +669,9 @@ deque<int> Data::askDijkstra(int startingVertex)
             }
             it++;
         }
-        qDebug() << "heap looks like";
-        for (int x = 0; x < meap.size(); x++)
-        {
-            qDebug() << x << "-" << meap.at(x).first << "-" << meap.at(x).second;
-        }
-    }qDebug() << "Dijkstra complete";
+    }
     return distMap;
-}catch (exception const& ex) {qDebug() << "Exception: " << ex.what();}}
+}
 
 QString Data::getStadName(int stadNum) const
 //Returns name of stadium at stadNum
@@ -742,24 +741,6 @@ int Data::getDistBetween(unsigned int here, unsigned int there) const
 std::vector< std::vector<int> > Data::getMatrix() const
 //Returns the 2D matrix
 {return matrix;}
-
-void Data::initializeStuff()
-{int TEMPORARYDELETELATER;
-    //create 8x8 matrix
-    matrix.resize(8);
-    for (int x =0; x < 8; x++)
-    {
-        matrix.at(x).resize(8);
-    }
-    for (int x = 0; x < 8; x++)
-    {
-        for (int y = 0; y < 8; y++)
-        {
-            matrix[x][y] = -1;
-        }
-    }
-    adjList.resize(8);
-}
 
 std::vector< std::list< std::pair<int,int> > > Data::getAdjList() const
 //Returns adjacency list
