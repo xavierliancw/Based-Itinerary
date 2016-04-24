@@ -886,32 +886,35 @@ void PrimeWin::on_homeNameRd_toggled(bool checked)
 //Sorts home's stadium table alphabetically by stadium name
 //Complexity: O(n^2)
 {
-//    //Perform sort when radio toggle is checked
-//    if (checked)
-//    {
-//        SortObj object;             //Object to be pushed into sortThese
-//        vector<SortObj> sortThese;  //Vector of stadiums to be sorted
-//        vector<int> stadNumOrder;   //Vector of stadNums
-//        CustomSorts use;          //Sorting class
+    //Perform sort when radio toggle is checked
+    if (checked)
+    {
+//        SortObj object;               //Object to be pushed into sortThese
+        pair<int,QString> data;                //Data to be sorted
+        vector<pair<int,QString> > sortThese;  //Vector of data to sort
+        vector<int> stadNumOrder;              //Vector of stadNums
+        CustomSorts use;                       //Sorting class
 
-//        //Create a list of stadNums to match the order the table is in now
-//        for (int x = 0; x < ui->homeStadTbl->rowCount(); x++)
-//        {
+        //Create a list of stadNums to match the order the table is in now
+        for (int x = 0; x < ui->homeStadTbl->rowCount(); x++)
+        {
+            data = make_pair(ui->homeStadTbl->item(x,0)->text().toInt(),
+                             ui->homeStadTbl->item(x,2)->text());
 //            object.stadNum = ui->homeStadTbl->item(x,0)->text().toInt();
 //            object.sortee = ui->homeStadTbl->item(x,2)->text();
-//            sortThese.push_back(object);
-//        }
-//        //Ask insertion sort to reorder the stadiums
-//        sortThese = use.InsertionSort(sortThese);
+            sortThese.push_back(data);
+        }
+        //Ask insertion sort to reorder the stadiums
+        sortThese = use.InsertionSort(sortThese);
 
-//        //Build a vector of just stadNums that mirrors sortThese
-//        for (int x = 0; x < (int)sortThese.size(); x++)
-//        {
-//            stadNumOrder.push_back(sortThese.at(x).stadNum);
-//        }
-//        //Refresh home table
-//        refreshHomeTbl(stadNumOrder);
-//    }
+        //Build a vector of just stadNums that mirrors sortThese
+        for (int x = 0; x < (int)sortThese.size(); x++)
+        {
+            stadNumOrder.push_back(sortThese.at(x).first);
+        }
+        //Refresh home table
+        refreshHomeTbl(stadNumOrder);
+    }
 }
 
 //Index2 - Itinerary Page=================================================
