@@ -123,11 +123,12 @@ private slots:
 
     void on_deleteSouvBtn_clicked();
 
+    void on_adminPrimBt_clicked();
+
 //Index5==================================================================
     void on_dataBackBt_clicked();
 
     void on_dataTxtBt_clicked();
-
 
 private:
     Ui::PrimeWin *ui;           //User interface

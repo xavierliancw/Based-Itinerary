@@ -161,6 +161,8 @@ public:
 
     deque<int> askDijkstra(int startingVertex);
 
+    int askPrim(vector<pair<int,int> > &edges);
+
 private:
     std::vector<StadObj> masterVect;        //Vector of all stadiums
     std::vector< std::vector<int> > matrix; //2D matrix of all distances

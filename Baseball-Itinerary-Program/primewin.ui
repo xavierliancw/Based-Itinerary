@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QStackedWidget" name="stackWidg">
       <property name="currentIndex">
-       <number>1</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="start">
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -1056,7 +1056,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButton_11">
+            <widget class="QPushButton" name="adminPrimBt">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -1076,7 +1076,7 @@
               </size>
              </property>
              <property name="text">
-              <string>View MST</string>
+              <string>View Prim's MST</string>
              </property>
             </widget>
            </item>
