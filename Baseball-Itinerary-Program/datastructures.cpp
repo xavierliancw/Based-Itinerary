@@ -158,12 +158,67 @@ void Data::addSouv(int stadNum, QString newName, double newPrice)
     masterVect.at(stadNum).souvVect.push_back(newSouv);
 }
 
-void Data::addDist(int x, int y, int newDist)
-//Changes a value in the matrix and its symmetrical counterpart
+struct list_pair_sort_compare_instructions
+//Instructs list.sort() functions to sort using the cost
 {
+    bool operator()(const std::pair<int,int> &left,
+                    const std::pair<int,int> &right)
+    {return left.second < right.second;}
+};
+
+void Data::deleteSouv(int stadNum, int souvNum)
+// removes a souvenir object from souvVect
+{
+    // erase element if possible
+    if(souvNum <= this->getSouvListSize(stadNum))
+    {
+        masterVect.at(stadNum).souvVect.erase(masterVect.at(stadNum).souvVect.begin()+souvNum);
+    }
+    else
+    {
+        qDebug() << "Error: Can't remove souvenir *** Out of Range ***";
+    }
+
+}
+
+void Data::addDist(int x, int y, int newDist)
+//Changes data in matrix and modifies adjacency list
+//Complexity: O(nlogn)
+{
+    //Declare an iterator for adjList
+    std::list< std::pair<int,int> >::iterator it = adjList.at(x).begin();
+
     //Fill in the data to there and back
     matrix[x][y] = newDist;
     matrix[y][x] = newDist;
+
+    //See if y already exists in the list at x
+    while ((*it).first != y && !adjList.at(x).empty()
+           && it != adjList.at(x).end())
+    {
+        it++;
+    }
+    //If adding a new distance
+    if (newDist != -1)
+    {
+        //If it is at the end, that means y isn't in the list, so push
+        if (it == adjList.at(x).end())
+        {
+            adjList.at(x).push_back(std::make_pair(y,newDist));
+        }
+        //Otherwise, just modify the cost of y
+        else
+        {
+            (*it).second = newDist;
+        }
+        //Now re-sort the list
+        adjList.at(x).sort(list_pair_sort_compare_instructions());
+    }
+    //Otherwise delete the distance from the list
+    else if (!adjList.at(x).empty() && it != adjList.at(x).end())
+    {
+        adjList.at(x).erase(it);
+    }
 }
 
 unsigned int Data::size() const
@@ -172,6 +227,7 @@ unsigned int Data::size() const
 
 void Data::importSQL()
 //Fill data structures with information from SQL database
+//Complexity: O(e^2) where e = number of edges
 {
     //Determine path to APPDATA folder
     QString dir = QDir::currentPath();
@@ -228,6 +284,7 @@ void Data::importSQL()
         //Import distances
         int y = 0;
         matrix.resize(masterVect.size());
+        adjList.resize(masterVect.size());
         for (unsigned int x = 0; x < masterVect.size(); x++)
         {
             matrix[x].resize(masterVect.size());
@@ -552,6 +609,148 @@ bool Data::importTXT(QString path)
     return !failure;
 }
 
+deque<int> Data::askDijkstra(int startingVertex)
+//Uses Dijkstra's algorithm to calculate paths to all other vertices
+//Complexity: O(elogv) where e = number of edges, v = number of vertices
+{
+    vector<int> parentMap;      //Vector that maps discovery lineage
+    deque<int> distMap;         //Distances from start to all other verts
+    MinMeap meap(matrix.size());//Minimum heap to help algorithm execution
+    int current;                //Current vertex
+    list< pair<int,int> >::iterator it;
+
+    //Initialize heap
+    for (int x = 0; x < (int)matrix.size(); x++)
+    {
+        //Initialize starting vertex with 0 cost
+        if (x == startingVertex)
+        {
+            meap.push(make_pair(x,0));
+        }
+        //Otherwise give all other vertices maximum cost
+        else
+        {
+            meap.push(make_pair(x,INT_MAX));
+        }
+    }
+    //Initialize distance map and  parent map
+    distMap.resize(matrix.size());
+    parentMap.resize(matrix.size());
+    parentMap.at(startingVertex) = -1;  //Start has no parent
+
+    //Algorithm execution until all vertex costs are calculated
+    while (!meap.empty())
+    {
+        //Update current from the top of the heap
+        current = meap.getMin().first;
+
+        //Record its distance to the source as well
+        distMap.at(current) = meap.getMin().second;
+
+        //Pop current off the heap
+        meap.popRoot();
+
+        //Explore neighbors of current vertex
+        it = adjList.at(current).begin();
+        while (it != adjList.at(current).end())
+        {
+            //If the heap isn't empty, the data exists in the heap, and
+            //  the the total cost from start to data is less than
+            //  the cost heap has for that data
+            if (!meap.empty() && meap.thisDataExists((*it).first)
+                && (*it).second + distMap[current]
+                < meap.mapQuery((*it).first).second)
+            {
+                //Update heap with new, better cost
+                meap.reKey((*it).first,(*it).second + distMap[current]);
+
+                //Parent of newly updated vertex is current
+                parentMap.at((*it).first) = current;
+            }
+            it++;
+        }
+    }
+    return distMap;
+}
+
+struct probject
+//Prim object for algorithm execution
+{
+    pair<int,int> edge;			//An edge between two vertices
+    int cost;					//The cost of the edge
+    bool discovered;			//Edge visitation boolean
+};
+int Data::askPrim(vector<pair<int, int> > &edges)
+//Returns cost and edges of Prim's MST
+{
+    MinMeap meap(adjList.size());		//Minimum heap to help algorithm
+    int current;                 		//Current vertex
+    list<pair<int,int> >::iterator it;	//List iterator
+    int totalCost = 0;                  //Total cost of tree
+    vector<probject> mstVect;           //Vector of prim objects
+
+    //Reset edges vector
+    edges.clear();
+
+    //Initialize heap and vector of prim objects
+    mstVect.resize(adjList.size());
+    for (int x = 0; x < (int)adjList.size(); x++)
+    {
+        //Initialize starting vertex with 0 cost
+        if (x == 0)
+        {
+            meap.push(make_pair(x,0));
+        }
+        //Otherwise give all other vertices maximum cost
+        else
+        {
+            meap.push(make_pair(x,INT_MAX));
+        }
+        mstVect.at(x).discovered = false;
+    }
+    //Algorithm execution until all vertex costs are calculated
+    while (!meap.empty())
+    {
+        //Update current from the top of the heap
+        current = meap.getMin().first;
+
+        //Check which edge contributed to current
+        if (mstVect.at(current).discovered == true)
+        {
+        	//Add the edge to the result
+        	edges.push_back(mstVect.at(current).edge);
+
+        	//Update total MST cost
+        	totalCost += mstVect.at(current).cost;
+        }
+
+        //Pop current off the heap
+        meap.popRoot();
+
+        //Explore neighbors of current vertex
+        it = adjList.at(current).begin();
+        while (it != adjList.at(current).end())
+        {
+            //If the heap isn't empty, the data exists in the heap, and
+            //  the the edge cost is less than the cost heap has
+            if (!meap.empty() && meap.thisDataExists((*it).first)
+                && (*it).second < meap.mapQuery((*it).first).second)
+            {
+                //Update heap with new, better cost
+                meap.reKey((*it).first,(*it).second);
+
+                //Update the edge in the prim vector
+                mstVect.at((*it).first).discovered = true;
+                mstVect.at((*it).first).edge
+                        = make_pair(current,(*it).first);
+                mstVect.at((*it).first).cost = (*it).second;
+            }
+            it++;
+        }
+    }
+    return totalCost;
+}
+
 QString Data::getStadName(int stadNum) const
 //Returns name of stadium at stadNum
 {return masterVect.at(stadNum).name;}
@@ -610,9 +809,20 @@ QString Data::getSouvName(int stadNum, int souvNum) const
 double Data::getSouvPrice(int stadNum, int souvNum) const
 {return masterVect.at(stadNum).souvVect.at(souvNum).price;}
 
+int Data::getSouvListSize(int stadNum) const
+{return masterVect.at(stadNum).souvVect.size();}
+
 int Data::getDistBetween(unsigned int here, unsigned int there) const
 //Returns distance between two stadiums
 {return matrix[here][there];}
+
+std::vector< std::vector<int> > Data::getMatrix() const
+//Returns the 2D matrix
+{return matrix;}
+
+std::vector< std::list< std::pair<int,int> > > Data::getAdjList() const
+//Returns adjacency list
+{return adjList;}
 
 ItinObj::ItinObj(int stadium)
 {

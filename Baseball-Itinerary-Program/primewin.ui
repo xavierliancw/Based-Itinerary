@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>913</width>
-    <height>563</height>
+    <height>597</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QStackedWidget" name="stackWidg">
       <property name="currentIndex">
-       <number>2</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="start">
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -241,7 +241,7 @@
                <widget class="QLabel" name="homeStadzLbl">
                 <property name="font">
                  <font>
-                  <pointsize>14</pointsize>
+                  <pointsize>16</pointsize>
                   <weight>75</weight>
                   <bold>true</bold>
                  </font>
@@ -249,9 +249,49 @@
                 <property name="text">
                  <string>STADIUM_NAME</string>
                 </property>
+                <property name="wordWrap">
+                 <bool>true</bool>
+                </property>
                </widget>
               </item>
-              <item row="1" column="0">
+              <item row="1" column="1">
+               <widget class="QLabel" name="homeTeamLbl">
+                <property name="font">
+                 <font>
+                  <pointsize>14</pointsize>
+                  <italic>true</italic>
+                  <underline>true</underline>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>TEAM_NAME</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                </property>
+                <property name="wordWrap">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLabel" name="homeLeagueLbl">
+                <property name="font">
+                 <font>
+                  <pointsize>12</pointsize>
+                  <italic>true</italic>
+                  <underline>false</underline>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>TEAM_LEAGUE</string>
+                </property>
+                <property name="wordWrap">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0" rowspan="2">
                <widget class="QLabel" name="homeLogoLbl">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -270,22 +310,6 @@
                 </property>
                 <property name="text">
                  <string>TEAM_LOGO</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QLabel" name="homeTeamLbl">
-                <property name="font">
-                 <font>
-                  <pointsize>11</pointsize>
-                  <italic>true</italic>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>TEAM_NAME</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
                 </property>
                </widget>
               </item>
@@ -478,6 +502,78 @@
            <enum>QFrame::Sunken</enum>
           </property>
           <layout class="QGridLayout" name="gridLayout_5">
+           <item row="1" column="2" rowspan="2">
+            <widget class="QFrame" name="frame_5">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>155</height>
+              </size>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::NoFrame</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_2">
+              <item>
+               <widget class="QLabel" name="label_3">
+                <property name="text">
+                 <string>Filters</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="homeAmericanCB">
+                <property name="text">
+                 <string>American Leagues</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="homeNationalCB">
+                <property name="text">
+                 <string>National Leagues</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="homeTurfCB">
+                <property name="text">
+                 <string>Uses Natural Turf</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="homeSynthCB">
+                <property name="text">
+                 <string>Uses Synthetic Turf</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="verticalSpacer_4">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </widget>
+           </item>
            <item row="1" column="0" rowspan="2" colspan="2">
             <widget class="QFrame" name="frame_7">
              <property name="sizePolicy">
@@ -557,13 +653,19 @@
              </layout>
             </widget>
            </item>
-           <item row="1" column="2" rowspan="2">
-            <widget class="QFrame" name="frame_5">
+           <item row="1" column="4" rowspan="2">
+            <widget class="QPushButton" name="homePlanTripBt">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+              <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>155</width>
+               <height>0</height>
+              </size>
              </property>
              <property name="maximumSize">
               <size>
@@ -571,63 +673,23 @@
                <height>155</height>
               </size>
              </property>
-             <property name="frameShape">
-              <enum>QFrame::NoFrame</enum>
+             <property name="text">
+              <string>Plan My Trip</string>
              </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout_2">
-              <item>
-               <widget class="QLabel" name="label_3">
-                <property name="text">
-                 <string>Filters</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="homeAmericanCB">
-                <property name="text">
-                 <string>American Leagues</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="homeNationalCB">
-                <property name="text">
-                 <string>National Leagues</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="homeTurfCB">
-                <property name="text">
-                 <string>Uses Natural Turf</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="homeSynthCB">
-                <property name="text">
-                 <string>Uses Synthetic Turf</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="verticalSpacer_4">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>40</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
             </widget>
+           </item>
+           <item row="1" column="3" rowspan="2">
+            <spacer name="horizontalSpacer_8">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
            </item>
            <item row="0" column="0" colspan="5">
             <widget class="QTableWidget" name="homeStadTbl">
@@ -681,44 +743,6 @@
               </property>
              </column>
             </widget>
-           </item>
-           <item row="1" column="4" rowspan="2">
-            <widget class="QPushButton" name="homePlanTripBt">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>155</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>155</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Plan My Trip</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="3" rowspan="2">
-            <spacer name="horizontalSpacer_8">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
            </item>
           </layout>
          </widget>
@@ -834,7 +858,7 @@
            <item>
             <widget class="QTableWidget" name="tableWidget">
              <attribute name="horizontalHeaderVisible">
-              <bool>true</bool>
+              <bool>false</bool>
              </attribute>
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
@@ -891,7 +915,7 @@
           </property>
           <layout class="QGridLayout" name="gridLayout_8">
            <item row="1" column="0">
-            <widget class="QTableWidget" name="tableWidget_6"/>
+            <widget class="QTableWidget" name="adminSouvTable"/>
            </item>
            <item row="0" column="0">
             <widget class="QLabel" name="label_17">
@@ -935,7 +959,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="pushButton_10">
+               <widget class="QPushButton" name="deleteSouvBtn">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -974,6 +998,13 @@
            <enum>QFrame::Raised</enum>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_10">
+           <item>
+            <widget class="QPushButton" name="adminBackBtn">
+             <property name="text">
+              <string>back</string>
+             </property>
+            </widget>
+           </item>
            <item>
             <widget class="QPushButton" name="adminDistBt">
              <property name="sizePolicy">
@@ -1025,7 +1056,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButton_11">
+            <widget class="QPushButton" name="adminPrimBt">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -1045,7 +1076,7 @@
               </size>
              </property>
              <property name="text">
-              <string>View MST</string>
+              <string>View Prim's MST</string>
              </property>
             </widget>
            </item>
