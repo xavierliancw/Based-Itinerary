@@ -3,14 +3,18 @@
 
 #include <QDebug>
 #include <vector>
+#include <list>
 #include <QString>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDir>
-
+#include <deque>
 #include <QFile>
 #include <QTextStream>
+
+#include "minheap.h"
+using namespace std;
 
 class TeamObj
 {
@@ -79,7 +83,7 @@ public:
     //Default destructor
     ~Data();
 
-    // Copy master vector to prevent altering master
+    //Copy master vector to prevent altering master
     void copyVector(std::vector<StadObj>& copy);
 
     //Add a stadium object to the vector
@@ -106,6 +110,7 @@ public:
 //    void delTeam(int stadNum, QString whichTeam);
 
     void addSouv(int stadNum, QString newName, double newPrice);
+    void deleteSouv(int stadNum, int souvNum);
     void modSouvName();
     void modSouvPrice();
 
@@ -132,9 +137,16 @@ public:
 
     QString getSouvName(int stadNum, int souvNum) const;
     double getSouvPrice(int stadNum, int souvNum) const;
+    int    getSouvListSize(int stadNum) const;
 
     //Returns distance between two stadiums
     int getDistBetween(unsigned int here, unsigned int there) const;
+
+    //Returns the 2D matrix
+    std::vector< std::vector<int> > getMatrix() const;
+
+    //Returns adjacency list
+    std::vector< std::list< std::pair<int,int> > > getAdjList() const;
 
     int getMST() const;
 
@@ -147,9 +159,14 @@ public:
     //Import from a text file (Really just resets to defaults for devs)
     bool importTXT(QString path);
 
+    deque<int> askDijkstra(int startingVertex);
+
 private:
     std::vector<StadObj> masterVect;        //Vector of all stadiums
     std::vector< std::vector<int> > matrix; //2D matrix of all distances
+
+    //Adjacency list representation of the 2D matrix
+    std::vector< std::list< std::pair<int,int> > > adjList;
 
 
 };

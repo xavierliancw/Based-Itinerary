@@ -142,6 +142,64 @@ void PrimeWin::refreshHome()
     }
 }
 
+void PrimeWin::refreshHomeTbl(vector<int> stadNumOrder)
+//Redraws table on home page, ordering based on stadNumOrder
+//Complexity: O(n)
+{
+    QSignalBlocker stopSignalsFrom(ui->homeStadTbl);
+    QTableWidgetItem *item;
+    vector<int>::iterator it = stadNumOrder.begin();
+
+    //REFRESH STADIUM TABLE
+    ui->homeStadTbl->clear();
+    ui->homeStadTbl->setRowCount(0);
+    ui->homeStadTbl->setColumnCount(4);
+
+    //Populate the stadium table
+    for (unsigned int x = 0; x < stadNumOrder.size(); x++)
+    {
+        //Add a row
+        ui->homeStadTbl->insertRow(ui->homeStadTbl->rowCount());
+
+        //First col has hidden stadNum
+        item = new QTableWidgetItem;
+        item->setData(0,QString::number(*it));
+        ui->homeStadTbl->setItem(x,0,item);
+
+        //Second col has field pic
+        int UNIMPLEMENTED;
+        //item = new QTableWidgetItem;
+        //item->setData(0,data.getPicOrSomething(*it));
+        ui->homeStadTbl->setItem(x,1,new QTableWidgetItem("NO_PIC"));
+
+        //Third col has stadium name
+        item = new QTableWidgetItem;
+        item->setData(0,data.getStadName(*it));
+        ui->homeStadTbl->setItem(x,2,item);
+
+        //Fourth col has team name
+        item = new QTableWidgetItem;
+        item->setData(0,data.getTeamName(*it));
+        ui->homeStadTbl->setItem(x,3,item);
+
+        //Advance iterator
+        it++;
+    }
+    //Prepare table for viewing
+    ui->homeStadTbl->hideColumn(0);
+    ui->homeStadTbl->showColumn(1); //Not sure why this is needed
+
+    ui->homeStadTbl->resizeColumnsToContents();
+
+    //Click on first row to prevent uninitialized labels
+    if (ui->homeStadTbl->rowCount() > 0)
+    {
+        ui->homeStadTbl->selectRow(0);
+        refreshHomeDetails();
+    }
+    stopSignalsFrom.unblock();
+}
+
 void PrimeWin::refreshHomeDetails()
 //Refreshes detail labels on the home page (Index 1)
 {
@@ -161,11 +219,12 @@ void PrimeWin::refreshHomeDetails()
 
     //Set labels and modify variables if necessary
     ui->homeStadzLbl->setText(data.getStadName(stadNum));
-    for (unsigned int x=0;x<data.teamSize(stadNum);x++)
+    for (unsigned int x = 0; x < data.teamSize(stadNum); x++)
     {
         teams += data.getTeamName(stadNum,x) + "\n";
     }
     ui->homeTeamLbl->setText(teams);
+    ui->homeLeagueLbl->setText(data.getTeamLeague(stadNum) + " League");
     ui->homePhoneLbl->setText(data.getStadPhone(stadNum));
     address.resize(address.indexOf(","));   //Cut off city and zip
     ui->homeAddressLbl->setText(address);
@@ -353,7 +412,8 @@ QString PrimeWin::phoneCheck(QString phone)
                     || bareNumber.size() - bareNumber.indexOf("+") == 11))
     {}//It's good, I'm just too lazy to DeMorganize the conditional
     //Check if phone number has the correct length if there's no +
-    else if (!hasPlus && (bareNumber.size() == 11 || bareNumber.size() == 10))
+    else if (!hasPlus && (bareNumber.size() == 11
+                          || bareNumber.size() == 10))
     {}//Same deal
     else
     {throwGen = true;}
@@ -419,7 +479,9 @@ void PrimeWin::catchLoginStatus(bool status)
 
 void PrimeWin::catchDataUpdate(Data caughtThis)
 //Catches signal to update data structures
-{data = caughtThis;}
+{
+    data = caughtThis;
+}
 
 void PrimeWin::catchAddItin()
 //Catches signal to update itin
@@ -440,6 +502,7 @@ void PrimeWin::catchAddItin()
         itinList.push_back(ItinObj(stadNum));
 
         //?????????show possible souvenirs??????????
+        int UNIMPLEMENTED;
 
         //Change the bt's text to remove
         addBt->setText("Remove");
@@ -470,6 +533,7 @@ void PrimeWin::catchAddItin()
     //?????????show possible souvenirs??????????
 }
 
+
 /*PAGE INDEX============================================================*/
 //Index 0 = start page
 //Index 1 = home page
@@ -484,6 +548,11 @@ void PrimeWin::on_startInfoBt_clicked()
 //Index 0 to 1
 {
     refreshHome();
+    ui->homeNameRd->setChecked(true);
+    ui->homeAmericanCB->setChecked(true);
+    ui->homeNationalCB->setChecked(true);
+    ui->homeTurfCB->setChecked(true);
+    ui->homeSynthCB->setChecked(true);
     ui->stackWidg->setCurrentIndex(1);
 }
 
@@ -546,7 +615,7 @@ void PrimeWin::on_homeNationalCB_toggled(bool checked)
 
             //IF - Here we find if the team league at the team indicated then
             //     it will hide all the rows that are American League team.
-            if(data.getTeamLeague(vecIndex, 0)=="American")
+            if(data.getTeamLeague(vecIndex, 0).toLower()=="american")
             {
                 ui->homeStadTbl->setRowHidden(i, true);
             } //end if(data.getTeamLeague(vecIndex, 0)=="American")
@@ -563,7 +632,31 @@ void PrimeWin::on_homeNationalCB_toggled(bool checked)
             //    it will 'unhide' the row.
             if(ui->homeStadTbl->isRowHidden(i))
             {
-                ui->homeStadTbl->setRowHidden(i, false);
+                if(ui->homeTurfCB->isChecked())
+                {
+                    if(data.getStadGrass(i).toLower() !="astro turf")
+                    {
+                        ui->homeStadTbl->setRowHidden(i, false);
+                    }
+                }
+                else if(ui->homeSynthCB->isChecked())
+                {
+                    if(data.getStadGrass(i).toLower()!="grass")
+                    {
+                        ui->homeStadTbl->setRowHidden(i, false);
+                    }
+                }
+                else if(ui->homeAmericanCB->isChecked())
+                {
+                    if(data.getTeamLeague(i, 0).toLower()!="national")
+                    {
+                        ui->homeStadTbl->setRowHidden(i, false);
+                    }
+                }
+                else
+                {
+                    ui->homeStadTbl->setRowHidden(i, false);
+                }
             }// end if(ui->homeStadTbl->isRowHidden(i))
 
         }// end for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
@@ -588,7 +681,7 @@ void PrimeWin::on_homeAmericanCB_toggled(bool checked)
 
             //IF - Here we find if the team league at the team indicated then
             //     it will hide all the rows that are National League team.
-            if(data.getTeamLeague(vecIndex, 0)=="National")
+            if(data.getTeamLeague(vecIndex, 0).toLower()=="national")
             {
                 ui->homeStadTbl->setRowHidden(i, true);
             } //end if(data.getTeamLeague(vecIndex, 0)=="American")
@@ -605,7 +698,31 @@ void PrimeWin::on_homeAmericanCB_toggled(bool checked)
             //    it will 'unhide' the row.
             if(ui->homeStadTbl->isRowHidden(i))
             {
-                ui->homeStadTbl->setRowHidden(i, false);
+                if(ui->homeTurfCB->isChecked())
+                {
+                    if(data.getStadGrass(i).toLower() !="astro turf")
+                    {
+                        ui->homeStadTbl->setRowHidden(i, false);
+                    }
+                }
+                else if(ui->homeSynthCB->isChecked())
+                {
+                    if(data.getStadGrass(i).toLower()!="grass")
+                    {
+                        ui->homeStadTbl->setRowHidden(i, false);
+                    }
+                }
+                else if(ui->homeNationalCB->isChecked())
+                {
+                    if(data.getTeamLeague(i, 0).toLower()!="american")
+                    {
+                        ui->homeStadTbl->setRowHidden(i, false);
+                    }
+                }
+                else
+                {
+                    ui->homeStadTbl->setRowHidden(i, false);
+                }
             }// end if(ui->homeStadTbl->isRowHidden(i))
 
         }// end for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
@@ -613,206 +730,190 @@ void PrimeWin::on_homeAmericanCB_toggled(bool checked)
     }// end else
 }//end void on_homeAmericanCB_toggled(bool checked)
 
-///* This function swaps two numbers
-//   Arguments :
-//             a, b - the numbers to be swapped
-//   */
-//void PrimeWin::swap(std::vector<StadObj> sortV, int &a, int &b)
-//{
-//    StadObj temp;
-//    temp = sortV[a];
-//    sortV[a] = sortV[b];
-//    sortV[b] = temp;
-//}
-
-///* This function does the quicksort
-//   Arguments :
-//             vector - the array to be sorted
-//             startIndex - index of the first element of the section
-//             endIndex - index of the last element of the section
-//*/
-//void PrimeWin::QuickSort(std::vector<StadObj> sortV, int startIndex, int endIndex)
-//{
-//    StadObj pivot = sortV[startIndex];                  //pivot element is the leftmost element
-//    int splitPoint;
-
-//    if(endIndex > startIndex)                         //if they are equal, it means there is
-//                                                      //only one element and quicksort's job
-//                                                      //here is finished
-//    {
-//        splitPoint = SplitArray(sortV, pivot, startIndex, endIndex);
-//                                                      //SplitArray() returns the position where
-//                                                      //pivot belongs to
-//        sortV[splitPoint] = pivot;
-//        QuickSort(sortV, startIndex, splitPoint-1);   //Quick sort first half
-//        QuickSort(sortV, splitPoint+1, endIndex);    //Quick sort second half
-//    }
-//}
-///* This function splits the array around the pivot
-//   Arguments :
-//             array - the array to be split
-//             pivot - pivot element whose position will be returned
-//             startIndex - index of the first element of the section
-//             endIndex - index of the last element of the section
-//   Returns :
-//           the position of the pivot
-//*/
-//int PrimeWin::SplitArray(std::vector<StadObj> sortV, StadObj pivot, int startIndex, int endIndex)
-//{
-//    int leftBoundary = startIndex;
-//    int rightBoundary = endIndex;
-
-//    while(leftBoundary < rightBoundary)             //shuttle pivot until the boundaries meet
-//    {
-//         while(pivot.name < sortV[rightBoundary].name      //keep moving until a lesser element is found
-//                && rightBoundary > leftBoundary)   //or until the leftBoundary is reached
-//         {
-//              rightBoundary--;                      //move left
-//         }
-
-//         swap(sortV, leftBoundary, rightBoundary);
-
-//         while(pivot.name >= sortV[leftBoundary].name       //keep moving until a greater or equal element is found
-//                && leftBoundary < rightBoundary)   //or until the rightBoundary is reached
-//         {
-//              leftBoundary++;                        //move right
-//         }
-//         swap(sortV, rightBoundary, leftBoundary);
-//    }
-//    return leftBoundary;                              //leftBoundary is the split point because
-//                                                      //the above while loop exits only when
-//                                                      //leftBoundary and rightBoundary are equal
-//}
 
 
-void PrimeWin::InsertionSort (std::vector<StadObj>& sortV)
+void PrimeWin::on_homeTurfCB_toggled(bool checked)
 {
-     int j;
-     StadObj temp; // stores temporary object for swap
-
-    // FOR - go until i reaches size
-    for (int i = 0; i < sortV.size(); i++)
+    //IF-This if statement will look for the checkbox that we made is checked
+    //   and if it is then it will look for all stadiums that use natural grass
+    //   and filter them out.
+    if(checked)
     {
-        j = i;
-        // WHILE - while j is greater than 0 and the object.name after j is less than current position
-        while (j > 0 && sortV[j].name < sortV[j-1].name)
+        //FOR-Loops through each item of each table to find the items in the
+        //    homeStadTble to filter out.
+
+        for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
         {
-              temp = sortV[j];          // store for swap
-              sortV[j] = sortV[j-1];    // swap(copy into place)
-              sortV[j-1] = temp;        // store back in where appropriate
-              j--;
-        } // end of while
-    } // end of for
-} // end of method
+            //This QString will be used to find our vector index.
+            QString strIndex = ui->homeStadTbl->item(i, 0)->text();
+
+            int vecIndex = strIndex.toInt();    //Convert strIndex to an int.
+
+            //IF-The item at the given index has 'grass' then it will filter it
+            //   out the grass.
+            if(data.getStadGrass(vecIndex).toLower() == "astro turf")
+            {
+                ui->homeStadTbl->setRowHidden(i, true);
+            }// if(data.getStadGrass(vecIndex) == "Astro Turf")
+
+        }// end for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
+
+    }// end if(checked)
+    else
+    {
+        //FOR LOOP- This loop will traverse the homeStadTbl
+        for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
+        {
+            //IF- if the row at the given index is hidden then here
+            //    it will 'unhide' the row.
+            if(ui->homeStadTbl->isRowHidden(i))
+            {
+                //IF- if the row at the given index is hidden then here
+                //    it will 'unhide' the row.
+                if(ui->homeStadTbl->isRowHidden(i))
+                {
+                    if(ui->homeNationalCB->isChecked())
+                    {
+                        if(data.getTeamLeague(i, 0).toLower() !="american")
+                        {
+                            ui->homeStadTbl->setRowHidden(i, false);
+                        }
+                    }
+                    else if(ui->homeSynthCB->isChecked())
+                    {
+                        if(data.getStadGrass(i).toLower()!="astro turf")
+                        {
+                            ui->homeStadTbl->setRowHidden(i, false);
+                        }
+                    }
+                    else if(ui->homeAmericanCB->isChecked())
+                    {
+                        if(data.getTeamLeague(i, 0).toLower()!="national")
+                        {
+                            ui->homeStadTbl->setRowHidden(i, false);
+                        }
+                    }
+                    else
+                    {
+                        ui->homeStadTbl->setRowHidden(i, false);
+                    }
+                }// end if(ui->homeStadTbl->isRowHidden(i))
+
+            }// end if(ui->homeStadTbl->isRowHidden(i))
+
+        }// end for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
+
+    }// end else
+
+}// end void PrimeWin::on_homeTurfCB_toggled(bool checked)
 
 
-// TOGGLE FOR SORTING ALPHABETICALLY
+void PrimeWin::on_homeSynthCB_toggled(bool checked)
+{
+    //IF-This if statement will look for the checkbox that we made is checked
+    //   and if it is then it will look for all stadiums that use natural grass
+    //   and filter them out.
+    if(checked)
+    {
+        //FOR-Loops through each item of each table to find the items in the
+        //    homeStadTble to filter out.
+
+        for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
+        {
+            //This QString will be used to find our vector index.
+            QString strIndex = ui->homeStadTbl->item(i, 0)->text();
+
+            int vecIndex = strIndex.toInt();    //Convert strIndex to an int.
+
+            //IF-The item at the given index has 'grass' then it will filter it
+            //   out the grass.
+            if(data.getStadGrass(vecIndex).toLower() == "grass")
+            {
+                ui->homeStadTbl->setRowHidden(i, true);
+            }// if(data.getStadGrass(vecIndex) == "Astro Turf")
+
+        }// end for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
+
+    }// end if(checked)
+    else
+    {
+        //FOR LOOP- This loop will traverse the homeStadTbl
+        for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
+        {
+            //IF- if the row at the given index is hidden then here
+            //    it will 'unhide' the row.
+            if(ui->homeStadTbl->isRowHidden(i))
+            {
+                //IF- if the row at the given index is hidden then here
+                //    it will 'unhide' the row.
+                if(ui->homeStadTbl->isRowHidden(i))
+                {
+                    if(ui->homeNationalCB->isChecked())
+                    {
+                        if(data.getTeamLeague(i, 0).toLower() !="american")
+                        {
+                            ui->homeStadTbl->setRowHidden(i, false);
+                        }
+                    }
+                    else if(ui->homeTurfCB->isChecked())
+                    {
+                        if(data.getStadGrass(i).toLower()!="astro turf")
+                        {
+                            ui->homeStadTbl->setRowHidden(i, false);
+                        }
+                    }
+                    else if(ui->homeAmericanCB->isChecked())
+                    {
+                        if(data.getTeamLeague(i, 0).toLower()!="national")
+                        {
+                            ui->homeStadTbl->setRowHidden(i, false);
+                        }
+                    }
+                    else
+                    {
+                        ui->homeStadTbl->setRowHidden(i, false);
+                    }
+                }// end if(ui->homeStadTbl->isRowHidden(i))
+
+            }// end if(ui->homeStadTbl->isRowHidden(i))
+
+        }// end for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
+
+    }// end else
+}// end void
+
 void PrimeWin::on_homeNameRd_toggled(bool checked)
+//Sorts home's stadium table alphabetically by stadium name
+//Complexity: O(n^2)
 {
-    // Vector to store alphabetical vector
-    std::vector<StadObj> alphaSortedVector;
-
-    data.copyVector(alphaSortedVector); // copies master into new vector
-
-//    QuickSort(alphaSortedVector, 0, alphaSortedVector.size()-1)
-    InsertionSort(alphaSortedVector);
-
-    int missingCompensator = 0; //Compensates for missing teams
-
-    //REFRESH STADIUM TABLE
-    ui->homeStadTbl->clear();
-    ui->homeStadTbl->setRowCount(0);
-    ui->homeStadTbl->setColumnCount(5);
-
-    //Populate the stadium table
-    for (unsigned int x=0;x<data.size();x++)
+    //Perform sort when radio toggle is checked
+    if (checked)
     {
-        //Add a row
-        ui->homeStadTbl->insertRow(ui->homeStadTbl->rowCount());
+//        SortObj object;               //Object to be pushed into sortThese
+        pair<int,QString> data;                //Data to be sorted
+        vector<pair<int,QString> > sortThese;  //Vector of data to sort
+        vector<int> stadNumOrder;              //Vector of stadNums
+        CustomSorts use;                       //Sorting class
 
-        //Determine if compensation is needed
-        if (data.teamSize(x) > 0)
+        //Create a list of stadNums to match the order the table is in now
+        for (int x = 0; x < ui->homeStadTbl->rowCount(); x++)
         {
-            missingCompensator = 0;
+            data = make_pair(ui->homeStadTbl->item(x,0)->text().toInt(),
+                             ui->homeStadTbl->item(x,2)->text());
+//            object.stadNum = ui->homeStadTbl->item(x,0)->text().toInt();
+//            object.sortee = ui->homeStadTbl->item(x,2)->text();
+            sortThese.push_back(data);
         }
-        else
+        //Ask insertion sort to reorder the stadiums
+        sortThese = use.InsertionSort(sortThese);
+
+        //Build a vector of just stadNums that mirrors sortThese
+        for (int x = 0; x < (int)sortThese.size(); x++)
         {
-            missingCompensator = 1;
+            stadNumOrder.push_back(sortThese.at(x).first);
         }
-
-        //Loop until all teams at the stadium are added
-        for (unsigned int t=0;t<data.teamSize(x)+missingCompensator;t++)
-        {
-            //Add a new row after listing first team if stad has > 1 team
-            if (t != 0)
-            {
-                ui->homeStadTbl->insertRow(ui->homeStadTbl->rowCount());
-            }
-            //Add stadNum to hidden first col
-            ui->homeStadTbl
-              ->setItem(ui->homeStadTbl
-                        ->rowCount()-1,0,
-                        new QTableWidgetItem(QString::number(x)));
-
-            //If there are teams here
-            if (data.teamSize(x) != 0)
-            {
-                //Add teamNum to hidden second col
-                ui->homeStadTbl
-                        ->setItem(ui->homeStadTbl->rowCount()-1,1,
-                                  new
-                                  QTableWidgetItem(QString::number(t)));
-            }
-            //If there's no team at this stadium
-            else
-            {
-                //Add -1 to hidden second col
-                ui->homeStadTbl
-                        ->setItem(ui->homeStadTbl->rowCount()-1,1,
-                                  new
-                                  QTableWidgetItem(QString::number(-1)));
-            }
-
-            //Add field picture to third col
-            int UNIMPLEMENTED;
-            ui->homeStadTbl->setItem(ui->homeStadTbl->rowCount()-1,2,
-                                     new QTableWidgetItem("NO_PIC"));
-
-            //Add stadium name to fourth col
-            ui->homeStadTbl
-              ->setItem(ui->homeStadTbl
-                        ->rowCount()-1,3,
-                        new QTableWidgetItem(alphaSortedVector.at(x).name));
-
-            //If there are teams here, add the team name
-            if (data.teamSize(x) != 0)
-            {
-                //Add team name to fifth col
-                ui->homeStadTbl
-                        ->setItem(ui->homeStadTbl->rowCount()-1,4,
-                                  new
-                                  QTableWidgetItem(
-                                      alphaSortedVector.at(x).teamVect.at(t).name));
-            }
-            else
-            {
-                ui->homeStadTbl
-                        ->setItem(ui->homeStadTbl->rowCount()-1,4,
-                                  new QTableWidgetItem(""));
-            }
-        }
-    }
-    //Prepare table for viewing
-    ui->homeStadTbl->hideColumn(0);
-    ui->homeStadTbl->hideColumn(1);
-    ui->homeStadTbl->resizeColumnsToContents();
-    ui->homeStadTbl->setFocus();
-
-    //Click on first row to prevent uninitialized labels
-    if (ui->homeStadTbl->rowCount() > 0)
-    {
-        ui->homeStadTbl->selectRow(0);
-        refreshHomeDetails();
+        //Refresh home table
+        refreshHomeTbl(stadNumOrder);
     }
 }
 
@@ -826,96 +927,93 @@ void PrimeWin::on_itinStartOverBt_clicked()
 
 void PrimeWin::on_itinOptimizeBt_clicked()
 //Optimizes order of the itinerary
-{
-    int UNFINISHED;//Needs a list of itinObjects
-//    //Needs a matrix to pass in
+//Complexity: O(n^2)
+{int UNFINISHED;
+    //TEST ITINERARY
+    std::list<int> itin;
+    itin.push_back(0);
+    itin.push_back(17);
+    itin.push_back(20);
+    itin.push_back(27);
+    itin.push_back(10);
+    itin.push_back(6);
 
-//    //Let's say itinerary is 2,3,6,1
-//    itin.push_back(2);
-//    itin.push_back(3);
-//    itin.push_back(6);
-//    itin.push_back(1);
+    std::deque<int> optimized;  //Optimized order of stadNums
+    std::deque<int> djMap;      //Map of costs to visit each stadium
+    int totalTripDist = 0;      //Total trip distance
+    int shortest;               //Stores current shortest distance
+    int nextStad;               //Stores next stad to visit
 
-//    Dijkstra pathFind(matrix);  //Dijkstra's algorithm
-//    std::deque<int> optimized;  //Optimized order of stadNums
-//    std::vector<int> djMap;     //Map of costs to visit each stadium
-//    int totalTripDist = 0;      //Total trip distance
-//    int shortest;               //Stores current shortest distance
-//    int nextStad;               //Stores next stad to visit
+    //Create and initialize a list iterator
+    std::list<int>::iterator it = itin.begin();
 
-//    //Create and initialize a list iterator
-//    std::list<int>::iterator it = itin.begin();
+    //Struct to represent a stadium in the itinerary
+    struct visitObj
+    {
+        bool visited;   //If visited
+        bool valid;     //If in itinerary
+    };
+    //Array of visited booleans where index is stadNum
+    visitObj visitAr[data.size()];
 
-//    //Struct to represent a stadium in the itinerary
-//    struct visitObj
-//    {
-//        bool visited;   //If visited
-//        bool valid;     //If in itinerary
-//    };
+    //Initialize the array to the uninitialized states
+    for (unsigned int x = 0; x < data.size(); x++)
+    {
+        visitAr[x].visited = false;
+        visitAr[x].valid = false;
+    }
+    //Make stadiums in the itin valid within the array
+    for (it = itin.begin(); it != itin.end(); it++)
+    {
+        visitAr[*it].valid = true;
+    }
+    //Reset itin iterator
+    it = itin.begin();
 
-//    //Array of visited booleans where index is stadNum
-//    visitObj visitAr[matrix.size()];
+    //Mark current true (visited) in the hash map, visiting itin's first
+    visitAr[*it].visited = true;
 
-//    //Initialize the array to the uninitialized states
-//    for (unsigned int x = 0; x < matrix.size(); x++)
-//    {
-//        visitAr[x].visited = false;
-//        visitAr[x].valid = false;
-//    }
+    //Add it to the NEW itinerary
+    optimized.push_back(*it);
 
-//    //Make stadiums in the itin valid within the array
-//    for (it = itin.begin(); it != itin.end(); it++)
-//    {
-//        visitAr[*it].valid = true;
-//    }
+    //Build the optimized itinerary
+    for (int i = 0; i < (int)itin.size() - 1; i++)
+    {
+        //Call Dijkstra's on the last stadium on the optimized itinerary
+        djMap = data.askDijkstra(optimized.back());
 
-//    //Reset itin iterator
-//    it = itin.begin();
+        //Reinitialize temporary values
+        shortest = INT_MAX;
+        nextStad = -1;
 
-//    //Mark current true (visited) in the hash map, visiting itin's first
-//    visitAr[*it].visited = true;
+        //Find next stad in the itin that has the shortest dist
+        for (int x = 0; x < (int)djMap.size(); x++)
+        {
+            //If stad is in the itin & not visited & it has a shorter dist
+            if (visitAr[x].valid
+                && !visitAr[x].visited && djMap[x] < shortest)
+            {
+                //Update shortest and the next stad to visit
+                shortest = djMap[x];
+                nextStad = x;
+            }
+        }
+        //Add that distance to a running total
+        totalTripDist += shortest;
 
-//    //Add it to the NEW itinerary
-//    optimized.push_back(*it);
+        //Mark it as visited on the visited array
+        visitAr[nextStad].visited = true;
 
-//    //Build the optimized itinerary
-//    for (int i = 0; i < (int)itin.size() - 1; i++)
-//    {
-//        //Call Dijkstra's on the last stadium on the optimized itinerary
-//        djMap = pathFind.getDistanceMap(optimized.back());
-
-//        //Reinitialize temporary values
-//        shortest = INT_MAX;
-//        nextStad = -1;
-
-//        //Find next stad in the itin that has the shortest dist
-//        for (int x = 0; x < matrix.size(); x++)
-//        {
-//            //If stad is in the itin & not visited & it has a shorter dist
-//            if (visitAr[x].valid && !visitAr[x].visited && djMap[x] < shortest)
-//            {
-//                //Update shortest and the next stad to visit
-//                shortest = djMap[x];
-//                nextStad = x;
-//            }
-//        }
-//        //Add that distance to a running total
-//        totalTripDist += shortest;
-
-//        //Mark it as visited on the visited array
-//        visitAr[nextStad].visited = true;
-
-//        //Add it to the NEW itinerary
-//        optimized.push_back(nextStad);
-//    }
-
-//    //Return new itinerary and the total distance travelled
-//    qDebug() << "OPTIMAL";
-//    for (int x = 0; x < optimized.size(); x++)
-//    {
-//        qDebug() << optimized[x];
-//    }
-//    qDebug() << totalTripDist;
+        //Add it to the NEW itinerary
+        optimized.push_back(nextStad);
+    }
+    //Return new itinerary and the total distance travelled
+    qDebug() << "OPTIMAL";
+    for (int x = 0; x < optimized.size(); x++)
+    {
+        qDebug() << optimized[x];
+    }
+    qDebug() << "total trip distance is" << totalTripDist;
 }
 
 //Index3 - Summary Page===================================================
@@ -1091,4 +1189,83 @@ void PrimeWin::on_dataTxtBt_clicked()
     }
 }
 
+void PrimeWin::refreshSouvenirTableAdmin()
+//Refreshes admin page's souvenir table
+{
+    int stadNum = ui->adminStadTbl->item(ui->adminStadTbl->currentRow(),
+                                         0)->text().toInt();
+    QTableWidget *widget = ui->adminSouvTable;
+
+    //REFRESH SOUVENIR TABLE
+    widget->clear();
+    widget->setRowCount(0);
+    widget->setColumnCount(2);
+    QTableWidgetItem *item; //Item to populate table cell
+    widget->setHorizontalHeaderLabels(QStringList() << "Item Name"
+                                                    << "Price");
+
+    //Loop to populate table
+    for (int x = 0; x < data.getSouvListSize(stadNum); x++)
+    {
+        //Add a row
+        widget->insertRow(widget->rowCount());
+
+        //Populate second column with souvName
+        item = new QTableWidgetItem;
+        item->setData(0,data.getSouvName(stadNum, x));
+        widget->setItem(x,0,item);
+
+        //Populate third column with souvPrice
+        item = new QTableWidgetItem;
+        item->setData(0,data.getSouvPrice(stadNum, x));
+        widget->setItem(x,1,item);
+    }
+    widget->resizeColumnsToContents();
+}
+
+// when an index is selected, the bottom panel will display a list of souvenirs
+// that corresponds to its stadium
+void PrimeWin::on_adminStadTbl_itemSelectionChanged()
+{ refreshSouvenirTableAdmin(); }
+
+// on Add New Souvenir Button
+void PrimeWin::on_pushButton_9_clicked()
+{
+    //Construct new dialog
+    // also pass in data object so we can access data structures
+    addSouvDialog newAddSouvWin(data, this);
+    connect(&newAddSouvWin,SIGNAL(throwNewSouvData(Data)),
+            this,SLOT(catchNewSouvenirData(Data)));
+    newAddSouvWin.exec();
+}
+
+// process new souvenir data
+void PrimeWin::catchNewSouvenirData(Data caughtData)
+{data = caughtData;}
+
+void PrimeWin::on_adminBackBtn_clicked()
+{ ui->adminHome->hide();  ui->start->show();}
+
+// on Delete Souvenir Button
+void PrimeWin::on_deleteSouvBtn_clicked()
+{
+   // get selected row
+   int stadNum = ui->adminStadTbl->selectionModel()->currentIndex().row();
+   int itemNum = ui->adminSouvTable->selectionModel()->currentIndex().row();
+
+   // error checking
+   if(stadNum != -1 && itemNum != -1)
+   {
+          // delete souvenir
+          data.deleteSouv(stadNum, itemNum);
+          refreshSouvenirTableAdmin();
+   }
+   else
+   {
+       //notify admin to make a selection on souvenir
+       QMessageBox::information(this, tr("Error"),
+                            tr("Please select a stadium and a souvenir to remove."),
+                            QMessageBox::Ok);
+   }
+}
 

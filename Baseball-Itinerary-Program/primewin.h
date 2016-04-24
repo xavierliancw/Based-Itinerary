@@ -13,9 +13,11 @@
 #include <QSignalBlocker>
 
 #include "datastructures.h"
+#include "customsorts.h"
 #include "adminlogin.h"
-#include "customimplementations.h"
+#include "minheap.h"
 #include "editdistances.h"
+#include "addsouvdialog.h"
 
 namespace Ui {
 class PrimeWin;
@@ -32,6 +34,9 @@ public:
 
     //Refreshes the view of everything on the home page (Index 1)
     void refreshHome();
+
+    //Refreshes the home table based on the vector passed in (Index 1)
+    void refreshHomeTbl(vector<int> stadNumOrder);
 
     //Refreshes detail labels on the home page (Index 1)
     void refreshHomeDetails();
@@ -78,19 +83,15 @@ private slots:
 
     void on_homePlanTripBt_clicked();
 
-
     void on_homeNationalCB_toggled(bool checked);
 
     void on_homeAmericanCB_toggled(bool checked);
 
+    void on_homeSynthCB_toggled(bool checked);
 
-    // Quicksort Unimplemented and not working
-//    void QuickSort(std::vector<StadObj> sortV, int startIndex, int endIndex);
-//    int SplitArray(std::vector<StadObj> sortV, StadObj pivotValue, int startIndex, int endIndex);
-    void InsertionSort(std::vector<StadObj>& sortV);
-//    void swap(std::vector<StadObj> sortV, int &a, int &b);
+    void on_homeTurfCB_toggled(bool checked);
+
     void on_homeNameRd_toggled(bool checked);
-
 
 //Index2==================================================================
     void on_itinStartOverBt_clicked();
@@ -108,18 +109,30 @@ private slots:
 
     void on_adminStadTbl_cellChanged(int row, int column);
 
+    void refreshSouvenirTableAdmin();
+
+    void on_adminStadTbl_itemSelectionChanged();
+
+    // on Add New Souvenir Button
+    void on_pushButton_9_clicked();
+
+    void on_adminBackBtn_clicked();
+
+    // Catch data from Add New Souv Button
+    void catchNewSouvenirData(Data caughtData);
+
+    void on_deleteSouvBtn_clicked();
+
 //Index5==================================================================
     void on_dataBackBt_clicked();
 
     void on_dataTxtBt_clicked();
 
 
-
 private:
     Ui::PrimeWin *ui;           //User interface
 
     std::list<ItinObj> itinList;
-
     Data data;                  //Interface for all data structures
     QFileSystemModel *dirmodel; //Model of file directory
 };
