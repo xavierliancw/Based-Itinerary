@@ -3,14 +3,18 @@
 
 #include <QDebug>
 #include <vector>
+#include <list>
 #include <QString>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDir>
-
+#include <deque>
 #include <QFile>
 #include <QTextStream>
+
+#include "minheap.h"
+using namespace std;
 
 class TeamObj
 {
@@ -138,6 +142,12 @@ public:
     //Returns distance between two stadiums
     int getDistBetween(unsigned int here, unsigned int there) const;
 
+    //Returns the 2D matrix
+    std::vector< std::vector<int> > getMatrix() const;
+
+    //Returns adjacency list
+    std::vector< std::list< std::pair<int,int> > > getAdjList() const;
+
     int getMST() const;
 
     //Fill data structures with information from SQL database
@@ -149,9 +159,14 @@ public:
     //Import from a text file (Really just resets to defaults for devs)
     bool importTXT(QString path);
 
+    deque<int> askDijkstra(int startingVertex);
+
 private:
     std::vector<StadObj> masterVect;        //Vector of all stadiums
     std::vector< std::vector<int> > matrix; //2D matrix of all distances
+
+    //Adjacency list representation of the 2D matrix
+    std::vector< std::list< std::pair<int,int> > > adjList;
 
 
 };

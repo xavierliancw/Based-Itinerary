@@ -13,8 +13,9 @@
 #include <QSignalBlocker>
 
 #include "datastructures.h"
+#include "customsorts.h"
 #include "adminlogin.h"
-#include "customimplementations.h"
+#include "minheap.h"
 #include "editdistances.h"
 #include "addsouvdialog.h"
 
