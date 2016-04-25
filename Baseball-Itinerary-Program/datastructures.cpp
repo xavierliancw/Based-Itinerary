@@ -673,6 +673,84 @@ deque<int> Data::askDijkstra(int startingVertex)
     return distMap;
 }
 
+struct probject
+//Prim object for algorithm execution
+{
+    pair<int,int> edge;			//An edge between two vertices
+    int cost;					//The cost of the edge
+    bool discovered;			//Edge visitation boolean
+};
+int Data::askPrim(vector<pair<int, int> > &edges)
+//Returns cost and edges of Prim's MST
+{
+    MinMeap meap(adjList.size());		//Minimum heap to help algorithm
+    int current;                 		//Current vertex
+    list<pair<int,int> >::iterator it;	//List iterator
+    int totalCost = 0;                  //Total cost of tree
+    vector<probject> mstVect;           //Vector of prim objects
+
+    //Reset edges vector
+    edges.clear();
+
+    //Initialize heap and vector of prim objects
+    mstVect.resize(adjList.size());
+    for (int x = 0; x < (int)adjList.size(); x++)
+    {
+        //Initialize starting vertex with 0 cost
+        if (x == 0)
+        {
+            meap.push(make_pair(x,0));
+        }
+        //Otherwise give all other vertices maximum cost
+        else
+        {
+            meap.push(make_pair(x,INT_MAX));
+        }
+        mstVect.at(x).discovered = false;
+    }
+    //Algorithm execution until all vertex costs are calculated
+    while (!meap.empty())
+    {
+        //Update current from the top of the heap
+        current = meap.getMin().first;
+
+        //Check which edge contributed to current
+        if (mstVect.at(current).discovered == true)
+        {
+        	//Add the edge to the result
+        	edges.push_back(mstVect.at(current).edge);
+
+        	//Update total MST cost
+        	totalCost += mstVect.at(current).cost;
+        }
+
+        //Pop current off the heap
+        meap.popRoot();
+
+        //Explore neighbors of current vertex
+        it = adjList.at(current).begin();
+        while (it != adjList.at(current).end())
+        {
+            //If the heap isn't empty, the data exists in the heap, and
+            //  the the edge cost is less than the cost heap has
+            if (!meap.empty() && meap.thisDataExists((*it).first)
+                && (*it).second < meap.mapQuery((*it).first).second)
+            {
+                //Update heap with new, better cost
+                meap.reKey((*it).first,(*it).second);
+
+                //Update the edge in the prim vector
+                mstVect.at((*it).first).discovered = true;
+                mstVect.at((*it).first).edge
+                        = make_pair(current,(*it).first);
+                mstVect.at((*it).first).cost = (*it).second;
+            }
+            it++;
+        }
+    }
+    return totalCost;
+}
+
 QString Data::getStadName(int stadNum) const
 //Returns name of stadium at stadNum
 {return masterVect.at(stadNum).name;}

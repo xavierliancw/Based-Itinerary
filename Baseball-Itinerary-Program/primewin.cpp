@@ -1149,6 +1149,24 @@ void PrimeWin::on_adminStadTbl_cellChanged(int row, int column)
     refreshAdminTbl();
 }
 
+void PrimeWin::on_adminPrimBt_clicked()
+//Pulls up a QMessageBox that displays everything about Prim's MST
+{
+    QMessageBox msgBox;             //Message box to display tree info
+    vector<pair<int,int> > edges;   //Vector of edges
+    int mileage;                    //MST mileage
+
+    //Ask Prim for the MST
+    mileage = data.askPrim(edges);
+
+    msgBox.setWindowTitle("Prim's MST");
+    msgBox.setIcon(QMessageBox::Information);
+    msgBox.setText("Minimum Spanning Tree Mileage: "
+                   + QString::number(mileage) + " miles");
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.exec();
+}
+
 //Index5 - Database Management Page=======================================
 void PrimeWin::on_dataBackBt_clicked()
 //Index 5 to 4
