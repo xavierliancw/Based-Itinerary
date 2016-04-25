@@ -169,8 +169,6 @@ private:
 
     //Adjacency list representation of the 2D matrix
     std::vector< std::list< std::pair<int,int> > > adjList;
-
-
 };
 
 #endif // DATASTRUCTURES_H
