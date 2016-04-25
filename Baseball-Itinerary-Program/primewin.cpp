@@ -928,92 +928,112 @@ void PrimeWin::on_itinStartOverBt_clicked()
 void PrimeWin::on_itinOptimizeBt_clicked()
 //Optimizes order of the itinerary
 //Complexity: O(n^2)
-{int UNFINISHED;
-    //TEST ITINERARY
-    std::list<int> itin;
-    itin.push_back(0);
-    itin.push_back(17);
-    itin.push_back(20);
-    itin.push_back(27);
-    itin.push_back(10);
-    itin.push_back(6);
-
-    std::deque<int> optimized;  //Optimized order of stadNums
-    std::deque<int> djMap;      //Map of costs to visit each stadium
-    int totalTripDist = 0;      //Total trip distance
-    int shortest;               //Stores current shortest distance
-    int nextStad;               //Stores next stad to visit
-
-    //Create and initialize a list iterator
-    std::list<int>::iterator it = itin.begin();
-
-    //Struct to represent a stadium in the itinerary
-    struct visitObj
+{
+    //Check if there are enough stadiums to optimizeS
+    if (itinList.size() > 2)
     {
-        bool visited;   //If visited
-        bool valid;     //If in itinerary
-    };
-    //Array of visited booleans where index is stadNum
-    visitObj visitAr[data.size()];
+        std::deque<int> optimized;  //Optimized order of stadNums
+        std::deque<int> djMap;      //Map of costs to visit each stadium
+        int totalTripDist = 0;      //Total trip distance
+        int shortest;               //Stores current shortest distance
+        int nextStad;               //Stores next stad to visit
 
-    //Initialize the array to the uninitialized states
-    for (unsigned int x = 0; x < data.size(); x++)
-    {
-        visitAr[x].visited = false;
-        visitAr[x].valid = false;
-    }
-    //Make stadiums in the itin valid within the array
-    for (it = itin.begin(); it != itin.end(); it++)
-    {
-        visitAr[*it].valid = true;
-    }
-    //Reset itin iterator
-    it = itin.begin();
+        //Create and initialize a list iterator
+        std::list<ItinObj>::iterator it = itinList.begin();
 
-    //Mark current true (visited) in the hash map, visiting itin's first
-    visitAr[*it].visited = true;
-
-    //Add it to the NEW itinerary
-    optimized.push_back(*it);
-
-    //Build the optimized itinerary
-    for (int i = 0; i < (int)itin.size() - 1; i++)
-    {
-        //Call Dijkstra's on the last stadium on the optimized itinerary
-        djMap = data.askDijkstra(optimized.back());
-
-        //Reinitialize temporary values
-        shortest = INT_MAX;
-        nextStad = -1;
-
-        //Find next stad in the itin that has the shortest dist
-        for (int x = 0; x < (int)djMap.size(); x++)
+        //Struct to represent a stadium in the itinerary
+        struct visitObj
         {
-            //If stad is in the itin & not visited & it has a shorter dist
-            if (visitAr[x].valid
-                && !visitAr[x].visited && djMap[x] < shortest)
-            {
-                //Update shortest and the next stad to visit
-                shortest = djMap[x];
-                nextStad = x;
-            }
-        }
-        //Add that distance to a running total
-        totalTripDist += shortest;
+            bool visited;   //If visited
+            bool valid;     //If in itinerary
+        };
+        //Array of visited booleans where index is stadNum
+        visitObj visitAr[data.size()];
 
-        //Mark it as visited on the visited array
-        visitAr[nextStad].visited = true;
+        //Initialize the array to the uninitialized states
+        for (unsigned int x = 0; x < data.size(); x++)
+        {
+            visitAr[x].visited = false;
+            visitAr[x].valid = false;
+        }
+        //Make stadiums in the itin valid within the array
+        for (it = itinList.begin(); it != itinList.end(); it++)
+        {
+            visitAr[(*it).getStadNum()].valid = true;
+        }
+        //Reset itin iterator
+        it = itinList.begin();
+
+        //Mark current true (visited) in the hash map, visiting itin's first
+        visitAr[(*it).getStadNum()].visited = true;
 
         //Add it to the NEW itinerary
-        optimized.push_back(nextStad);
+        optimized.push_back((*it).getStadNum());
+
+        //Build the optimized itinerary
+        for (int i = 0; i < (int)itinList.size() - 1; i++)
+        {
+            //Call Dijkstra's on the last stadium on the optimized itinerary
+            djMap = data.askDijkstra(optimized.back());
+
+            //Reinitialize temporary values
+            shortest = INT_MAX;
+            nextStad = -1;
+
+            //Find next stad in the itin that has the shortest dist
+            for (int x = 0; x < (int)djMap.size(); x++)
+            {
+                //If stad is in the itin & not visited & it has a shorter dist
+                if (visitAr[x].valid
+                    && !visitAr[x].visited && djMap[x] < shortest)
+                {
+                    //Update shortest and the next stad to visit
+                    shortest = djMap[x];
+                    nextStad = x;
+                }
+            }
+            //Add that distance to a running total
+            totalTripDist += shortest;
+
+            //Mark it as visited on the visited array
+            visitAr[nextStad].visited = true;
+
+            //Add it to the NEW itinerary
+            optimized.push_back(nextStad);
+        }
+        //Return new itinerary and the total distance travelled
+        list<ItinObj> newItin;
+
+        for (int x = 0; x < (int)optimized.size(); x++)
+        {
+            it = itinList.begin();
+            while (it != itinList.end())
+            {
+                if (optimized.at(x) == (*it).getStadNum())
+                {
+                    newItin.push_back(*it);
+                    it = itinList.end();
+                }
+                else
+                {
+                    it++;
+                }
+            }
+        }
+        itinList = newItin;
+        refreshItin();
+        ui->itinDistLbl->setText("Total Distance: "
+                                 + QString::number(totalTripDist)
+                                 + " miles");
     }
-    //Return new itinerary and the total distance travelled
-    qDebug() << "OPTIMAL";
-    for (int x = 0; x < optimized.size(); x++)
+    //Otherwise show an error
+    else
     {
-        qDebug() << optimized[x];
+        QMessageBox::warning(this, tr("Not Enough Stadiums"),
+                             tr("There needs to be at least three "
+                                "stadiums queued in your itinerary."),
+                             QMessageBox::Ok);
     }
-    qDebug() << "total trip distance is" << totalTripDist;
 }
 
 //Index3 - Summary Page===================================================
