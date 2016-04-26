@@ -39,109 +39,6 @@ PrimeWin::PrimeWin(QWidget *parent, int dummyVarForNow) :
                   this, SLOT(on_adminLoginBt_clicked()));
 }
 
-void PrimeWin::refreshHome()
-//Refreshes the view of everything on the home page
-//Complexity: O(t), t = number of teams
-{
-    int missingCompensator = 0; //Compensates for missing teams
-
-    //REFRESH STADIUM TABLE
-    ui->homeStadTbl->clear();
-    ui->homeStadTbl->setRowCount(0);
-    ui->homeStadTbl->setColumnCount(5);
-
-    //Populate the stadium table
-    for (unsigned int x=0;x<data.size();x++)
-    {
-        //Add a row
-        ui->homeStadTbl->insertRow(ui->homeStadTbl->rowCount());
-
-        //Determine if compensation is needed
-        if (data.teamSize(x) > 0)
-        {
-            missingCompensator = 0;
-        }
-        else
-        {
-            missingCompensator = 1;
-        }
-
-        //Loop until all teams at the stadium are added
-        for (unsigned int t=0;t<data.teamSize(x)+missingCompensator;t++)
-        {
-            //Add a new row after listing first team if stad has > 1 team
-            if (t != 0)
-            {
-                ui->homeStadTbl->insertRow(ui->homeStadTbl->rowCount());
-            }
-            //Add stadNum to hidden first col
-            ui->homeStadTbl
-              ->setItem(ui->homeStadTbl
-                        ->rowCount()-1,0,
-                        new QTableWidgetItem(QString::number(x)));
-
-            //If there are teams here
-            if (data.teamSize(x) != 0)
-            {
-                //Add teamNum to hidden second col
-                ui->homeStadTbl
-                        ->setItem(ui->homeStadTbl->rowCount()-1,1,
-                                  new
-                                  QTableWidgetItem(QString::number(t)));
-            }
-            //If there's no team at this stadium
-            else
-            {
-                //Add -1 to hidden second col
-                ui->homeStadTbl
-                        ->setItem(ui->homeStadTbl->rowCount()-1,1,
-                                  new
-                                  QTableWidgetItem(QString::number(-1)));
-            }
-
-            //Add field picture to third col
-            int UNIMPLEMENTED;
-            ui->homeStadTbl->setItem(ui->homeStadTbl->rowCount()-1,2,
-                                     new QTableWidgetItem("NO_PIC"));
-
-            //Add stadium name to fourth col
-            ui->homeStadTbl
-              ->setItem(ui->homeStadTbl
-                        ->rowCount()-1,3,
-                        new QTableWidgetItem(data.getStadName(x)));
-
-            //If there are teams here, add the team name
-            if (data.teamSize(x) != 0)
-            {
-                //Add team name to fifth col
-                ui->homeStadTbl
-                        ->setItem(ui->homeStadTbl->rowCount()-1,4,
-                                  new
-                                  QTableWidgetItem(
-                                      data.getTeamName(x,t)));
-            }
-            else
-            {
-                ui->homeStadTbl
-                        ->setItem(ui->homeStadTbl->rowCount()-1,4,
-                                  new QTableWidgetItem(""));
-            }
-        }
-    }
-    //Prepare table for viewing
-    ui->homeStadTbl->hideColumn(0);
-    ui->homeStadTbl->hideColumn(1);
-    ui->homeStadTbl->resizeColumnsToContents();
-    ui->homeStadTbl->setFocus();
-
-    //Click on first row to prevent uninitialized labels
-    if (ui->homeStadTbl->rowCount() > 0)
-    {
-        ui->homeStadTbl->selectRow(0);
-        refreshHomeDetails();
-    }
-}
-
 void PrimeWin::refreshHomeTbl(vector<int> stadNumOrder)
 //Redraws table on home page, ordering based on stadNumOrder
 //Complexity: O(n)
@@ -271,7 +168,7 @@ void PrimeWin::refreshItinBuilder()
     ui->tableWidget->resizeColumnsToContents();
     ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "Stadium"
                                                << "Team"
-                                               << "Add/Remove");
+                                               << "");
 }
 
 void PrimeWin::refreshItin()
@@ -583,12 +480,12 @@ void PrimeWin::catchAddItin()
 void PrimeWin::on_startInfoBt_clicked()
 //Index 0 to 1
 {
-    refreshHome();
     ui->homeNameRd->setChecked(true);
     ui->homeAmericanCB->setChecked(true);
     ui->homeNationalCB->setChecked(true);
     ui->homeTurfCB->setChecked(true);
-    ui->homeSynthCB->setChecked(true);
+    ui->homeSynthCB->setChecked(false);
+    ui->homeSynthCB->click();
     ui->stackWidg->setCurrentIndex(1);
 }
 
@@ -634,289 +531,96 @@ void PrimeWin::on_homePlanTripBt_clicked()
     ui->stackWidg->setCurrentIndex(2);
 }
 
-void PrimeWin::on_homeNationalCB_toggled(bool checked)
+void PrimeWin::filterStads()
+//Filters stadiums based on the checkbox filters
+//Complexity: O(n)
 {
-    //IF - Checks to see if our Checkbox is checked. If it is then
-    //     it will filter out all American League teams. Else it will
-    //     revert the table back to its original state.
-    if(checked)
+    vector<bool> filteredStads;
+    vector<int> applicableStadNums;
+    bool applicable;
+
+    //Iterate through all stadNums and see which ones need to be filtered
+    for (int x = 0; x < (int)data.size(); x++)
     {
-        //FOR LOOP- This will loop through the table.
-        for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
+        //Initialize applicable to false, meaning filter this stad out
+        applicable = false;
+
+        //If filtering in National Teams
+        if (ui->homeNationalCB->isChecked()
+            && data.getTeamLeague(x).toLower() == "national")
+        {applicable = true;}
+        //If filtering in American Teams
+        if (ui->homeAmericanCB->isChecked()
+            && data.getTeamLeague(x).toLower() == "american")
+        {applicable = true;}
+        //If filtering in synthetic turf
+        if (ui->homeSynthCB->isChecked()
+            && data.getStadGrass(x).toLower() != "grass")
+        {applicable = true;}
+        //If filtering in natural turf
+        if (ui->homeTurfCB->isChecked()
+            && data.getStadGrass(x).toLower() == "grass")
+        {applicable = true;}
+
+        //Push the stadNum's applicability into the vector
+        filteredStads.push_back(applicable);
+    }
+    //Create a vector of applicable stadNums
+    for (int x = 0; x < (int)filteredStads.size(); x++)
+    {
+        if (filteredStads.at(x))
         {
-            //This QString will be used to find our vector index.
-            QString strIndex = ui->homeStadTbl->item(i, 0)->text();
+            applicableStadNums.push_back(x);
+        }
+    }
+    //Pass the stadNums into the refresh function
+    refreshHomeTbl(applicableStadNums);
 
-            int vecIndex = strIndex.toInt();    //Convert strIndex to an int.
+    //Reclick the sorting radio button that's currently selected
+    if (ui->homeNameRd->isChecked())
+    {on_homeNameRd_toggled(true);}
+    else if (ui->homeTeamRd->isChecked())
+    {
+        int UNIMPLEMENTED;
+    }
+    else if (ui->homeDateRd->isChecked())
+    {
+        int NOTIMPLEMENTED;
+    }
+    else if (ui->homeCapRd->isChecked())
+    {on_homeCapRd_toggled(true);}
+    else if (ui->homeTypeRd->isChecked())
+    {on_homeTypeRd_toggled(true);}
 
-            //IF - Here we find if the team league at the team indicated then
-            //     it will hide all the rows that are American League team.
-            if(data.getTeamLeague(vecIndex, 0).toLower()=="american")
-            {
-                ui->homeStadTbl->setRowHidden(i, true);
-            } //end if(data.getTeamLeague(vecIndex, 0)=="American")
-
-        } //end  for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
-
-    } // end if(checked)
+    //Hide contents of side panel if all stadiums are filtered out
+    if (ui->homeStadTbl->rowCount() == 0)
+    {
+        ui->frame_6->hide();
+        ui->frame_8->hide();
+        ui->homeNirLbl->hide();
+        ui->homeSouvTbl->hide();
+    }
+    //Otherwise make them reappear
     else
     {
-        //FOR LOOP- This loop will traverse the homeStadTbl
-        for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
-        {
-            //IF- if the row at the given index is hidden then here
-            //    it will 'unhide' the row.
-            if(ui->homeStadTbl->isRowHidden(i))
-            {
-                if(ui->homeTurfCB->isChecked())
-                {
-                    if(data.getStadGrass(i).toLower() !="astro turf")
-                    {
-                        ui->homeStadTbl->setRowHidden(i, false);
-                    }
-                }
-                else if(ui->homeSynthCB->isChecked())
-                {
-                    if(data.getStadGrass(i).toLower()!="grass")
-                    {
-                        ui->homeStadTbl->setRowHidden(i, false);
-                    }
-                }
-                else if(ui->homeAmericanCB->isChecked())
-                {
-                    if(data.getTeamLeague(i, 0).toLower()!="national")
-                    {
-                        ui->homeStadTbl->setRowHidden(i, false);
-                    }
-                }
-                else
-                {
-                    ui->homeStadTbl->setRowHidden(i, false);
-                }
-            }// end if(ui->homeStadTbl->isRowHidden(i))
+        ui->frame_6->show();
+        ui->frame_8->show();
+        ui->homeNirLbl->show();
+        ui->homeSouvTbl->show();
+    }
+}
 
-        }// end for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
+void PrimeWin::on_homeAmericanCB_clicked()
+{filterStads();}
 
-    }// end else
-}// end void PrimeWin::on_homeNationalCB_toggled(bool checked)
+void PrimeWin::on_homeNationalCB_clicked()
+{filterStads();}
 
-void PrimeWin::on_homeAmericanCB_toggled(bool checked)
-{
-    //IF - Checks to see if our Checkbox is checked. If it is then
-    //     it will filter out all National League teams. Else it will
-    //     revert the table back to its original state.
-    if(checked)
-    {
-        //FOR LOOP- This will loop through the table.
-        for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
-        {
-            //This QString will be used to find our vector index.
-            QString strIndex = ui->homeStadTbl->item(i, 0)->text();
+void PrimeWin::on_homeTurfCB_clicked()
+{filterStads();}
 
-            int vecIndex = strIndex.toInt();    //Convert strIndex to an int.
-
-            //IF - Here we find if the team league at the team indicated then
-            //     it will hide all the rows that are National League team.
-            if(data.getTeamLeague(vecIndex, 0).toLower()=="national")
-            {
-                ui->homeStadTbl->setRowHidden(i, true);
-            } //end if(data.getTeamLeague(vecIndex, 0)=="American")
-
-        } //end  for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
-
-    } // end if(checked)
-    else
-    {
-        //FOR LOOP- This loop will traverse the homeStadTbl
-        for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
-        {
-            //IF- if the row at the given index is hidden then here
-            //    it will 'unhide' the row.
-            if(ui->homeStadTbl->isRowHidden(i))
-            {
-                if(ui->homeTurfCB->isChecked())
-                {
-                    if(data.getStadGrass(i).toLower() !="astro turf")
-                    {
-                        ui->homeStadTbl->setRowHidden(i, false);
-                    }
-                }
-                else if(ui->homeSynthCB->isChecked())
-                {
-                    if(data.getStadGrass(i).toLower()!="grass")
-                    {
-                        ui->homeStadTbl->setRowHidden(i, false);
-                    }
-                }
-                else if(ui->homeNationalCB->isChecked())
-                {
-                    if(data.getTeamLeague(i, 0).toLower()!="american")
-                    {
-                        ui->homeStadTbl->setRowHidden(i, false);
-                    }
-                }
-                else
-                {
-                    ui->homeStadTbl->setRowHidden(i, false);
-                }
-            }// end if(ui->homeStadTbl->isRowHidden(i))
-
-        }// end for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
-
-    }// end else
-}//end void on_homeAmericanCB_toggled(bool checked)
-
-
-
-void PrimeWin::on_homeTurfCB_toggled(bool checked)
-{
-    //IF-This if statement will look for the checkbox that we made is checked
-    //   and if it is then it will look for all stadiums that use natural grass
-    //   and filter them out.
-    if(checked)
-    {
-        //FOR-Loops through each item of each table to find the items in the
-        //    homeStadTble to filter out.
-
-        for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
-        {
-            //This QString will be used to find our vector index.
-            QString strIndex = ui->homeStadTbl->item(i, 0)->text();
-
-            int vecIndex = strIndex.toInt();    //Convert strIndex to an int.
-
-            //IF-The item at the given index has 'grass' then it will filter it
-            //   out the grass.
-            if(data.getStadGrass(vecIndex).toLower() == "astro turf")
-            {
-                ui->homeStadTbl->setRowHidden(i, true);
-            }// if(data.getStadGrass(vecIndex) == "Astro Turf")
-
-        }// end for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
-
-    }// end if(checked)
-    else
-    {
-        //FOR LOOP- This loop will traverse the homeStadTbl
-        for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
-        {
-            //IF- if the row at the given index is hidden then here
-            //    it will 'unhide' the row.
-            if(ui->homeStadTbl->isRowHidden(i))
-            {
-                //IF- if the row at the given index is hidden then here
-                //    it will 'unhide' the row.
-                if(ui->homeStadTbl->isRowHidden(i))
-                {
-                    if(ui->homeNationalCB->isChecked())
-                    {
-                        if(data.getTeamLeague(i, 0).toLower() !="american")
-                        {
-                            ui->homeStadTbl->setRowHidden(i, false);
-                        }
-                    }
-                    else if(ui->homeSynthCB->isChecked())
-                    {
-                        if(data.getStadGrass(i).toLower()!="astro turf")
-                        {
-                            ui->homeStadTbl->setRowHidden(i, false);
-                        }
-                    }
-                    else if(ui->homeAmericanCB->isChecked())
-                    {
-                        if(data.getTeamLeague(i, 0).toLower()!="national")
-                        {
-                            ui->homeStadTbl->setRowHidden(i, false);
-                        }
-                    }
-                    else
-                    {
-                        ui->homeStadTbl->setRowHidden(i, false);
-                    }
-                }// end if(ui->homeStadTbl->isRowHidden(i))
-
-            }// end if(ui->homeStadTbl->isRowHidden(i))
-
-        }// end for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
-
-    }// end else
-
-}// end void PrimeWin::on_homeTurfCB_toggled(bool checked)
-
-
-void PrimeWin::on_homeSynthCB_toggled(bool checked)
-{
-    //IF-This if statement will look for the checkbox that we made is checked
-    //   and if it is then it will look for all stadiums that use natural grass
-    //   and filter them out.
-    if(checked)
-    {
-        //FOR-Loops through each item of each table to find the items in the
-        //    homeStadTble to filter out.
-
-        for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
-        {
-            //This QString will be used to find our vector index.
-            QString strIndex = ui->homeStadTbl->item(i, 0)->text();
-
-            int vecIndex = strIndex.toInt();    //Convert strIndex to an int.
-
-            //IF-The item at the given index has 'grass' then it will filter it
-            //   out the grass.
-            if(data.getStadGrass(vecIndex).toLower() == "grass")
-            {
-                ui->homeStadTbl->setRowHidden(i, true);
-            }// if(data.getStadGrass(vecIndex) == "Astro Turf")
-
-        }// end for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
-
-    }// end if(checked)
-    else
-    {
-        //FOR LOOP- This loop will traverse the homeStadTbl
-        for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
-        {
-            //IF- if the row at the given index is hidden then here
-            //    it will 'unhide' the row.
-            if(ui->homeStadTbl->isRowHidden(i))
-            {
-                //IF- if the row at the given index is hidden then here
-                //    it will 'unhide' the row.
-                if(ui->homeStadTbl->isRowHidden(i))
-                {
-                    if(ui->homeNationalCB->isChecked())
-                    {
-                        if(data.getTeamLeague(i, 0).toLower() !="american")
-                        {
-                            ui->homeStadTbl->setRowHidden(i, false);
-                        }
-                    }
-                    else if(ui->homeTurfCB->isChecked())
-                    {
-                        if(data.getStadGrass(i).toLower()!="astro turf")
-                        {
-                            ui->homeStadTbl->setRowHidden(i, false);
-                        }
-                    }
-                    else if(ui->homeAmericanCB->isChecked())
-                    {
-                        if(data.getTeamLeague(i, 0).toLower()!="national")
-                        {
-                            ui->homeStadTbl->setRowHidden(i, false);
-                        }
-                    }
-                    else
-                    {
-                        ui->homeStadTbl->setRowHidden(i, false);
-                    }
-                }// end if(ui->homeStadTbl->isRowHidden(i))
-
-            }// end if(ui->homeStadTbl->isRowHidden(i))
-
-        }// end for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
-
-    }// end else
-}// end void
+void PrimeWin::on_homeSynthCB_clicked()
+{filterStads();}
 
 void PrimeWin::on_homeNameRd_toggled(bool checked)
 //Sorts home's stadium table alphabetically by stadium name
@@ -956,10 +660,10 @@ void PrimeWin::on_homeCapRd_toggled(bool checked)
     //Perform sort when radio toggle is checked
     if (checked)
     {
-        pair<int,QString> dataP;                    //Data to be sorted
-        vector<pair<int,QString> > sortThese;//Vector of data to sort
-        vector<int> stadNumOrder;              //Vector of stadNums
-        CustomSorts use;                       //Sorting class
+        pair<int,QString> dataP;                //Data to be sorted
+        vector<pair<int,QString> > sortThese;   //Vector of data to sort
+        vector<int> stadNumOrder;               //Vector of stadNums
+        CustomSorts use;                        //Sorting class
         int stadNum;
 
         //Create a list of stadNums to match the order the table is in now
@@ -997,10 +701,10 @@ void PrimeWin::on_homeTypeRd_toggled(bool checked)
     //Perform sort when radio toggle is checked
     if (checked)
     {
-        pair<int,QString> dataP;                    //Data to be sorted
-        vector<pair<int,QString> > sortThese;//Vector of data to sort
-        vector<int> stadNumOrder;              //Vector of stadNums
-        CustomSorts use;                       //Sorting class
+        pair<int,QString> dataP;                //Data to be sorted
+        vector<pair<int,QString> > sortThese;   //Vector of data to sort
+        vector<int> stadNumOrder;               //Vector of stadNums
+        CustomSorts use;                         //Sorting class
         int stadNum;
 
         //Create a list of stadNums to match the order the table is in now
