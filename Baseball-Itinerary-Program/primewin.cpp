@@ -468,6 +468,35 @@ QString PrimeWin::phoneCheck(QString phone)
     }
 }
 
+void PrimeWin::calcTrip()
+//Calculates total trip distance of itinerary
+{
+    list<ItinObj>::iterator it;
+    deque<int> distMap;
+    int tripDist = 0;
+
+    it = itinList.begin();
+
+    while (it != itinList.end())
+    {
+        //Ask Dijkstra for distances to all other vertices from iterator
+        distMap = data.askDijkstra((*it).getStadNum());
+
+        //Look at next stadium in the itin
+        it++;
+
+        //Only add to running total if not at end
+        if (it != itinList.end())
+        {
+            //Add the distance to that stad to the running total
+            tripDist += distMap.at((*it).getStadNum());
+        }
+    }
+    ui->itinDistLbl->setText("Total Distance: "
+                             + QString::number(tripDist)
+                             + " miles");
+}
+
 /*PUBLIC SLOTS==========================================================*/
 void PrimeWin::catchLoginStatus(bool status)
 //Catches signal to see if login is good or not
@@ -529,6 +558,10 @@ void PrimeWin::catchAddItin()
         addBt->setText("Add");
     }
 
+    //Calculate itinerary trip distance
+    calcTrip();
+
+    //Refresh the itinerary
     refreshItin();
     //?????????show possible souvenirs??????????
 }
@@ -889,7 +922,6 @@ void PrimeWin::on_homeNameRd_toggled(bool checked)
     //Perform sort when radio toggle is checked
     if (checked)
     {
-//        SortObj object;               //Object to be pushed into sortThese
         pair<int,QString> data;                //Data to be sorted
         vector<pair<int,QString> > sortThese;  //Vector of data to sort
         vector<int> stadNumOrder;              //Vector of stadNums
@@ -900,8 +932,6 @@ void PrimeWin::on_homeNameRd_toggled(bool checked)
         {
             data = make_pair(ui->homeStadTbl->item(x,0)->text().toInt(),
                              ui->homeStadTbl->item(x,2)->text());
-//            object.stadNum = ui->homeStadTbl->item(x,0)->text().toInt();
-//            object.sortee = ui->homeStadTbl->item(x,2)->text();
             sortThese.push_back(data);
         }
         //Ask insertion sort to reorder the stadiums
@@ -932,6 +962,7 @@ void PrimeWin::on_itinOptimizeBt_clicked()
     //Check if there are enough stadiums to optimizeS
     if (itinList.size() > 2)
     {
+        list<ItinObj> newItin;      //New itinerary
         std::deque<int> optimized;  //Optimized order of stadNums
         std::deque<int> djMap;      //Map of costs to visit each stadium
         int totalTripDist = 0;      //Total trip distance
@@ -964,7 +995,7 @@ void PrimeWin::on_itinOptimizeBt_clicked()
         //Reset itin iterator
         it = itinList.begin();
 
-        //Mark current true (visited) in the hash map, visiting itin's first
+        //Mark current true in the hash map, visiting itin's first
         visitAr[(*it).getStadNum()].visited = true;
 
         //Add it to the NEW itinerary
@@ -973,7 +1004,7 @@ void PrimeWin::on_itinOptimizeBt_clicked()
         //Build the optimized itinerary
         for (int i = 0; i < (int)itinList.size() - 1; i++)
         {
-            //Call Dijkstra's on the last stadium on the optimized itinerary
+            //Call Dijkstra's on the last stadium on the optimized itin
             djMap = data.askDijkstra(optimized.back());
 
             //Reinitialize temporary values
@@ -983,7 +1014,7 @@ void PrimeWin::on_itinOptimizeBt_clicked()
             //Find next stad in the itin that has the shortest dist
             for (int x = 0; x < (int)djMap.size(); x++)
             {
-                //If stad is in the itin & not visited & it has a shorter dist
+                //If stad is in the itin, unvisited, & has a shorter dist
                 if (visitAr[x].valid
                     && !visitAr[x].visited && djMap[x] < shortest)
                 {
@@ -1001,9 +1032,7 @@ void PrimeWin::on_itinOptimizeBt_clicked()
             //Add it to the NEW itinerary
             optimized.push_back(nextStad);
         }
-        //Return new itinerary and the total distance travelled
-        list<ItinObj> newItin;
-
+        //Build the new itinerary
         for (int x = 0; x < (int)optimized.size(); x++)
         {
             it = itinList.begin();
@@ -1020,6 +1049,7 @@ void PrimeWin::on_itinOptimizeBt_clicked()
                 }
             }
         }
+        //Update the old itin wiht the new, updated one
         itinList = newItin;
         refreshItin();
         ui->itinDistLbl->setText("Total Distance: "
