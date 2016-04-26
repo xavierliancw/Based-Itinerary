@@ -190,6 +190,9 @@ void PrimeWin::refreshHomeTbl(vector<int> stadNumOrder)
     ui->homeStadTbl->showColumn(1); //Not sure why this is needed
 
     ui->homeStadTbl->resizeColumnsToContents();
+    ui->homeStadTbl->setHorizontalHeaderLabels(QStringList() << "STADNUM"
+                                               << "" << "Stadium"
+                                               << "Team");
 
     //Click on first row to prevent uninitialized labels
     if (ui->homeStadTbl->rowCount() > 0)
@@ -265,7 +268,7 @@ void PrimeWin::refreshItinBuilder()
         //Put the add button in column 3
         ui->tableWidget->setCellWidget(i, 2, addBt);
     }
-
+    ui->tableWidget->resizeColumnsToContents();
     ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "Stadium"
                                                << "Team"
                                                << "Add/Remove");
@@ -1266,29 +1269,29 @@ void PrimeWin::refreshSouvenirTableAdmin()
 
     //REFRESH SOUVENIR TABLE
     widget->clear();
-    widget->setRowCount(0);
-    widget->setColumnCount(2);
-    QTableWidgetItem *item; //Item to populate table cell
-    widget->setHorizontalHeaderLabels(QStringList() << "Item Name"
-                                                    << "Price");
+    widget->setRowCount(2);
+    widget->setColumnCount(0);
+    QTableWidgetItem *item;
 
     //Loop to populate table
     for (int x = 0; x < data.getSouvListSize(stadNum); x++)
     {
-        //Add a row
-        widget->insertRow(widget->rowCount());
+        //Add a col
+        widget->insertColumn(widget->columnCount());
 
-        //Populate second column with souvName
+        //Populate first row with souvName
         item = new QTableWidgetItem;
         item->setData(0,data.getSouvName(stadNum, x));
-        widget->setItem(x,0,item);
+        widget->setItem(0,x,item);
 
-        //Populate third column with souvPrice
+        //Populate second row with souvPrice
         item = new QTableWidgetItem;
         item->setData(0,data.getSouvPrice(stadNum, x));
-        widget->setItem(x,1,item);
+        widget->setItem(1,x,item);
     }
     widget->resizeColumnsToContents();
+    widget->setRowHeight(0,60);
+    widget->setRowHeight(1,60);
 }
 
 // when an index is selected, the bottom panel will display a list of souvenirs
@@ -1311,9 +1314,6 @@ void PrimeWin::on_pushButton_9_clicked()
 void PrimeWin::catchNewSouvenirData(Data caughtData)
 {data = caughtData;}
 
-void PrimeWin::on_adminBackBtn_clicked()
-{ ui->adminHome->hide();  ui->start->show();}
-
 // on Delete Souvenir Button
 void PrimeWin::on_deleteSouvBtn_clicked()
 {
@@ -1331,9 +1331,8 @@ void PrimeWin::on_deleteSouvBtn_clicked()
    else
    {
        //notify admin to make a selection on souvenir
-       QMessageBox::information(this, tr("Error"),
-                            tr("Please select a stadium and a souvenir to remove."),
+       QMessageBox::warning(this, tr("Error"),
+                            tr("Select a stadium and a souvenir."),
                             QMessageBox::Ok);
    }
 }
-
