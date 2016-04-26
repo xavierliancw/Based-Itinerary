@@ -119,8 +119,6 @@ private slots:
     // on Add New Souvenir Button
     void on_pushButton_9_clicked();
 
-    void on_adminBackBtn_clicked();
-
     // Catch data from Add New Souv Button
     void catchNewSouvenirData(Data caughtData);
 
