@@ -41,3 +41,7 @@ Scrum Log
 18 April
 - CHECKPOINT 1 (Positive client response)
 - Closed story #16
+
+25 April
+- Fixed bug #77 where Macbook Clang compilers had issues compiling
+- Closed issues #13, #12, #10, #38, #75, #86, #92
