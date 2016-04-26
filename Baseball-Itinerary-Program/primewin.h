@@ -53,6 +53,9 @@ public:
     //Validates phone numbers and returns a formatted number
     QString phoneCheck(QString phone);
 
+    //Calculates the itinerary's trip distance
+    void calcTrip();
+
 public slots:
     void catchLoginStatus(bool status); //Catches login signal
 
