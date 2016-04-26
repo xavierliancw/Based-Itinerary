@@ -130,7 +130,7 @@ void PrimeWin::refreshHomeDetails()
     ui->homeAddressLbl->setText(address);
     cityZip.remove(0,cityZip.indexOf(",") + 2); //Cut off street
     ui->homeCityZipLbl->setText(cityZip);
-    ui->homeDateLbl->setText(data.getStadOpened(stadNum));
+    ui->homeDateLbl->setText(data.getStadOpened(stadNum,true));
     capacity.insert(capacity.size() - 3,",");
     ui->homeCapLbl->setText(capacity);
     ui->homeTurfLbl->setText(data.getStadGrass(stadNum));
@@ -970,6 +970,7 @@ void PrimeWin::on_adminStadTbl_cellChanged(int row, int column)
         break;
     case 8://Opened
         data.modStadOpened(row,input);
+        int ValidateThis;
         break;
     case 9://Type
         data.modStadType(row,input);

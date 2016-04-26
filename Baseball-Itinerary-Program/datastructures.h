@@ -12,6 +12,7 @@
 #include <deque>
 #include <QFile>
 #include <QTextStream>
+#include <QDate>
 
 #include "minheap.h"
 using namespace std;
@@ -39,7 +40,7 @@ public:
     QString name;
     QString address;
     QString phone;
-    QString opened;
+    QDate opened;
     int capacity;
     QString grass;
     QString type;
@@ -123,6 +124,7 @@ public:
     QString getStadAddress(int stadNum) const;
     QString getStadPhone(int stadNum) const;
     QString getStadOpened(int stadNum) const;
+    QString getStadOpened(int stadNum,bool format) const;
     int getStadCapactiy(int stadNum) const;
     QString getStadGrass(int stadNum) const;
     QString getStadType(int stadNum) const;
