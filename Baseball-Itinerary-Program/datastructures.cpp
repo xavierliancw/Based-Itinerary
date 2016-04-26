@@ -342,6 +342,9 @@ bool Data::exportSQL()
             failure = true;
         }
 
+        //Create transaction for instant commit
+        QSqlDatabase::database().transaction();
+
         //Create a variable to execute SQL commands
         QSqlQuery query;
 
@@ -431,7 +434,7 @@ bool Data::exportSQL()
                      << query.lastError();
         }
         for (unsigned int y = 0; y < masterVect.size(); y++)
-            {
+        {
             prepareCmd = "INSERT INTO distances(";
             for (unsigned int x = 0; x < masterVect.size(); x++)
             {
@@ -452,6 +455,9 @@ bool Data::exportSQL()
                 failure = true;
             }
         }
+        //Instantly write all changes to the database
+        QSqlDatabase::database().commit();
+
         qDebug() << "Complete";
         db.close();
 
