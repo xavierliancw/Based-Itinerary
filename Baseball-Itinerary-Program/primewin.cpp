@@ -950,6 +950,87 @@ void PrimeWin::on_homeNameRd_toggled(bool checked)
     }
 }
 
+void PrimeWin::on_homeCapRd_toggled(bool checked)
+//Sorts home table by capacity
+{
+    //Perform sort when radio toggle is checked
+    if (checked)
+    {
+        pair<int,QString> dataP;                    //Data to be sorted
+        vector<pair<int,QString> > sortThese;//Vector of data to sort
+        vector<int> stadNumOrder;              //Vector of stadNums
+        CustomSorts use;                       //Sorting class
+        int stadNum;
+
+        //Create a list of stadNums to match the order the table is in now
+        for (int x = 0; x < ui->homeStadTbl->rowCount(); x++)
+        {
+            stadNum = ui->homeStadTbl->item(x,0)->text().toInt();
+            dataP = make_pair(stadNum,QString::number
+                              (data.getStadCapactiy(stadNum)));
+            sortThese.push_back(dataP);
+        }
+        //Ask insertion sort to reorder the stadiums
+        sortThese = use.InsertionSort(sortThese);
+
+        //Build a vector of just stadNums that mirrors sortThese
+        for (int x = 0; x < (int)sortThese.size(); x++)
+        {
+            stadNumOrder.push_back(sortThese.at(x).first);
+        }
+        //Refresh home table
+        refreshHomeTbl(stadNumOrder);
+
+        //Make the capacity label stand out
+        ui->homeCapLbl->setStyleSheet("font-weight: bold; color: red");
+    }
+    else
+    {
+        //Restore capacity label
+        ui->homeCapLbl->setStyleSheet("");
+    }
+}
+
+void PrimeWin::on_homeTypeRd_toggled(bool checked)
+//Sorts home table by park typology
+{
+    //Perform sort when radio toggle is checked
+    if (checked)
+    {
+        pair<int,QString> dataP;                    //Data to be sorted
+        vector<pair<int,QString> > sortThese;//Vector of data to sort
+        vector<int> stadNumOrder;              //Vector of stadNums
+        CustomSorts use;                       //Sorting class
+        int stadNum;
+
+        //Create a list of stadNums to match the order the table is in now
+        for (int x = 0; x < ui->homeStadTbl->rowCount(); x++)
+        {
+            stadNum = ui->homeStadTbl->item(x,0)->text().toInt();
+            dataP = make_pair(stadNum,data.getStadType(stadNum));
+            sortThese.push_back(dataP);
+        }
+        //Ask insertion sort to reorder the stadiums
+        sortThese = use.InsertionSort(sortThese);
+
+        //Build a vector of just stadNums that mirrors sortThese
+        for (int x = 0; x < (int)sortThese.size(); x++)
+        {
+            stadNumOrder.push_back(sortThese.at(x).first);
+        }
+        //Refresh home table
+        refreshHomeTbl(stadNumOrder);
+
+        //Make the typology label stand out
+        ui->homeTypeLbl->setStyleSheet("font-weight: bold; color: red");
+    }
+    else
+    {
+        //Restore capacity label
+        ui->homeTypeLbl->setStyleSheet("");
+    }
+}
+
 //Index2 - Itinerary Page=================================================
 void PrimeWin::on_itinStartOverBt_clicked()
 //Index 2 to 0

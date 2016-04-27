@@ -96,6 +96,10 @@ private slots:
 
     void on_homeNameRd_toggled(bool checked);
 
+    void on_homeCapRd_toggled(bool checked);
+
+    void on_homeTypeRd_toggled(bool checked);
+
 //Index2==================================================================
     void on_itinStartOverBt_clicked();
 
