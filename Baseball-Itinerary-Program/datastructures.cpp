@@ -25,7 +25,7 @@ void Data::addStad(QString name, QString address,
     newStad.name = name;
     newStad.address = address;
     newStad.phone = phone;
-    newStad.opened = opened;
+    newStad.opened = QDate::fromString(opened,"dd MM yyyy");
     newStad.capacity = capacity;
     newStad.grass = grass;
     newStad.type = type;
@@ -48,7 +48,10 @@ void Data::modStadPhone(int stadNum, QString newPhone)
 
 void Data::modStadOpened(int stadNum, QString newOpened)
 //Modifies opening date of stadNum
-{masterVect.at(stadNum).opened = newOpened;}
+{
+    masterVect.at(stadNum).opened
+            = QDate::fromString(newOpened,"MMMM dd, yyyy");
+}
 
 void Data::modStadCapacity(int stadNum, int newCapacity)
 //Modifies stadNum's capacity
@@ -512,7 +515,8 @@ bool Data::importTXT(QString path)
             newStadObj.address += " " + fin.readLine();
             newStadObj.phone = fin.readLine();
             fin.read(9);//skip "Opened - "
-            newStadObj.opened = fin.readLine();
+            newStadObj.opened =
+                    QDate::fromString(fin.readLine(),"MMMM dd, yyyy");
             fin.read(11); //skip "Capacity - "
             str = fin.readLine();
             str.remove(QChar(','));
@@ -771,7 +775,16 @@ QString Data::getStadPhone(int stadNum) const
 
 QString Data::getStadOpened(int stadNum) const
 //Returns opening date of stadium at stadNum
-{return masterVect.at(stadNum).opened;}
+{return masterVect.at(stadNum).opened.toString("dd MM yyyy");}
+
+QString Data::getStadOpened(int stadNum,bool format) const
+//Returns formatted opening date of stadium at stadNum
+{
+    if (format)
+    {
+        return masterVect.at(stadNum).opened.toString("dd MMMM yyyy");
+    }
+}
 
 int Data::getStadCapactiy(int stadNum) const
 //Returns seating capacity of stadium at stadNum
