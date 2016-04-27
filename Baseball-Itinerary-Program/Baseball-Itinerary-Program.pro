@@ -20,7 +20,7 @@ SOURCES += main.cpp\
     editdistances.cpp \
     addsouvdialog.cpp \
     customsorts.cpp \
-    minheap.cpp
+    minmeap.cpp
 
 HEADERS  += primewin.h \
     adminlogin.h \
@@ -28,7 +28,7 @@ HEADERS  += primewin.h \
     editdistances.h \
     addsouvdialog.h \
     customsorts.h \
-    minheap.h
+    minmeap.h
 
 FORMS    += primewin.ui \
     adminlogin.ui \

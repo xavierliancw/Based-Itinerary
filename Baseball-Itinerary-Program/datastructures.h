@@ -13,7 +13,7 @@
 #include <QFile>
 #include <QTextStream>
 
-#include "minheap.h"
+#include "minmeap.h"
 using namespace std;
 
 class TeamObj

@@ -15,7 +15,7 @@
 #include "datastructures.h"
 #include "customsorts.h"
 #include "adminlogin.h"
-#include "minheap.h"
+#include "minmeap.h"
 #include "editdistances.h"
 #include "addsouvdialog.h"
 

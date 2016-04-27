@@ -1,4 +1,11 @@
-#include "minheap.h"
+/**
+  @file
+  @author Xavier
+  @date 27 April 2016
+
+  The MinMeap class methods are implemented in this file.
+  */
+#include "minmeap.h"
 
 /*MinMeap METHODS*/
 MinMeap::MinMeap(unsigned int meapInitSize)
