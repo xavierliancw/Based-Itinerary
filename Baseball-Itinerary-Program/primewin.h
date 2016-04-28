@@ -32,9 +32,6 @@ public:
     ~PrimeWin();
     PrimeWin(QWidget *parent, int dummyVarForNow);
 
-    //Refreshes the view of everything on the home page (Index 1)
-    void refreshHome();
-
     //Refreshes the home table based on the vector passed in (Index 1)
     void refreshHomeTbl(vector<int> stadNumOrder);
 
@@ -86,15 +83,21 @@ private slots:
 
     void on_homePlanTripBt_clicked();
 
-    void on_homeNationalCB_toggled(bool checked);
+    void filterStads();
 
-    void on_homeAmericanCB_toggled(bool checked);
+    void on_homeAmericanCB_clicked();
 
-    void on_homeSynthCB_toggled(bool checked);
+    void on_homeNationalCB_clicked();
 
-    void on_homeTurfCB_toggled(bool checked);
+    void on_homeTurfCB_clicked();
+
+    void on_homeSynthCB_clicked();
 
     void on_homeNameRd_toggled(bool checked);
+
+    void on_homeCapRd_toggled(bool checked);
+
+    void on_homeTypeRd_toggled(bool checked);
 
 //Index2==================================================================
     void on_itinStartOverBt_clicked();

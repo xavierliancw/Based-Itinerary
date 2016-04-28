@@ -19,6 +19,7 @@
 #include <QDir>
 #include <QFile>
 #include <QTextStream>
+#include <QDate>
 
 #include "minmeap.h"
 using namespace std;
@@ -115,7 +116,7 @@ public:
     /**
      * @brief The date this stadium first opened
      */
-    QString opened;            //This stadium's opening date
+    QDate opened;            //This stadium's opening date
     /**
      * @brief The seating capacity of this stadium
      */
@@ -292,14 +293,9 @@ public:
     void delStad(int stadNum);
 
     //Modifies data pertaining to teams
-    void addTeam(int stadNum, QString newTeam, QString newLeague);//Legacy implementation
-    void modTeam(int stadNum, QString newTeamName);//Legacy implementation
-    void modLeague(int stadNum, QString newLeague);//Legacy implementation
-
-    //Legacy methods
-//    void modTeam(int stadNum, QString oldTeamName, QString newTeamName);
-//    void modTeam(int stadNum, QString whichTeam, int newStadNum);
-//    void delTeam(int stadNum, QString whichTeam);
+    void addTeam(int stadNum, QString newTeam, QString newLeague);
+    void modTeam(int stadNum, QString newTeamName);
+    void modLeague(int stadNum, QString newLeague);
 
     void addSouv(int stadNum, QString newName, double newPrice);
     void deleteSouv(int stadNum, int souvNum);
@@ -315,6 +311,7 @@ public:
     QString getStadAddress(int stadNum) const;
     QString getStadPhone(int stadNum) const;
     QString getStadOpened(int stadNum) const;
+    QString getStadOpened(int stadNum,bool format) const;
     int getStadCapactiy(int stadNum) const;
     QString getStadGrass(int stadNum) const;
     QString getStadType(int stadNum) const;
