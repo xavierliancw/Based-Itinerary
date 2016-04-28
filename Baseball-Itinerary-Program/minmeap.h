@@ -14,6 +14,26 @@
 #include <sstream>
 using namespace std;
 
+/*************************************************************************
+ * MinMeap (Minimum Binary Heap with Map Parallel) (Int Specific)
+ * ----------------------------------------------------------------------
+ * This class implements a minimum binary heap using a deque.
+ * There's another parallel vector that tracks the location of each key
+ * in the heap so that key retrieval is O(1).
+ * Because of this, this heap MUST be initialized with a size that cannot
+ * change.
+ * This MinMeap stores a heap of value-key pairs and will maintain heap
+ * order by comparing the second variable in the pair variable.
+ * ----------------------------------------------------------------------
+ * PRE-REQUISITES
+ * ----------------------------------------------------------------------
+ * #include <deque>
+ * #include <string>
+ * #include <utility>
+ * #include <stdexcept>
+ * #include <sstream>
+ * using namespace std;
+ ************************************************************************/
 /**
  * @brief This class implements a combination data structure of a minumum
  * binary heap and a map.

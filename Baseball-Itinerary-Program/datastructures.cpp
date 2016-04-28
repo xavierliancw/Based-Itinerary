@@ -8,12 +8,6 @@ Data::~Data()
 //Destructor
 {}
 
-// Copy vector from master
-void Data::copyVector(std::vector<StadObj>& copy)
-{
-    copy = masterVect;
-}
-
 void Data::addStad(QString name, QString address,
                    QString phone, QString opened, int capacity,
                    QString grass, QString type)
@@ -81,16 +75,17 @@ void Data::addTeam(int stadNum, QString newTeam, QString newLeague/*LOGOVARIABLE
     addingTeam.stadNum = stadNum;
     addingTeam.league = newLeague;
     //maybe add a logo?
-    masterVect.at(stadNum).teamVect.push_back(addingTeam);
+
+    masterVect.at(stadNum).team = addingTeam;
 }
 
 void Data::modTeam(int stadNum, QString newTeamName)
 //Modifies name of team
-{masterVect.at(stadNum).teamVect.at(0).name = newTeamName;}
+{masterVect.at(stadNum).team.name = newTeamName;}
 
 void Data::modLeague(int stadNum, QString newLeague)
 //Modifies league of team
-{masterVect.at(stadNum).teamVect.at(0).league = newLeague;}
+{masterVect.at(stadNum).team.league = newLeague;}
 
 ////Legacy implementations
 //void Data::modTeam(int stadNum, QString oldTeamName, QString newTeamName)
@@ -381,18 +376,14 @@ bool Data::exportSQL()
                       "VALUES (:stadnum,:name,:league)");
         for (unsigned int x = 0; x < masterVect.size(); x++)
         {
-            for (unsigned int t = 0;
-                 t < masterVect.at(x).teamVect.size(); t++)
+            query.bindValue(":stadnum",x);
+            query.bindValue(":name",getTeamName(x));
+            query.bindValue(":league",getTeamLeague(x));
+            if (!query.exec())
             {
-                query.bindValue(":stadnum",x);
-                query.bindValue(":name",getTeamName(x,t));
-                query.bindValue(":league",getTeamLeague(x,t));
-                if (!query.exec())
-                {
-                    qDebug() << "SQL exporting team failed with "
-                             << query.lastError();
-                    failure = true;
-                }
+                qDebug() << "SQL exporting team failed with "
+                         << query.lastError();
+                failure = true;
             }
         }
         qDebug() << "Complete";
@@ -785,23 +776,13 @@ QString Data::getStadType(int stadNum) const
 //Returns type of stadium at stadNum
 {return masterVect.at(stadNum).type;}
 
-unsigned int Data::teamSize(int stadNum) const
-//Returns number of teams at a stadium
-{return masterVect.at(stadNum).teamVect.size();}
-
 QString Data::getTeamName(int stadNum) const
 //Returns team name
-{return masterVect.at(stadNum).teamVect.at(0).name;}
+{return masterVect.at(stadNum).team.name;}
 
 QString Data::getTeamLeague(int stadNum) const
 //Returns a team's league
-{return masterVect.at(stadNum).teamVect.at(0).league;}
-
-QString Data::getTeamName(int stadNum, int teamIndex) const
-{return masterVect.at(stadNum).teamVect.at(teamIndex).name;}
-
-QString Data::getTeamLeague(int stadNum, int teamIndex) const
-{return masterVect.at(stadNum).teamVect.at(teamIndex).league;}
+{return masterVect.at(stadNum).team.league;}
 
 int Data::getTeamStad() const
 {

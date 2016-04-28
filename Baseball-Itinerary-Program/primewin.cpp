@@ -39,109 +39,6 @@ PrimeWin::PrimeWin(QWidget *parent, int dummyVarForNow) :
                   this, SLOT(on_adminLoginBt_clicked()));
 }
 
-void PrimeWin::refreshHome()
-//Refreshes the view of everything on the home page
-//Complexity: O(t), t = number of teams
-{
-    int missingCompensator = 0; //Compensates for missing teams
-
-    //REFRESH STADIUM TABLE
-    ui->homeStadTbl->clear();
-    ui->homeStadTbl->setRowCount(0);
-    ui->homeStadTbl->setColumnCount(5);
-
-    //Populate the stadium table
-    for (unsigned int x=0;x<data.size();x++)
-    {
-        //Add a row
-        ui->homeStadTbl->insertRow(ui->homeStadTbl->rowCount());
-
-        //Determine if compensation is needed
-        if (data.teamSize(x) > 0)
-        {
-            missingCompensator = 0;
-        }
-        else
-        {
-            missingCompensator = 1;
-        }
-
-        //Loop until all teams at the stadium are added
-        for (unsigned int t=0;t<data.teamSize(x)+missingCompensator;t++)
-        {
-            //Add a new row after listing first team if stad has > 1 team
-            if (t != 0)
-            {
-                ui->homeStadTbl->insertRow(ui->homeStadTbl->rowCount());
-            }
-            //Add stadNum to hidden first col
-            ui->homeStadTbl
-              ->setItem(ui->homeStadTbl
-                        ->rowCount()-1,0,
-                        new QTableWidgetItem(QString::number(x)));
-
-            //If there are teams here
-            if (data.teamSize(x) != 0)
-            {
-                //Add teamNum to hidden second col
-                ui->homeStadTbl
-                        ->setItem(ui->homeStadTbl->rowCount()-1,1,
-                                  new
-                                  QTableWidgetItem(QString::number(t)));
-            }
-            //If there's no team at this stadium
-            else
-            {
-                //Add -1 to hidden second col
-                ui->homeStadTbl
-                        ->setItem(ui->homeStadTbl->rowCount()-1,1,
-                                  new
-                                  QTableWidgetItem(QString::number(-1)));
-            }
-
-            //Add field picture to third col
-            int UNIMPLEMENTED;
-            ui->homeStadTbl->setItem(ui->homeStadTbl->rowCount()-1,2,
-                                     new QTableWidgetItem("NO_PIC"));
-
-            //Add stadium name to fourth col
-            ui->homeStadTbl
-              ->setItem(ui->homeStadTbl
-                        ->rowCount()-1,3,
-                        new QTableWidgetItem(data.getStadName(x)));
-
-            //If there are teams here, add the team name
-            if (data.teamSize(x) != 0)
-            {
-                //Add team name to fifth col
-                ui->homeStadTbl
-                        ->setItem(ui->homeStadTbl->rowCount()-1,4,
-                                  new
-                                  QTableWidgetItem(
-                                      data.getTeamName(x,t)));
-            }
-            else
-            {
-                ui->homeStadTbl
-                        ->setItem(ui->homeStadTbl->rowCount()-1,4,
-                                  new QTableWidgetItem(""));
-            }
-        }
-    }
-    //Prepare table for viewing
-    ui->homeStadTbl->hideColumn(0);
-    ui->homeStadTbl->hideColumn(1);
-    ui->homeStadTbl->resizeColumnsToContents();
-    ui->homeStadTbl->setFocus();
-
-    //Click on first row to prevent uninitialized labels
-    if (ui->homeStadTbl->rowCount() > 0)
-    {
-        ui->homeStadTbl->selectRow(0);
-        refreshHomeDetails();
-    }
-}
-
 void PrimeWin::refreshHomeTbl(vector<int> stadNumOrder)
 //Redraws table on home page, ordering based on stadNumOrder
 //Complexity: O(n)
@@ -207,7 +104,6 @@ void PrimeWin::refreshHomeDetails()
 //Refreshes detail labels on the home page (Index 1)
 {
     int stadNum;        //Stadium vector index number
-    QString teams;      //Teams that play at the stadium
     QString address;    //Address of stadium
     QString cityZip;    //Everything in the address after the street
     QString capacity;   //Capacity of stadium
@@ -222,11 +118,7 @@ void PrimeWin::refreshHomeDetails()
 
     //Set labels and modify variables if necessary
     ui->homeStadzLbl->setText(data.getStadName(stadNum));
-    for (unsigned int x = 0; x < data.teamSize(stadNum); x++)
-    {
-        teams += data.getTeamName(stadNum,x) + "\n";
-    }
-    ui->homeTeamLbl->setText(teams);
+    ui->homeTeamLbl->setText(data.getTeamName(stadNum));
     ui->homeLeagueLbl->setText(data.getTeamLeague(stadNum) + " League");
     ui->homePhoneLbl->setText(data.getStadPhone(stadNum));
     address.resize(address.indexOf(","));   //Cut off city and zip
@@ -255,7 +147,7 @@ void PrimeWin::refreshItinBuilder()
                             new QTableWidgetItem(data.getStadName(i)));
         //Put the team name in colum 2
         ui->tableWidget->setItem(i, 1,
-                            new QTableWidgetItem(data.getTeamName(i,0)));
+                            new QTableWidgetItem(data.getTeamName(i)));
 
         //Create an add button
         QPushButton *addBt = new QPushButton();

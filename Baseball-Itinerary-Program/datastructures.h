@@ -1,90 +1,282 @@
+/**
+  @file
+  @author jerryberry
+  @date 27 April 2016
+
+  This file contains the class declarations for the TeamObj, SouvObj,
+  StadObj, ItinObj, and Data classes.
+  */
 #ifndef DATASTRUCTURES_H
 #define DATASTRUCTURES_H
-
-#include <QDebug>
 #include <vector>
 #include <list>
+#include <deque>
+#include <QDebug>
 #include <QString>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDir>
-#include <deque>
 #include <QFile>
 #include <QTextStream>
 
 #include "minmeap.h"
 using namespace std;
 
+/**
+ * @brief This class is the object representation of a team.
+ *
+ * This class represents a team by holding variables that relate to
+ * baseball teams.
+ * @par REQUIREMENTS:
+ * #include <QString>   <br>
+ * using namespace std;
+ */
 class TeamObj
 {
 public:
-    int stadNum;
-    QString name;
-    QString league;
+    /**
+     * @brief The stadium this baseball team belongs to
+     *
+     * Each stadium is identified through its own unique stadNum.
+     * @see Data
+     */
+    int stadNum;    //The stadium this team belongs to
+    /**
+     * @brief The name of the baseball team
+     */
+    QString name;   //The team's name
+    /**
+     * @brief The baseball league this baseball team belongs to
+     */
+    QString league; //The team's baseball league
     //PERHAPS A LOGO alkjfeiaj;fkejrlaj;lkja;lfkj;ejf;ajf;aiejf;lakjdf;lajeoilfj;
 };
 /*======================================================================*/
+/**
+ * @brief This class is the object representation of a souvenir.
+ *
+ * This class represents a souvenir by holding variables that relate to
+ * souvenirs.
+ * @par REQUIREMENTS:
+ * #include <QString>   <br>
+ * using namespace std;
+ */
 class SouvObj
 {
 public:
-    int stadNum;
-    QString name;
-    double price;
+    /**
+     * @brief The stadium this souvenir is sold at
+     *
+     * Each stadium is identified through its own unique stadNum.
+     * @see Data
+     */
+    int stadNum;    //The stadium this souvenir belongs to
+    /**
+     * @brief The name of this souvenir
+     */
+    QString name;   //This souvenir's name
+    /**
+     * @brief The selling price of this souvenir
+     */
+    double price;   //This souvenir's selling price
 };
 /*======================================================================*/
+/**
+ * @brief This class is the object representation of a stadium.
+ *
+ * This class represents a stadium by holding variables that relate to
+ * stadiums. A stadium has its own baseball team and its own souvenirs.
+ * @par REQUIREMENTS:
+ * class SouvObj        <br>
+ * class TeamObj        <br>
+ * #include <vector>    <br>
+ * #include <QString>   <br>
+ * #include <QDate>     <br>
+ * using namespace std;
+ * @see SouvObj
+ * @see TeamObj
+ */
 class StadObj
 {
 public:
-    QString name;
-    QString address;
-    QString phone;
-    QString opened;
-    int capacity;
-    QString grass;
-    QString type;
+    /**
+     * @brief The name of this stadium
+     */
+    QString name;              //This stadium's name
+    /**
+     * @brief The address of this stadium
+     */
+    QString address;           //This stadium's address
+    /**
+     * @brief The phone number of this stadium
+     */
+    QString phone;             //This stadium's phone number
+    /**
+     * @brief The date this stadium first opened
+     */
+    QString opened;            //This stadium's opening date
+    /**
+     * @brief The seating capacity of this stadium
+     */
+    int capacity;              //The seating capacity of this stadium
+    /**
+     * @brief The type of turf this stadium uses for the baseball field
+     */
+    QString grass;             //The type of turf this stadium uses
+    /**
+     * @brief This stadium's type
+     */
+    QString type;              //This stadium's type
+    /**
+     * @brief This stadium's baseball team
+     */
+    TeamObj team;              //This stadium's team
     //PERHAPS A PIC OF THE FIELD d;alskfjeoijfalkajgl;aijerlkajmsdlkjiejr;alkjr(like the wiki page)
-
-    std::vector<SouvObj> souvVect;
-    std::vector<TeamObj> teamVect;
+    /**
+     * @brief This stadium's vector of souvenir objects
+     */
+    vector<SouvObj> souvVect;  //Vector of souvenirs
 };
 /*======================================================================*/
+/**
+ * @brief This class is the object representation of a queued stadium
+ * within the itinerary.
+ *
+ * This class represents a queued stadium within the itinerary. It also
+ * performs functions that will help a tourist plan a trip.
+ *
+ * For example, when a tourist wants to add souvenirs from a particular
+ * stadium that's on the trip itinerary into the wishlist, this class
+ * object will store the wanted souvenirs and their quantities.
+ * @par REQUIREMENTS:
+ * #include <vector>    <br>
+ * using namespace std;
+ */
 class ItinObj
 {
 public:
-    ItinObj(int stadium);
-    void pushCart(int souvNum, int qty);//Pushes a souv into the cart
-    void delCart(int souvNum);          //Removes a souv from the cart
-    void chgQty(int souvNum, int newQty); //Changes qty of souv in cart
+    /**
+     * @brief The default constructor
+     * @param stadium : The stadium number this ItinObj represents
+     *
+     * Each stadium is identified through its own unique stadNum.
+     * @see Data
+     */
+    ItinObj(int stadium);                   //Constructor
+    /**
+     * @brief Push a souvenir into the wishlist
+     * @param souvNum : The index number that identifies the souvenir from
+     * its StadObj's vector
+     * @param qty : The quantity of a souvenir desired
+     */
+    void pushCart(int souvNum, int qty);    //Pushes a souv into the cart
+    /**
+     * @brief Remove a souvenir from the wishlist
+     * @param souvNum : The index number that identifies the souvenir from
+     * its StadObj's vector
+     */
+    void delCart(int souvNum);              //Removes a souv from the cart
+    /**
+     * @brief Change the quantity of a souvenir wanted within the wishlist
+     * @param souvNum : The index number that identifies the souvenir from
+     * its StadObj's vector
+     * @param newQty : The new quantity of a souvenir wanted
+     */
+    void chgQty(int souvNum, int newQty);   //Changes qty of souv in cart
 
-    int getStadNum() const;             //Returns stadNum
-    int getCartSize() const;            //Gets size of shopping cart
-    int getSouvNumAt(int index) const;  //Gets souvNum at index
-    int getQtyFor(int souvNum) const;   //Returns quantity of a souv
+    /**
+     * @brief Obtain the stadNum of the stadium represented by this
+     * ItinObj
+     * @return Returns the stadNum this ItinObj represents
+     *
+     * Each stadium is identified through its own unique stadNum.
+     * @see Data
+     */
+    int getStadNum() const;                 //Returns stadNum
+    /**
+     * @brief Obtain the number of different kinds of souvenirs wanted
+     * @return Returns the size of the wishlist
+     */
+    int getCartSize() const;                //Gets size of shopping cart
+    /**
+     * @brief Obtain the index number that identifies the souvenir from
+     * its StadObj's vector that is at a location within the wishlist
+     * @param index : Specifies which index location to look in within
+     * the wishlist vector
+     * @return  Returns the index number that identifies the souvenir from
+     * its StadObj's vector from the specified index location
+     */
+    int getSouvNumAt(int index) const;      //Gets souvNum at index
+    /**
+     * @brief Obtain the quantity of a certain souvenir within the
+     * wishlist
+     * @param souvNum : The index number that identifies the souvenir from
+     * its StadObj's vector
+     * @return Returns the quantity of a specified souvenir from the
+     * wishlist vector
+     */
+    int getQtyFor(int souvNum) const;       //Returns quantity of a souv
 
 private:
-    int stadNum;                    //current stadium
-
-    std::vector<int> itinSouvList;  //list of souviners bought
-    std::vector<int> itinSouvQuant; //quantity of each souviner
+    int stadNum;               //The stadium this object represents
+    vector<int> itinSouvList;  //Vector of souvenirs wanted
+    vector<int> itinSouvQuant; //Quantity of each souvenir wanted
 };
 /*======================================================================*/
 /*************************************************************************
  * class: Data
  * ----------------------------------------------------------------------
- * This class is the middle man between the GUI and all of the baseball
- * data.
- * **********************************************************************/
+ * This class is the primary interface between the GUI and all of the
+ * data that pertains to stadiums, the distances between stadiums, teams,
+ * and souvenirs.
+ ************************************************************************/
+/**
+ * @brief This class is the primary interface between the GUI and all of
+ * the data that pertains to stadiums, the distances between stadiums,
+ * teams, and souvenirs.
+ *
+ * This class is an interface class that performs functions related to
+ * stadium data. It handles all operations that relate to stadiums, the
+ * distances between stadiums, teams, and souvenirs.
+ *
+ * All stadium data is stored in a vector of StadObj's. Each index
+ * location of the vector holds an individual, unique stadium. As such,
+ * each stadium can be identified by its index location. This entire
+ * program refers to this identification number as a stadNum.
+ *
+ * This also means that all stadNums are contiguous, non-negative, and
+ * begin at 0.
+ *
+ * Because this class actually holds representations of all the stadiums,
+ * this class is used to add, modify, delete, or retrieve information that
+ * pertains to stadiums.
+ *
+ * Additionally, this class handles an SQL interface that can save and
+ * load all stadium data to and from, respectively, an SQL database file
+ * that is stored locally.
+ * @par REQUIREMENTS:
+ * class StadObj             <br>
+ * #include <vector>         <br>
+ * #include < list>          <br>
+ * #include <deque>          <br>
+ * #include <utility>        <br>
+ * #include <QDebug>         <br>
+ * #include <QSqlDatabase>   <br>
+ * #include <QSqlQuery>      <br>
+ * #include <QSqlError>      <br>
+ * #include <QDir>           <br>
+ * #include <QFile>          <br>
+ * #include <QTextStream>    <br>
+ * using namespace std;
+ * @warning This class does not have exception handling
+ * @see StadObj
+ */
 class Data
 {
 public:
-    //Constructs the structure and imports data from the SQL database
-    Data();
-    //Default destructor
-    ~Data();
-
-    //Copy master vector to prevent altering master
-    void copyVector(std::vector<StadObj>& copy);
+    Data();     //Constructor
+    ~Data();    //Destructor
 
     //Add a stadium object to the vector
     void addStad(QString name, QString address,
@@ -128,11 +320,8 @@ public:
     QString getStadType(int stadNum) const;
 
     //The following returns information about teams
-    unsigned int teamSize(int stadNum) const;//Vital legacy
-    QString getTeamName(int stadNum) const;//Legacy implementation
-    QString getTeamLeague(int stadNum) const;//Legacy implementation
-    QString getTeamName(int stadNum, int teamIndex) const;//Legacy
-    QString getTeamLeague(int stadNum, int teamIndex) const;//Legacy
+    QString getTeamName(int stadNum) const;
+    QString getTeamLeague(int stadNum) const;
     int getTeamStad() const;
 
     QString getSouvName(int stadNum, int souvNum) const;
