@@ -1,4 +1,125 @@
+/**
+  @file
+  @author jerryberry
+  @date 27 April 2016
+
+  This file contains the methods for the TeamObj, SouvObj, StadObj,
+  ItinObj, and Data classes.
+  */
 #include "datastructures.h"
+
+//========================================================================
+/*ItinObj METHODS*/
+
+ItinObj::ItinObj(int stadium)
+{
+    stadNum = stadium;
+    itinSouvList.clear();
+    itinSouvQuant.clear();
+}
+
+void ItinObj::pushCart(int souvNum, int qty)
+//Pushes a souvenir to the cart at the current stadium
+{
+    itinSouvList.push_back(souvNum);
+    itinSouvQuant.push_back(qty);
+}
+
+void ItinObj::delCart(int souvNum)
+//Deletes a souvenir from the cart
+{
+    bool found = false; //Validation boolean
+
+    //Look for the souvenir in the itinerary
+    for (unsigned int x = 0; x < itinSouvList.size(); x++)
+    {
+        //If the souvenir in question is found
+        if (itinSouvList.at(x) == souvNum)
+        {
+            //Delete it
+            std::vector<int>::iterator it = itinSouvList.begin() + x;
+            itinSouvList.erase(it);
+            itinSouvQuant.erase(it);
+
+            //Skip exception
+            found = true;
+
+            //Exit loop
+            x = itinSouvList.size();
+        }
+    }
+    //Throw an exception if souvenir is not found
+    if (!found)
+    {
+        qDebug() << "Cannot find souvenir in cart to delete";
+    }
+}
+
+void ItinObj::chgQty(int souvNum, int newQty)
+//Changes the quantity of the indexed souvenir
+{
+    bool found = false; //Validation boolean
+
+    //Look for the souvenir in the itinerary
+    for (unsigned int x = 0; x < itinSouvList.size(); x++)
+    {
+        //If the souvenir in question is found
+        if (itinSouvList.at(x) == souvNum)
+        {
+            //Change its quantity
+            itinSouvQuant.at(x) = newQty;
+
+            //Skip exception
+            found = true;
+
+            //Exit loop
+            x = itinSouvList.size();
+        }
+    }
+    //Throw an exception if souvenir is not found
+    if (!found)
+    {
+        qDebug() << "Cannot find souvenir in cart to change";
+    }
+}
+
+int ItinObj::getStadNum() const
+//Returns stadium number
+{return stadNum;}
+
+int ItinObj::getCartSize() const
+//Returns the size of the shopping cart at the current stadium
+{return itinSouvList.size();}
+
+int ItinObj::getSouvNumAt(int index) const
+//Returns the souvenir at index
+{return itinSouvList.at(index);}
+
+int ItinObj::getQtyFor(int souvNum) const
+//Returns the quantity of the souvenir bought
+{
+    int quantity = -1;   //Quantity of a souvenir in the cart
+
+    //Search for souvenir in itin
+    for (unsigned int x = 0; x < itinSouvList.size(); x++)
+    {
+        //If the souvenir is found, prep to return its quantity
+        if (souvNum == itinSouvList.at(x))
+        {
+            quantity = itinSouvQuant.at(x);
+            x = itinSouvList.size(); //Leave loop
+        }
+    }
+    //Throw an exception if souvenir isn't found
+    if (quantity < 0)
+    {
+        qDebug() << "Cannot find souvenir in cart";
+    }
+    return quantity;
+}
+
+//========================================================================
+/*Data METHODS*/
 
 Data::Data()
 //Constructor
@@ -78,7 +199,6 @@ void Data::addTeam(int stadNum, QString newTeam, QString newLeague/*LOGOVARIABLE
     addingTeam.stadNum = stadNum;
     addingTeam.league = newLeague;
     //maybe add a logo?
-
     masterVect.at(stadNum).team = addingTeam;
 }
 
@@ -90,61 +210,6 @@ void Data::modLeague(int stadNum, QString newLeague)
 //Modifies league of team
 {masterVect.at(stadNum).team.league = newLeague;}
 
-////Legacy implementations
-//void Data::modTeam(int stadNum, QString oldTeamName, QString newTeamName)
-////Changes name of a team
-//{
-//    //Search for team at the stadium (data set is naturally miniscule)
-//    for (unsigned int x = 0; x < masterVect.at(stadNum).teamVect.size();
-//         x++)
-//    {
-//        //If found, rename the team
-//        if (oldTeamName == masterVect.at(stadNum).teamVect.at(x).name)
-//        {
-//            masterVect.at(stadNum).teamVect.at(x).name = newTeamName;
-//        }
-//    }
-//}
-
-//void Data::modTeam(int stadNum, QString whichTeam, int newStadNum)
-////Changes home stadium of the team at stadNum
-//{
-//    TeamObj movingTeam; //Variable to hold the moving team
-
-//    //Search for team at the stadium (data set is naturally miniscule)
-//    for (unsigned int x = 0; x < masterVect.at(stadNum).teamVect.size();
-//         x++)
-//    {
-//        //If found, remove the team
-//        if (whichTeam == masterVect.at(stadNum).teamVect.at(x).name)
-//        {
-//            movingTeam = masterVect.at(stadNum).teamVect.at(x);
-//            masterVect.at(stadNum)
-//                    .teamVect.erase(masterVect.at(stadNum)
-//                                    .teamVect.begin() + x);
-//        }
-//    }
-//    movingTeam.stadNum = newStadNum;
-//    masterVect.at(newStadNum).teamVect.push_back(movingTeam);
-//}
-
-//void Data::delTeam(int stadNum, QString whichTeam)
-////Deletes a team
-//{
-//    //Search for team at the stadium (data set is naturally miniscule)
-//    for (unsigned int x = 0; x < masterVect.at(stadNum).teamVect.size();
-//         x++)
-//    {
-//        //If found, remove the team
-//        if (whichTeam == masterVect.at(stadNum).teamVect.at(x).name)
-//        {
-//            masterVect.at(stadNum)
-//                    .teamVect.erase(masterVect.at(stadNum)
-//                                    .teamVect.begin() + x);
-//        }
-//    }
-//}
-
 void Data::addSouv(int stadNum, QString newName, double newPrice)
 //Adds a souvenir to a stadium
 {
@@ -152,25 +217,30 @@ void Data::addSouv(int stadNum, QString newName, double newPrice)
     newSouv.stadNum = stadNum;
     newSouv.name = newName;
     newSouv.price = newPrice;
-
     masterVect.at(stadNum).souvVect.push_back(newSouv);
 }
 
-struct list_pair_sort_compare_instructions
-//Instructs list.sort() functions to sort using the cost
+void Data::modSouvName()
 {
-    bool operator()(const std::pair<int,int> &left,
-                    const std::pair<int,int> &right)
-    {return left.second < right.second;}
-};
+    qDebug() << "Data::modSouvName() is not implemented";
+    int UNIMPLEMENTED;
+}
+
+void Data::modSouvPrice()
+{
+    qDebug()  << "Data::modSouvPrice() is not implemented";
+    int UNIMPLEMENTED;
+}
 
 void Data::deleteSouv(int stadNum, int souvNum)
-// removes a souvenir object from souvVect
+//Removes a souvenir object from souvVect
 {
-    // erase element if possible
+    //Erase element if possible
     if(souvNum <= this->getSouvListSize(stadNum))
     {
-        masterVect.at(stadNum).souvVect.erase(masterVect.at(stadNum).souvVect.begin()+souvNum);
+        masterVect.at(stadNum)
+                .souvVect.erase(masterVect.at(stadNum)
+                                .souvVect.begin()+souvNum);
     }
     else
     {
@@ -178,6 +248,26 @@ void Data::deleteSouv(int stadNum, int souvNum)
     }
 
 }
+
+/**
+ * @brief The based_on_second struct provides instructions for std::sort
+ * to compare only the second integer of integer std::pairs
+ *
+ * It does this by overloading the () operator
+ *
+ * The only function that uses this is Data::addDist() since the adjacency
+ * list needs to sort its respective std::list whenever a new distance
+ * is added, such that the smallest distance is always at the front and
+ * the longest is at the back.
+ * @see Data::addDist()
+ */
+struct based_on_second
+//Instructs list.sort() functions to sort using the cost
+{
+    bool operator()(const std::pair<int,int> &left,
+                    const std::pair<int,int> &right)
+    {return left.second < right.second;}
+};
 
 void Data::addDist(int x, int y, int newDist)
 //Changes data in matrix and modifies adjacency list
@@ -210,7 +300,7 @@ void Data::addDist(int x, int y, int newDist)
             (*it).second = newDist;
         }
         //Now re-sort the list
-        adjList.at(x).sort(list_pair_sort_compare_instructions());
+        adjList.at(x).sort(based_on_second());
     }
     //Otherwise delete the distance from the list
     else if (!adjList.at(x).empty() && it != adjList.at(x).end())
@@ -539,72 +629,50 @@ bool Data::importTXT(QString path)
         {
             matrix[x].resize(masterVect.size());
         }
-        addDist(10,9,2070);  addDist(10,11,1390);
-        addDist(10,15,680); addDist(10,6,680);
-        addDist(15,0,6); addDist(15,0,-1);
-        addDist(15,6,0); addDist(15,17,650);
-        addDist(6,17,650); addDist(15,21,340);
-        addDist(6,21,340); addDist(15,0,340);
-        addDist(6,0,340); addDist(21,0,0);
-        addDist(21,11,1500); addDist(0,11,1500);
-        addDist(21,26,110); addDist(0,26,110);
-        addDist(26,17,300); addDist(26,20,830);
-        addDist(1,9,210); addDist(1,8,90);
-        addDist(1,13,240); addDist(1,29,240);
-        addDist(2,23,1255); addDist(2,14,195);
-        addDist(2,8,195); addDist(2,9,430);
-        addDist(3,4,460); addDist(3,28,740);
-        addDist(3,5,230); addDist(3,17,870);
-        addDist(3,20,650); addDist(4,29,415);
-        addDist(4,13,415); addDist(4,16,235);
-        addDist(4,3,460); addDist(4,20,560);
-        addDist(5,16,680); addDist(5,12,790);
-        addDist(5,23,965); addDist(5,17,1115);
-        addDist(5,3,230); addDist(7,19,90);
-        addDist(7,25,0); addDist(7,23,930);
-        addDist(7,28,560); addDist(7,27,195);
-        addDist(8,27,115); addDist(8,22,225);
-        addDist(8,1,90); addDist(9,2,430);
-        addDist(9,27,225); addDist(9,1,210);
-        addDist(9,24,430); addDist(9,10,2070);
-        addDist(11,24,300); addDist(11,16,465);
-        addDist(11,21,1500); addDist(11,0,1500);
-        addDist(11,10,1390); addDist(12,22,790);
-        addDist(12,23,210); addDist(12,5,790);
-        addDist(13,1,240); addDist(13,22,250);
-        addDist(13,4,415); addDist(13,24,80);
-        addDist(13,29,0); addDist(14,2,195);
-        addDist(14,19,80); addDist(14,27,315);
-        addDist(14,18,0); addDist(16,22,310);
-        addDist(16,5,680); addDist(16,4,235);
-        addDist(16,11,465); addDist(17,20,580);
-        addDist(17,3,870); addDist(17,5,1115);
-        addDist(17,26,300); addDist(17,6,650);
-        addDist(17,15,650); addDist(18,2,195);
-        addDist(18,19,80); addDist(18,27,315);
-        addDist(18,14,0); addDist(19,14,80);
-        addDist(19,18,80); addDist(19,7,90);
-        addDist(19,25,90); addDist(20,4,560);
-        addDist(20,3,650); addDist(20,17,580);
-        addDist(20,26,830); addDist(22,8,225);
-        addDist(22,27,260); addDist(22,12,790);
-        addDist(22,28,375); addDist(22,16,310);
-        addDist(22,13,250); addDist(22,19,250);
-        addDist(23,7,930); addDist(23,25,930);
-        addDist(23,2,1255); addDist(23,5,965);
-        addDist(23,12,210); addDist(23,28,600);
-        addDist(24,9,430); addDist(24,29,80);
-        addDist(24,13,80); addDist(24,11,300);
-        addDist(25,7,0); addDist(25,19,90);
-        addDist(25,23,930); addDist(25,28,560);
-        addDist(25,27,195); addDist(27,9,225);
-        addDist(27,14,315); addDist(27,18,315);
-        addDist(27,7,195); addDist(27,25,195);
-        addDist(27,22,260); addDist(27,8,115);
-        addDist(28,7,560); addDist(28,25,560);
-        addDist(28,23,600); addDist(28,3,740);
-        addDist(28,22,375); addDist(29,13,0);
-        addDist(29,24,80); addDist(29,1,240);
+        addDist(10,9,2070); addDist(10,11,1390);addDist(10,15,680);
+        addDist(10,6,680);  addDist(15,0,6);    addDist(15,0,-1);
+        addDist(15,6,0);    addDist(15,17,650); addDist(6,17,650);
+        addDist(15,21,340); addDist(6,21,340);  addDist(15,0,340);
+        addDist(6,0,340);   addDist(21,0,0);    addDist(21,11,1500);
+        addDist(0,11,1500); addDist(21,26,110); addDist(0,26,110);
+        addDist(26,17,300); addDist(26,20,830); addDist(1,9,210);
+        addDist(1,8,90);    addDist(1,13,240);  addDist(1,29,240);
+        addDist(2,23,1255); addDist(2,14,195);  addDist(2,8,195);
+        addDist(2,9,430);   addDist(3,4,460);   addDist(3,28,740);
+        addDist(3,5,230);   addDist(3,17,870);  addDist(3,20,650);
+        addDist(4,29,415);  addDist(4,13,415);  addDist(4,16,235);
+        addDist(4,3,460);   addDist(4,20,560);  addDist(5,16,680);
+        addDist(5,12,790);  addDist(5,23,965);  addDist(5,17,1115);
+        addDist(5,3,230);   addDist(7,19,90);   addDist(7,25,0);
+        addDist(7,23,930);  addDist(7,28,560);  addDist(7,27,195);
+        addDist(8,27,115);  addDist(8,22,225);  addDist(8,1,90);
+        addDist(9,2,430);   addDist(9,27,225);  addDist(9,1,210);
+        addDist(9,24,430);  addDist(9,10,2070); addDist(11,24,300);
+        addDist(11,16,465); addDist(11,21,1500);addDist(11,0,1500);
+        addDist(11,10,1390);addDist(12,22,790); addDist(12,23,210);
+        addDist(12,5,790);  addDist(13,1,240);  addDist(13,22,250);
+        addDist(13,4,415);  addDist(13,24,80);  addDist(13,29,0);
+        addDist(14,2,195);  addDist(14,19,80);  addDist(14,27,315);
+        addDist(14,18,0);   addDist(16,22,310); addDist(16,5,680);
+        addDist(16,4,235);  addDist(16,11,465); addDist(17,20,580);
+        addDist(17,3,870);  addDist(17,5,1115); addDist(17,26,300);
+        addDist(17,6,650);  addDist(17,15,650); addDist(18,2,195);
+        addDist(18,19,80);  addDist(18,27,315); addDist(18,14,0);
+        addDist(19,14,80);  addDist(19,18,80);  addDist(19,7,90);
+        addDist(19,25,90);  addDist(20,4,560);  addDist(20,3,650);
+        addDist(20,17,580); addDist(20,26,830); addDist(22,8,225);
+        addDist(22,27,260); addDist(22,12,790); addDist(22,28,375);
+        addDist(22,16,310); addDist(22,13,250); addDist(22,19,250);
+        addDist(23,7,930);  addDist(23,25,930); addDist(23,2,1255);
+        addDist(23,5,965);  addDist(23,12,210); addDist(23,28,600);
+        addDist(24,9,430);  addDist(24,29,80);  addDist(24,13,80);
+        addDist(24,11,300); addDist(25,7,0);    addDist(25,19,90);
+        addDist(25,23,930); addDist(25,28,560); addDist(25,27,195);
+        addDist(27,9,225);  addDist(27,14,315); addDist(27,18,315);
+        addDist(27,7,195);  addDist(27,25,195); addDist(27,22,260);
+        addDist(27,8,115);  addDist(28,7,560);  addDist(28,25,560);
+        addDist(28,23,600); addDist(28,3,740);  addDist(28,22,375);
+        addDist(29,13,0);   addDist(29,24,80);  addDist(29,1,240);
         addDist(29,22,250); addDist(29,4,415);
     }
     return !failure;
@@ -674,6 +742,11 @@ deque<int> Data::askDijkstra(int startingVertex)
     return distMap;
 }
 
+/**
+ * @brief The probject struct is used specifically by Data::askPrim() to
+ * aid in algorithm execution
+ * @see Data::askPrim()
+ */
 struct probject
 //Prim object for algorithm execution
 {
@@ -775,6 +848,7 @@ QString Data::getStadOpened(int stadNum,bool format) const
     {
         return masterVect.at(stadNum).opened.toString("dd MMMM yyyy");
     }
+    return "";
 }
 
 int Data::getStadCapactiy(int stadNum) const
@@ -816,123 +890,3 @@ int Data::getSouvListSize(int stadNum) const
 int Data::getDistBetween(unsigned int here, unsigned int there) const
 //Returns distance between two stadiums
 {return matrix[here][there];}
-
-std::vector< std::vector<int> > Data::getMatrix() const
-//Returns the 2D matrix
-{return matrix;}
-
-std::vector< std::list< std::pair<int,int> > > Data::getAdjList() const
-//Returns adjacency list
-{return adjList;}
-
-ItinObj::ItinObj(int stadium)
-{
-    stadNum = stadium;
-    itinSouvList.clear();
-    itinSouvQuant.clear();
-}
-
-void ItinObj::pushCart(int souvNum, int qty)
-//Pushes a souvenir to the cart at the current stadium
-{
-    itinSouvList.push_back(souvNum);
-    itinSouvQuant.push_back(qty);
-}
-
-void ItinObj::delCart(int souvNum)
-//Deletes a souvenir from the cart
-{
-    bool found = false; //Validation boolean
-
-    //Look for the souvenir in the itinerary
-    for (unsigned int x = 0; x < itinSouvList.size(); x++)
-    {
-        //If the souvenir in question is found
-        if (itinSouvList.at(x) == souvNum)
-        {
-            //Delete it
-            std::vector<int>::iterator it = itinSouvList.begin() + x;
-            itinSouvList.erase(it);
-            itinSouvQuant.erase(it);
-
-            //Skip exception
-            found = true;
-
-            //Exit loop
-            x = itinSouvList.size();
-        }
-    }
-    //Throw an exception if souvenir is not found
-    if (!found)
-    {
-        //THROW AN EXCEPTION HERE
-        qDebug() << "Cannot find souvenir in cart to delete";
-    }
-}
-
-void ItinObj::chgQty(int souvNum, int newQty)
-//Changes the quantity of the indexed souvenir
-{
-    bool found = false; //Validation boolean
-
-    //Look for the souvenir in the itinerary
-    for (unsigned int x = 0; x < itinSouvList.size(); x++)
-    {
-        //If the souvenir in question is found
-        if (itinSouvList.at(x) == souvNum)
-        {
-            //Change its quantity
-            itinSouvQuant.at(x) = newQty;
-
-            //Skip exception
-            found = true;
-
-            //Exit loop
-            x = itinSouvList.size();
-        }
-    }
-    //Throw an exception if souvenir is not found
-    if (!found)
-    {
-        //THROW AN EXCEPTION HERE
-        qDebug() << "Cannot find souvenir in cart to change";
-    }
-}
-
-int ItinObj::getStadNum() const
-//Returns stadium number
-{return stadNum;}
-
-int ItinObj::getCartSize() const
-//Returns the size of the shopping cart at the current stadium
-{return itinSouvList.size();}
-
-int ItinObj::getSouvNumAt(int index) const
-//Returns the souvenir at index
-{return itinSouvList.at(index);}
-
-int ItinObj::getQtyFor(int souvNum) const
-//Returns the quantity of the souvenir bought
-{
-    int quantity = -1;   //Quantity of a souvenir in the cart
-
-    //Search for souvenir in itin
-    for (unsigned int x = 0; x < itinSouvList.size(); x++)
-    {
-        //If the souvenir is found, prep to return its quantity
-        if (souvNum == itinSouvList.at(x))
-        {
-            quantity = itinSouvQuant.at(x);
-            x = itinSouvList.size(); //Leave loop
-        }
-    }
-
-    //Throw an exception if souvenir isn't found
-    if (quantity < 0)
-    {
-        //THROW AN EXCEPTION HERE
-        qDebug() << "Cannot find souvenir in cart";
-    }
-
-    return quantity;
-}
