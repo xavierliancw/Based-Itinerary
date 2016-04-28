@@ -1,3 +1,9 @@
+/**
+  @file
+  @author Stephen
+  @date 28 April 2016
+  @brief This file contains the CustomSorts class methods.
+  */
 #include "customsorts.h"
 
 /*CustomSorts METHODS*/

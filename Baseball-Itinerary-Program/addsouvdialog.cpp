@@ -1,3 +1,9 @@
+/**
+  @file
+  @author Blake
+  @date 28 April 2016
+  @brief This file contains the addSouvDialog class methods.
+  */
 #include "addsouvdialog.h"
 #include "ui_addsouvdialog.h"
 

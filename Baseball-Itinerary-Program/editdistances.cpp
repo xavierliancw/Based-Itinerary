@@ -1,3 +1,9 @@
+/**
+  @file
+  @author Xavier
+  @date 28 April 2016
+  @brief This file contains the editdistances class methods.
+  */
 #include "editdistances.h"
 #include "ui_editdistances.h"
 
