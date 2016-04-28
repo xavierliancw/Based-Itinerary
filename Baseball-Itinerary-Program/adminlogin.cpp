@@ -1,3 +1,9 @@
+/**
+  @file
+  @author Xavier
+  @date 28 April 2016
+  @brief This file contains the methods for the AdminLogin class.
+  */
 #include "adminlogin.h"
 #include "ui_adminlogin.h"
 

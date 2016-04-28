@@ -1,3 +1,9 @@
+/**
+  @file
+  @author jerryberry
+  @date 28 April 2016
+  @brief This file contains the PrimeWin class methods.
+  */
 #include "primewin.h"
 #include "ui_primewin.h"
 
@@ -261,106 +267,6 @@ void PrimeWin::refreshAdminTbl()
     }
     ui->adminStadTbl->resizeColumnsToContents();
     stopSignalsFrom.unblock();
-}
-
-QString PrimeWin::phoneCheck(QString phone)
-//Validates phone numbers and returns a formatted number
-{
-    QString bareNumber;     //Cleaned up input
-    bool hasPlus = false;   //Determines if there's a plus or not
-    bool morePlus = false;  //Determines if there are duplicate + signs
-    bool throwGen = false;  //Determines if generic error is necessary
-
-    //Iterate through all characters, keeping only + and numbers
-    for(QString::iterator it = phone.begin(); it != phone.end(); it++)
-    {
-        if (*it == '0' || *it == '1' || *it == '2' || *it == '3'
-            || *it == '4' || *it == '5' || *it == '6' || *it == '7'
-            || *it == '8' || *it == '9' || *it == '+')
-        {
-            bareNumber += *it;
-
-            //If there's a plus, flag it
-            if (*it == '+')
-            {
-                //If hasPlus is already true, then mark flag duplicate
-                if (hasPlus)
-                {
-                    morePlus = true;
-                }
-                //Otherwise just mark it true
-                else
-                {
-                    hasPlus = true;
-    }   }   }   }
-    //Check if there are duplicate +'s
-    if (morePlus)
-    {
-        QMessageBox::warning(this, tr("Invalid Phone Number"),
-                             tr("There can only be one \"+\" in a "
-                                "phone number."),
-                             QMessageBox::Ok);
-        return "NULL";
-    }
-    //Check if phone number is the correct length if it has a +
-    if (hasPlus && (bareNumber.size() - bareNumber.indexOf("+") == 12
-                    || bareNumber.size() - bareNumber.indexOf("+") == 11))
-    {}//It's good, I'm just too lazy to DeMorganize the conditional
-    //Check if phone number has the correct length if there's no +
-    else if (!hasPlus && (bareNumber.size() == 11
-                          || bareNumber.size() == 10))
-    {}//Same deal
-    else
-    {throwGen = true;}
-
-    //Format the number if nothing's wrong
-    if (!throwGen)
-    {
-        //Insert the start of the area code
-        //If there's a +
-        if (hasPlus)
-        {
-            //If the size is 11
-            if (bareNumber.size() - bareNumber.indexOf("+") == 12)
-            {
-                //Insert space after the first character after the +
-                bareNumber.insert(bareNumber.indexOf("+") + 2, " (");
-            }
-            //If the size is 10
-            else
-            {
-                //Insert ( after the +
-                bareNumber.insert(bareNumber.indexOf("+") + 1, "(");
-            }
-        }
-        //If there's no +
-        else
-        {
-            //If size is 11
-            if (bareNumber.size() == 11)
-            {
-                bareNumber.insert(1, " (");
-            }
-            //If size is 10
-            else
-            {
-                bareNumber.insert(0, "(");
-            }
-        }
-        //Finish area code
-        bareNumber.insert(bareNumber.indexOf("(") + 4, ") ");
-        //Add the dash
-        bareNumber.insert(bareNumber.lastIndexOf(" ") + 4,"-");
-        return bareNumber;
-    }
-    //Otherwise throw the generic error
-    else
-    {
-        QMessageBox::warning(this, tr("Invalid Phone Number"),
-                             tr("Phone number is not valid."),
-                             QMessageBox::Ok);
-        return "NULL";
-    }
 }
 
 void PrimeWin::calcTrip()
@@ -981,6 +887,106 @@ void PrimeWin::on_adminStadTbl_cellChanged(int row, int column)
         break;
     }
     refreshAdminTbl();
+}
+
+QString PrimeWin::phoneCheck(QString phone)
+//Validates phone numbers and returns a formatted number
+{
+    QString bareNumber;     //Cleaned up input
+    bool hasPlus = false;   //Determines if there's a plus or not
+    bool morePlus = false;  //Determines if there are duplicate + signs
+    bool throwGen = false;  //Determines if generic error is necessary
+
+    //Iterate through all characters, keeping only + and numbers
+    for(QString::iterator it = phone.begin(); it != phone.end(); it++)
+    {
+        if (*it == '0' || *it == '1' || *it == '2' || *it == '3'
+            || *it == '4' || *it == '5' || *it == '6' || *it == '7'
+            || *it == '8' || *it == '9' || *it == '+')
+        {
+            bareNumber += *it;
+
+            //If there's a plus, flag it
+            if (*it == '+')
+            {
+                //If hasPlus is already true, then mark flag duplicate
+                if (hasPlus)
+                {
+                    morePlus = true;
+                }
+                //Otherwise just mark it true
+                else
+                {
+                    hasPlus = true;
+    }   }   }   }
+    //Check if there are duplicate +'s
+    if (morePlus)
+    {
+        QMessageBox::warning(this, tr("Invalid Phone Number"),
+                             tr("There can only be one \"+\" in a "
+                                "phone number."),
+                             QMessageBox::Ok);
+        return "NULL";
+    }
+    //Check if phone number is the correct length if it has a +
+    if (hasPlus && (bareNumber.size() - bareNumber.indexOf("+") == 12
+                    || bareNumber.size() - bareNumber.indexOf("+") == 11))
+    {}//It's good, I'm just too lazy to DeMorganize the conditional
+    //Check if phone number has the correct length if there's no +
+    else if (!hasPlus && (bareNumber.size() == 11
+                          || bareNumber.size() == 10))
+    {}//Same deal
+    else
+    {throwGen = true;}
+
+    //Format the number if nothing's wrong
+    if (!throwGen)
+    {
+        //Insert the start of the area code
+        //If there's a +
+        if (hasPlus)
+        {
+            //If the size is 11
+            if (bareNumber.size() - bareNumber.indexOf("+") == 12)
+            {
+                //Insert space after the first character after the +
+                bareNumber.insert(bareNumber.indexOf("+") + 2, " (");
+            }
+            //If the size is 10
+            else
+            {
+                //Insert ( after the +
+                bareNumber.insert(bareNumber.indexOf("+") + 1, "(");
+            }
+        }
+        //If there's no +
+        else
+        {
+            //If size is 11
+            if (bareNumber.size() == 11)
+            {
+                bareNumber.insert(1, " (");
+            }
+            //If size is 10
+            else
+            {
+                bareNumber.insert(0, "(");
+            }
+        }
+        //Finish area code
+        bareNumber.insert(bareNumber.indexOf("(") + 4, ") ");
+        //Add the dash
+        bareNumber.insert(bareNumber.lastIndexOf(" ") + 4,"-");
+        return bareNumber;
+    }
+    //Otherwise throw the generic error
+    else
+    {
+        QMessageBox::warning(this, tr("Invalid Phone Number"),
+                             tr("Phone number is not valid."),
+                             QMessageBox::Ok);
+        return "NULL";
+    }
 }
 
 void PrimeWin::on_adminPrimBt_clicked()

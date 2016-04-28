@@ -3,7 +3,7 @@
   @author jerryberry
   @date 27 April 2016
 
-  This file contains the methods for the TeamObj, SouvObj, StadObj,
+  @brief This file contains the methods for the TeamObj, SouvObj, StadObj,
   ItinObj, and Data classes.
   */
 #include "datastructures.h"

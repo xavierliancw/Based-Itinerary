@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['jerryberry_27s_20baseball_20itinerary_20program',['jerryberry&apos;s Baseball Itinerary Program',['../index.html',1,'']]]
+  ['documentation_20for_20the_20baseball_20itinerary_20program',['Documentation for the Baseball Itinerary Program',['../index.html',1,'']]]
 ];

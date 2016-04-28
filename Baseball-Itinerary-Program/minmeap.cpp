@@ -3,7 +3,7 @@
   @author Xavier
   @date 27 April 2016
 
-  The MinMeap class methods are implemented in this file.
+  @brief The MinMeap class methods are implemented in this file.
   */
 #include "minmeap.h"
 

@@ -3,8 +3,8 @@
   @author jerryberry
   @date 27 April 2016
 
-  This file contains the class declarations for the TeamObj, SouvObj,
-  StadObj, ItinObj, and Data classes.
+  @brief This file contains the class declarations for the TeamObj,
+  SouvObj, StadObj, ItinObj, and Data classes.
   */
 #ifndef DATASTRUCTURES_H
 #define DATASTRUCTURES_H
@@ -241,7 +241,7 @@ private:
  * stadium data. It handles all operations that relate to stadiums, the
  * distances between stadiums, teams, and souvenirs.
  *
- * All stadium data is stored in a vector of StadObj's. Each index
+ * @note All stadium data is stored in a vector of StadObj's. Each index
  * location of the vector holds an individual, unique stadium. As such,
  * each stadium can be identified by its index location. This entire
  * program refers to this identification number as a stadNum.

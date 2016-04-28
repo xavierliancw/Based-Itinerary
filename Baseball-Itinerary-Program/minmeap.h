@@ -3,7 +3,7 @@
   @author Xavier
   @date 27 April 2016
 
-  The MinMeap class declaration is implemented in this file.
+  @brief The MinMeap class declaration is implemented in this file.
   */
 #ifndef MINHEAP_H
 #define MINHEAP_H
