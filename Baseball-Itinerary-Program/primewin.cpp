@@ -102,6 +102,7 @@ void PrimeWin::refreshHomeTbl(vector<int> stadNumOrder)
     if (ui->homeStadTbl->rowCount() > 0)
     {
         ui->homeStadTbl->selectRow(0);
+        refreshHomeSouvTbl();
         refreshHomeDetails();
     }
     stopSignalsFrom.unblock();
@@ -483,7 +484,10 @@ void PrimeWin::on_adminLoginBt_clicked()
 
 void PrimeWin::on_homeStadTbl_itemSelectionChanged()
 //Refreshes home page when the home page's table selection changes
-{refreshHomeDetails();}
+{
+    refreshHomeDetails();
+    refreshHomeSouvTbl();
+}
 
 //Index1 - Home Page======================================================
 void PrimeWin::on_homeBackBt_clicked()
@@ -496,6 +500,42 @@ void PrimeWin::on_homePlanTripBt_clicked()
 {
     refreshItinBuilder();
     ui->stackWidg->setCurrentIndex(2);
+}
+
+void PrimeWin::refreshHomeSouvTbl()
+//Refreshes home page's souvenir table
+{
+    int stadNum = ui->homeStadTbl->item(ui->homeStadTbl->currentRow(),
+                                         0)->text().toInt();
+    QTableWidget *widget = ui->homeSouvTbl;
+
+    //REFRESH SOUVENIR TABLE
+    widget->clear();
+    widget->setRowCount(2);
+    widget->setColumnCount(0);
+    QTableWidgetItem *item;
+
+    //Loop to populate table
+    for (int x = 0; x < data.getSouvListSize(stadNum); x++)
+    {
+        //Add a col
+        widget->insertColumn(widget->columnCount());
+
+        //Populate first row with souvName
+        item = new QTableWidgetItem;
+        item->setData(0,data.getSouvName(stadNum, x));
+        widget->setItem(0,x,item);
+
+        //Populate second row with souvPrice
+        item = new QTableWidgetItem;
+        item->setData(0,"$"
+                      + QString::number(data.getSouvPrice(stadNum, x)));
+        item->setTextAlignment(Qt::AlignCenter);
+        widget->setItem(1,x,item);
+    }
+    widget->resizeColumnsToContents();
+    widget->setRowHeight(0,40);
+    widget->setRowHeight(1,40);
 }
 
 void PrimeWin::filterStads()

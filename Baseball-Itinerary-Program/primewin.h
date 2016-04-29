@@ -167,6 +167,8 @@ private slots:
 
     void on_homePlanTripBt_clicked();
 
+    void refreshHomeSouvTbl();
+
     void filterStads();
 
     void on_homeAmericanCB_clicked();
