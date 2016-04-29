@@ -159,6 +159,10 @@ class ItinObj
 public:
     /**
      * @brief The default constructor
+     */
+    ItinObj();
+    /**
+     * @brief Overloaded constructor
      * @param stadium : The stadium number this ItinObj represents
      *
      * Each stadium is identified through its own unique stadNum.

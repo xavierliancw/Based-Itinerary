@@ -24,7 +24,7 @@
     <item row="0" column="0">
      <widget class="QStackedWidget" name="stackWidg">
       <property name="currentIndex">
-       <number>4</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="start">
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -794,7 +794,17 @@
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_6">
             <item>
-             <widget class="QListWidget" name="listWidget"/>
+             <widget class="QListWidget" name="listWidget">
+              <property name="editTriggers">
+               <set>QAbstractItemView::NoEditTriggers</set>
+              </property>
+              <property name="dragDropMode">
+               <enum>QAbstractItemView::DragDrop</enum>
+              </property>
+              <property name="defaultDropAction">
+               <enum>Qt::MoveAction</enum>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QPushButton" name="itinOptimizeBt">
@@ -804,16 +814,16 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_14">
+             <widget class="QLabel" name="itinCountLbl">
               <property name="text">
-               <string>stadiums queued</string>
+               <string>Stadiums Queued: 0</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QLabel" name="itinDistLbl">
               <property name="text">
-               <string>Total Distance: TOTAL_DISTANCE</string>
+               <string>Total Distance: 0 Miles</string>
               </property>
              </widget>
             </item>

@@ -11,7 +11,12 @@
 //========================================================================
 /*ItinObj METHODS*/
 
+ItinObj::ItinObj()
+//Default constructor
+{}
+
 ItinObj::ItinObj(int stadium)
+//Overloaded constructor
 {
     stadNum = stadium;
     itinSouvList.clear();
