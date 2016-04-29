@@ -16,6 +16,7 @@
 #include <QMessageBox>
 #include <QFileSystemModel>
 #include <QSignalBlocker>
+#include <QDragEnterEvent>
 
 #include "datastructures.h"
 #include "customsorts.h"
@@ -111,12 +112,13 @@ public:
     void calcTrip();
 
 public slots:
+    //Catches login signal
     /**
      * @brief Determine if PrimeWin should switch to the administrator's
      * page
      * @param status : If true, switch the page / If not, don't
      */
-    void catchLoginStatus(bool status); //Catches login signal
+    void catchLoginStatus(bool status);
 
     /**
      * @brief Update PrimeWin's Data variable
@@ -129,6 +131,18 @@ public slots:
      * @brief Update itinerary with newly queued or dequeued stadium
      */
     void catchAddItin();
+
+    //Event filter to detect drag and drops
+    /**
+     * @brief Look for Qt events
+     * @param object : GUI element that's generating a Qt event
+     * @param event : Qt event that's happening
+     * @return Returns false always
+     *
+     * Drag and drop functionality within the itinerary is implemented
+     * in this method.
+     */
+    bool eventFilter(QObject *object, QEvent *event);
 
 private slots:
 /*PAGE INDEX============================================================*/
@@ -209,9 +223,10 @@ private slots:
 
 private:
     Ui::PrimeWin *ui;           //User interface
-
-    std::list<ItinObj> itinList;
+    list<ItinObj> itinList;     //List of queued stadiums in itinerary
     Data data;                  //Interface for all data structures
     QFileSystemModel *dirmodel; //Model of file directory
+    ItinObj dragDrop;           //Data that's being dragged in the itin
+    int pickup;                 //Row of dragged data
 };
 #endif // PRIMEWIN_H

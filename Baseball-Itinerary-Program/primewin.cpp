@@ -39,6 +39,7 @@ PrimeWin::PrimeWin(QWidget *parent, int dummyVarForNow) :
     ui->dataFileBrowser->resizeColumnToContents(0);
     ui->adminStadTbl->horizontalHeader()
             ->setDefaultAlignment(Qt::AlignLeft);
+    ui->listWidget->viewport()->installEventFilter(this);
 
     //Keystroke to pull up admin login window
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return),
@@ -175,6 +176,7 @@ void PrimeWin::refreshItinBuilder()
 void PrimeWin::refreshItin()
 //Refreshes the itineray view (Index 2)
 {
+    QSignalBlocker blockSignals(ui->listWidget);
     //Clear itinerary view
     ui->listWidget->clear();
 
@@ -184,6 +186,7 @@ void PrimeWin::refreshItin()
     {
         ui->listWidget->addItem(data.getStadName(it->getStadNum()));
     }
+    blockSignals.unblock();
 }
 
 void PrimeWin::refreshAdminTbl()
@@ -271,6 +274,7 @@ void PrimeWin::refreshAdminTbl()
 
 void PrimeWin::calcTrip()
 //Calculates total trip distance of itinerary
+//Complexity: O(n^2)
 {
     list<ItinObj>::iterator it;
     deque<int> distMap;
@@ -296,6 +300,8 @@ void PrimeWin::calcTrip()
     ui->itinDistLbl->setText("Total Distance: "
                              + QString::number(tripDist)
                              + " miles");
+    ui->itinCountLbl->setText("Stadiums Queued: "
+                              + QString::number(itinList.size()));
 }
 
 /*PUBLIC SLOTS==========================================================*/
@@ -316,8 +322,8 @@ void PrimeWin::catchDataUpdate(Data caughtThis)
 void PrimeWin::catchAddItin()
 //Catches signal to update itin
 {
-//    //Block signals to prevent unintended behavior
-//    const QSignalBlocker blockItinTbl(ui->itineraryTbl);
+    //Block signals to prevent unintended behavior
+    QSignalBlocker blockSignals(ui->listWidget);
 
     //Create button object to emululate the button that was pushed
     QPushButton *addBt = qobject_cast<QPushButton*>(sender());
@@ -365,8 +371,68 @@ void PrimeWin::catchAddItin()
     //Refresh the itinerary
     refreshItin();
     //?????????show possible souvenirs??????????
+    blockSignals.unblock();
 }
 
+bool PrimeWin::eventFilter(QObject *object, QEvent *event)
+//Event filter to detect drag and drops within the itinerary
+//Complexity: O(n^2)
+{
+    //Only consider events happening inside the itinerary
+    if (object == ui->listWidget->viewport())
+    {
+        QDropEvent *theDrop;  //Simulates whatever is being dropped
+        QPoint pos;           //Helps model determine which row to drop to
+        QModelIndex model;    //Determines row drop location
+        list<ItinObj>::iterator it; //Itin list iterator
+
+        //Setup drop data
+        theDrop = static_cast<QDropEvent*>(event);
+        pos = theDrop->pos();
+        model = ui->listWidget->indexAt(pos);
+
+        //Grab the data of the stadium being dragged
+        if (event->type() == QEvent::DragEnter)
+        {
+            it = itinList.begin();
+            for (int x = 0; x < ui->listWidget->currentRow(); x++)
+            {
+                it++;
+            }
+            dragDrop = *it;
+            pickup = ui->listWidget->currentRow();
+        }
+        //Drop information
+        if (event->type() == QEvent::Drop)
+        {
+            //Ignore Qt's drop
+            theDrop->setDropAction(Qt::IgnoreAction);
+
+            //Search for dragged item's starting point
+            it = itinList.begin();
+            for (int x = 0; x < pickup; x++)
+            {
+                it++;
+            }
+            //Erase the dragged entry
+            itinList.erase(it);
+
+            //Search for the item's insertion point
+            it = itinList.begin();
+            for (int x = 0; x < model.row(); x++)
+            {
+               it++;
+            }
+            //Insert the dragged entry into the correct spot
+            itinList.insert(it,dragDrop);
+
+            //Redraw the itinerary
+            refreshItin();
+            calcTrip();
+        }
+    }
+    return false;
+}
 
 /*PAGE INDEX============================================================*/
 //Index 0 = start page
