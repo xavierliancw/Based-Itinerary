@@ -1,3 +1,9 @@
+/**
+  @file
+  @author jerryberry
+  @date 28 April 2016
+  @brief This file contains the PrimeWin class methods.
+  */
 #include "primewin.h"
 #include "ui_primewin.h"
 
@@ -33,113 +39,11 @@ PrimeWin::PrimeWin(QWidget *parent, int dummyVarForNow) :
     ui->dataFileBrowser->resizeColumnToContents(0);
     ui->adminStadTbl->horizontalHeader()
             ->setDefaultAlignment(Qt::AlignLeft);
+    ui->listWidget->viewport()->installEventFilter(this);
 
     //Keystroke to pull up admin login window
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return),
                   this, SLOT(on_adminLoginBt_clicked()));
-}
-
-void PrimeWin::refreshHome()
-//Refreshes the view of everything on the home page
-//Complexity: O(t), t = number of teams
-{
-    int missingCompensator = 0; //Compensates for missing teams
-
-    //REFRESH STADIUM TABLE
-    ui->homeStadTbl->clear();
-    ui->homeStadTbl->setRowCount(0);
-    ui->homeStadTbl->setColumnCount(5);
-
-    //Populate the stadium table
-    for (unsigned int x=0;x<data.size();x++)
-    {
-        //Add a row
-        ui->homeStadTbl->insertRow(ui->homeStadTbl->rowCount());
-
-        //Determine if compensation is needed
-        if (data.teamSize(x) > 0)
-        {
-            missingCompensator = 0;
-        }
-        else
-        {
-            missingCompensator = 1;
-        }
-
-        //Loop until all teams at the stadium are added
-        for (unsigned int t=0;t<data.teamSize(x)+missingCompensator;t++)
-        {
-            //Add a new row after listing first team if stad has > 1 team
-            if (t != 0)
-            {
-                ui->homeStadTbl->insertRow(ui->homeStadTbl->rowCount());
-            }
-            //Add stadNum to hidden first col
-            ui->homeStadTbl
-              ->setItem(ui->homeStadTbl
-                        ->rowCount()-1,0,
-                        new QTableWidgetItem(QString::number(x)));
-
-            //If there are teams here
-            if (data.teamSize(x) != 0)
-            {
-                //Add teamNum to hidden second col
-                ui->homeStadTbl
-                        ->setItem(ui->homeStadTbl->rowCount()-1,1,
-                                  new
-                                  QTableWidgetItem(QString::number(t)));
-            }
-            //If there's no team at this stadium
-            else
-            {
-                //Add -1 to hidden second col
-                ui->homeStadTbl
-                        ->setItem(ui->homeStadTbl->rowCount()-1,1,
-                                  new
-                                  QTableWidgetItem(QString::number(-1)));
-            }
-
-            //Add field picture to third col
-            int UNIMPLEMENTED;
-            ui->homeStadTbl->setItem(ui->homeStadTbl->rowCount()-1,2,
-                                     new QTableWidgetItem("NO_PIC"));
-
-            //Add stadium name to fourth col
-            ui->homeStadTbl
-              ->setItem(ui->homeStadTbl
-                        ->rowCount()-1,3,
-                        new QTableWidgetItem(data.getStadName(x)));
-
-            //If there are teams here, add the team name
-            if (data.teamSize(x) != 0)
-            {
-                //Add team name to fifth col
-                ui->homeStadTbl
-                        ->setItem(ui->homeStadTbl->rowCount()-1,4,
-                                  new
-                                  QTableWidgetItem(
-                                      data.getTeamName(x,t)));
-            }
-            else
-            {
-                ui->homeStadTbl
-                        ->setItem(ui->homeStadTbl->rowCount()-1,4,
-                                  new QTableWidgetItem(""));
-            }
-        }
-    }
-    //Prepare table for viewing
-    ui->homeStadTbl->hideColumn(0);
-    ui->homeStadTbl->hideColumn(1);
-    ui->homeStadTbl->resizeColumnsToContents();
-    ui->homeStadTbl->setFocus();
-
-    //Click on first row to prevent uninitialized labels
-    if (ui->homeStadTbl->rowCount() > 0)
-    {
-        ui->homeStadTbl->selectRow(0);
-        refreshHomeDetails();
-    }
 }
 
 void PrimeWin::refreshHomeTbl(vector<int> stadNumOrder)
@@ -190,11 +94,15 @@ void PrimeWin::refreshHomeTbl(vector<int> stadNumOrder)
     ui->homeStadTbl->showColumn(1); //Not sure why this is needed
 
     ui->homeStadTbl->resizeColumnsToContents();
+    ui->homeStadTbl->setHorizontalHeaderLabels(QStringList() << "STADNUM"
+                                               << "" << "Stadium"
+                                               << "Team");
 
     //Click on first row to prevent uninitialized labels
     if (ui->homeStadTbl->rowCount() > 0)
     {
         ui->homeStadTbl->selectRow(0);
+        refreshHomeSouvTbl();
         refreshHomeDetails();
     }
     stopSignalsFrom.unblock();
@@ -204,7 +112,6 @@ void PrimeWin::refreshHomeDetails()
 //Refreshes detail labels on the home page (Index 1)
 {
     int stadNum;        //Stadium vector index number
-    QString teams;      //Teams that play at the stadium
     QString address;    //Address of stadium
     QString cityZip;    //Everything in the address after the street
     QString capacity;   //Capacity of stadium
@@ -219,18 +126,14 @@ void PrimeWin::refreshHomeDetails()
 
     //Set labels and modify variables if necessary
     ui->homeStadzLbl->setText(data.getStadName(stadNum));
-    for (unsigned int x = 0; x < data.teamSize(stadNum); x++)
-    {
-        teams += data.getTeamName(stadNum,x) + "\n";
-    }
-    ui->homeTeamLbl->setText(teams);
+    ui->homeTeamLbl->setText(data.getTeamName(stadNum));
     ui->homeLeagueLbl->setText(data.getTeamLeague(stadNum) + " League");
     ui->homePhoneLbl->setText(data.getStadPhone(stadNum));
     address.resize(address.indexOf(","));   //Cut off city and zip
     ui->homeAddressLbl->setText(address);
     cityZip.remove(0,cityZip.indexOf(",") + 2); //Cut off street
     ui->homeCityZipLbl->setText(cityZip);
-    ui->homeDateLbl->setText(data.getStadOpened(stadNum));
+    ui->homeDateLbl->setText(data.getStadOpened(stadNum,true));
     capacity.insert(capacity.size() - 3,",");
     ui->homeCapLbl->setText(capacity);
     ui->homeTurfLbl->setText(data.getStadGrass(stadNum));
@@ -252,7 +155,7 @@ void PrimeWin::refreshItinBuilder()
                             new QTableWidgetItem(data.getStadName(i)));
         //Put the team name in colum 2
         ui->tableWidget->setItem(i, 1,
-                            new QTableWidgetItem(data.getTeamName(i,0)));
+                            new QTableWidgetItem(data.getTeamName(i)));
 
         //Create an add button
         QPushButton *addBt = new QPushButton();
@@ -265,15 +168,16 @@ void PrimeWin::refreshItinBuilder()
         //Put the add button in column 3
         ui->tableWidget->setCellWidget(i, 2, addBt);
     }
-
+    ui->tableWidget->resizeColumnsToContents();
     ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "Stadium"
                                                << "Team"
-                                               << "Add/Remove");
+                                               << "");
 }
 
 void PrimeWin::refreshItin()
 //Refreshes the itineray view (Index 2)
 {
+    QSignalBlocker blockSignals(ui->listWidget);
     //Clear itinerary view
     ui->listWidget->clear();
 
@@ -283,6 +187,7 @@ void PrimeWin::refreshItin()
     {
         ui->listWidget->addItem(data.getStadName(it->getStadNum()));
     }
+    blockSignals.unblock();
 }
 
 void PrimeWin::refreshAdminTbl()
@@ -368,104 +273,36 @@ void PrimeWin::refreshAdminTbl()
     stopSignalsFrom.unblock();
 }
 
-QString PrimeWin::phoneCheck(QString phone)
-//Validates phone numbers and returns a formatted number
+void PrimeWin::calcTrip()
+//Calculates total trip distance of itinerary
+//Complexity: O(n^2)
 {
-    QString bareNumber;     //Cleaned up input
-    bool hasPlus = false;   //Determines if there's a plus or not
-    bool morePlus = false;  //Determines if there are duplicate + signs
-    bool throwGen = false;  //Determines if generic error is necessary
+    list<ItinObj>::iterator it;
+    deque<int> distMap;
+    int tripDist = 0;
 
-    //Iterate through all characters, keeping only + and numbers
-    for(QString::iterator it = phone.begin(); it != phone.end(); it++)
+    it = itinList.begin();
+
+    while (it != itinList.end())
     {
-        if (*it == '0' || *it == '1' || *it == '2' || *it == '3'
-            || *it == '4' || *it == '5' || *it == '6' || *it == '7'
-            || *it == '8' || *it == '9' || *it == '+')
+        //Ask Dijkstra for distances to all other vertices from iterator
+        distMap = data.askDijkstra((*it).getStadNum());
+
+        //Look at next stadium in the itin
+        it++;
+
+        //Only add to running total if not at end
+        if (it != itinList.end())
         {
-            bareNumber += *it;
-
-            //If there's a plus, flag it
-            if (*it == '+')
-            {
-                //If hasPlus is already true, then mark flag duplicate
-                if (hasPlus)
-                {
-                    morePlus = true;
-                }
-                //Otherwise just mark it true
-                else
-                {
-                    hasPlus = true;
-    }   }   }   }
-    //Check if there are duplicate +'s
-    if (morePlus)
-    {
-        QMessageBox::warning(this, tr("Invalid Phone Number"),
-                             tr("There can only be one \"+\" in a "
-                                "phone number."),
-                             QMessageBox::Ok);
-        return "NULL";
-    }
-    //Check if phone number is the correct length if it has a +
-    if (hasPlus && (bareNumber.size() - bareNumber.indexOf("+") == 12
-                    || bareNumber.size() - bareNumber.indexOf("+") == 11))
-    {}//It's good, I'm just too lazy to DeMorganize the conditional
-    //Check if phone number has the correct length if there's no +
-    else if (!hasPlus && (bareNumber.size() == 11
-                          || bareNumber.size() == 10))
-    {}//Same deal
-    else
-    {throwGen = true;}
-
-    //Format the number if nothing's wrong
-    if (!throwGen)
-    {
-        //Insert the start of the area code
-        //If there's a +
-        if (hasPlus)
-        {
-            //If the size is 11
-            if (bareNumber.size() - bareNumber.indexOf("+") == 12)
-            {
-                //Insert space after the first character after the +
-                bareNumber.insert(bareNumber.indexOf("+") + 2, " (");
-            }
-            //If the size is 10
-            else
-            {
-                //Insert ( after the +
-                bareNumber.insert(bareNumber.indexOf("+") + 1, "(");
-            }
+            //Add the distance to that stad to the running total
+            tripDist += distMap.at((*it).getStadNum());
         }
-        //If there's no +
-        else
-        {
-            //If size is 11
-            if (bareNumber.size() == 11)
-            {
-                bareNumber.insert(1, " (");
-            }
-            //If size is 10
-            else
-            {
-                bareNumber.insert(0, "(");
-            }
-        }
-        //Finish area code
-        bareNumber.insert(bareNumber.indexOf("(") + 4, ") ");
-        //Add the dash
-        bareNumber.insert(bareNumber.lastIndexOf(" ") + 4,"-");
-        return bareNumber;
     }
-    //Otherwise throw the generic error
-    else
-    {
-        QMessageBox::warning(this, tr("Invalid Phone Number"),
-                             tr("Phone number is not valid."),
-                             QMessageBox::Ok);
-        return "NULL";
-    }
+    ui->itinDistLbl->setText("Total Distance: "
+                             + QString::number(tripDist)
+                             + " miles");
+    ui->itinCountLbl->setText("Stadiums Queued: "
+                              + QString::number(itinList.size()));
 }
 
 /*PUBLIC SLOTS==========================================================*/
@@ -486,8 +323,8 @@ void PrimeWin::catchDataUpdate(Data caughtThis)
 void PrimeWin::catchAddItin()
 //Catches signal to update itin
 {
-//    //Block signals to prevent unintended behavior
-//    const QSignalBlocker blockItinTbl(ui->itineraryTbl);
+    //Block signals to prevent unintended behavior
+    QSignalBlocker blockSignals(ui->listWidget);
 
     //Create button object to emululate the button that was pushed
     QPushButton *addBt = qobject_cast<QPushButton*>(sender());
@@ -529,10 +366,74 @@ void PrimeWin::catchAddItin()
         addBt->setText("Add");
     }
 
+    //Calculate itinerary trip distance
+    calcTrip();
+
+    //Refresh the itinerary
     refreshItin();
     //?????????show possible souvenirs??????????
+    blockSignals.unblock();
 }
 
+bool PrimeWin::eventFilter(QObject *object, QEvent *event)
+//Event filter to detect drag and drops within the itinerary
+//Complexity: O(n^2)
+{
+    //Only consider events happening inside the itinerary
+    if (object == ui->listWidget->viewport())
+    {
+        QDropEvent *theDrop;  //Simulates whatever is being dropped
+        QPoint pos;           //Helps model determine which row to drop to
+        QModelIndex model;    //Determines row drop location
+        list<ItinObj>::iterator it; //Itin list iterator
+
+        //Setup drop data
+        theDrop = static_cast<QDropEvent*>(event);
+        pos = theDrop->pos();
+        model = ui->listWidget->indexAt(pos);
+
+        //Grab the data of the stadium being dragged
+        if (event->type() == QEvent::DragEnter)
+        {
+            it = itinList.begin();
+            for (int x = 0; x < ui->listWidget->currentRow(); x++)
+            {
+                it++;
+            }
+            dragDrop = *it;
+            pickup = ui->listWidget->currentRow();
+        }
+        //Drop information
+        if (event->type() == QEvent::Drop)
+        {
+            //Ignore Qt's drop
+            theDrop->setDropAction(Qt::IgnoreAction);
+
+            //Search for dragged item's starting point
+            it = itinList.begin();
+            for (int x = 0; x < pickup; x++)
+            {
+                it++;
+            }
+            //Erase the dragged entry
+            itinList.erase(it);
+
+            //Search for the item's insertion point
+            it = itinList.begin();
+            for (int x = 0; x < model.row(); x++)
+            {
+               it++;
+            }
+            //Insert the dragged entry into the correct spot
+            itinList.insert(it,dragDrop);
+
+            //Redraw the itinerary
+            refreshItin();
+            calcTrip();
+        }
+    }
+    return false;
+}
 
 /*PAGE INDEX============================================================*/
 //Index 0 = start page
@@ -547,7 +448,12 @@ void PrimeWin::catchAddItin()
 void PrimeWin::on_startInfoBt_clicked()
 //Index 0 to 1
 {
-    refreshHome();
+    ui->homeNameRd->setChecked(true);
+    ui->homeAmericanCB->setChecked(true);
+    ui->homeNationalCB->setChecked(true);
+    ui->homeTurfCB->setChecked(true);
+    ui->homeSynthCB->setChecked(false);
+    ui->homeSynthCB->click();
     ui->stackWidg->setCurrentIndex(1);
 }
 
@@ -578,7 +484,10 @@ void PrimeWin::on_adminLoginBt_clicked()
 
 void PrimeWin::on_homeStadTbl_itemSelectionChanged()
 //Refreshes home page when the home page's table selection changes
-{refreshHomeDetails();}
+{
+    refreshHomeDetails();
+    refreshHomeSouvTbl();
+}
 
 //Index1 - Home Page======================================================
 void PrimeWin::on_homeBackBt_clicked()
@@ -593,289 +502,132 @@ void PrimeWin::on_homePlanTripBt_clicked()
     ui->stackWidg->setCurrentIndex(2);
 }
 
-void PrimeWin::on_homeNationalCB_toggled(bool checked)
+void PrimeWin::refreshHomeSouvTbl()
+//Refreshes home page's souvenir table
 {
-    //IF - Checks to see if our Checkbox is checked. If it is then
-    //     it will filter out all American League teams. Else it will
-    //     revert the table back to its original state.
-    if(checked)
+    int stadNum = ui->homeStadTbl->item(ui->homeStadTbl->currentRow(),
+                                         0)->text().toInt();
+    QTableWidget *widget = ui->homeSouvTbl;
+
+    //REFRESH SOUVENIR TABLE
+    widget->clear();
+    widget->setRowCount(2);
+    widget->setColumnCount(0);
+    QTableWidgetItem *item;
+
+    //Loop to populate table
+    for (int x = 0; x < data.getSouvListSize(stadNum); x++)
     {
-        //FOR LOOP- This will loop through the table.
-        for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
+        //Add a col
+        widget->insertColumn(widget->columnCount());
+
+        //Populate first row with souvName
+        item = new QTableWidgetItem;
+        item->setData(0,data.getSouvName(stadNum, x));
+        widget->setItem(0,x,item);
+
+        //Populate second row with souvPrice
+        item = new QTableWidgetItem;
+        item->setData(0,"$"
+                      + QString::number(data.getSouvPrice(stadNum, x)));
+        item->setTextAlignment(Qt::AlignCenter);
+        widget->setItem(1,x,item);
+    }
+    widget->resizeColumnsToContents();
+    widget->setRowHeight(0,40);
+    widget->setRowHeight(1,40);
+}
+
+void PrimeWin::filterStads()
+//Filters stadiums based on the checkbox filters
+//Complexity: O(n)
+{
+    vector<bool> filteredStads;
+    vector<int> applicableStadNums;
+    bool applicable;
+
+    //Iterate through all stadNums and see which ones need to be filtered
+    for (int x = 0; x < (int)data.size(); x++)
+    {
+        //Initialize applicable to false, meaning filter this stad out
+        applicable = false;
+
+        //If filtering in National Teams
+        if (ui->homeNationalCB->isChecked()
+            && data.getTeamLeague(x).toLower() == "national")
+        {applicable = true;}
+        //If filtering in American Teams
+        if (ui->homeAmericanCB->isChecked()
+            && data.getTeamLeague(x).toLower() == "american")
+        {applicable = true;}
+        //If filtering in synthetic turf
+        if (ui->homeSynthCB->isChecked()
+            && data.getStadGrass(x).toLower() != "grass")
+        {applicable = true;}
+        //If filtering in natural turf
+        if (ui->homeTurfCB->isChecked()
+            && data.getStadGrass(x).toLower() == "grass")
+        {applicable = true;}
+
+        //Push the stadNum's applicability into the vector
+        filteredStads.push_back(applicable);
+    }
+    //Create a vector of applicable stadNums
+    for (int x = 0; x < (int)filteredStads.size(); x++)
+    {
+        if (filteredStads.at(x))
         {
-            //This QString will be used to find our vector index.
-            QString strIndex = ui->homeStadTbl->item(i, 0)->text();
+            applicableStadNums.push_back(x);
+        }
+    }
+    //Pass the stadNums into the refresh function
+    refreshHomeTbl(applicableStadNums);
 
-            int vecIndex = strIndex.toInt();    //Convert strIndex to an int.
+    //Reclick the sorting radio button that's currently selected
+    if (ui->homeNameRd->isChecked())
+    {on_homeNameRd_toggled(true);}
+    else if (ui->homeTeamRd->isChecked())
+    {
+        int UNIMPLEMENTED;
+    }
+    else if (ui->homeDateRd->isChecked())
+    {
+        int NOTIMPLEMENTED;
+    }
+    else if (ui->homeCapRd->isChecked())
+    {on_homeCapRd_toggled(true);}
+    else if (ui->homeTypeRd->isChecked())
+    {on_homeTypeRd_toggled(true);}
 
-            //IF - Here we find if the team league at the team indicated then
-            //     it will hide all the rows that are American League team.
-            if(data.getTeamLeague(vecIndex, 0).toLower()=="american")
-            {
-                ui->homeStadTbl->setRowHidden(i, true);
-            } //end if(data.getTeamLeague(vecIndex, 0)=="American")
-
-        } //end  for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
-
-    } // end if(checked)
+    //Hide contents of side panel if all stadiums are filtered out
+    if (ui->homeStadTbl->rowCount() == 0)
+    {
+        ui->frame_6->hide();
+        ui->frame_8->hide();
+        ui->homeNirLbl->hide();
+        ui->homeSouvTbl->hide();
+    }
+    //Otherwise make them reappear
     else
     {
-        //FOR LOOP- This loop will traverse the homeStadTbl
-        for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
-        {
-            //IF- if the row at the given index is hidden then here
-            //    it will 'unhide' the row.
-            if(ui->homeStadTbl->isRowHidden(i))
-            {
-                if(ui->homeTurfCB->isChecked())
-                {
-                    if(data.getStadGrass(i).toLower() !="astro turf")
-                    {
-                        ui->homeStadTbl->setRowHidden(i, false);
-                    }
-                }
-                else if(ui->homeSynthCB->isChecked())
-                {
-                    if(data.getStadGrass(i).toLower()!="grass")
-                    {
-                        ui->homeStadTbl->setRowHidden(i, false);
-                    }
-                }
-                else if(ui->homeAmericanCB->isChecked())
-                {
-                    if(data.getTeamLeague(i, 0).toLower()!="national")
-                    {
-                        ui->homeStadTbl->setRowHidden(i, false);
-                    }
-                }
-                else
-                {
-                    ui->homeStadTbl->setRowHidden(i, false);
-                }
-            }// end if(ui->homeStadTbl->isRowHidden(i))
+        ui->frame_6->show();
+        ui->frame_8->show();
+        ui->homeNirLbl->show();
+        ui->homeSouvTbl->show();
+    }
+}
 
-        }// end for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
+void PrimeWin::on_homeAmericanCB_clicked()
+{filterStads();}
 
-    }// end else
-}// end void PrimeWin::on_homeNationalCB_toggled(bool checked)
+void PrimeWin::on_homeNationalCB_clicked()
+{filterStads();}
 
-void PrimeWin::on_homeAmericanCB_toggled(bool checked)
-{
-    //IF - Checks to see if our Checkbox is checked. If it is then
-    //     it will filter out all National League teams. Else it will
-    //     revert the table back to its original state.
-    if(checked)
-    {
-        //FOR LOOP- This will loop through the table.
-        for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
-        {
-            //This QString will be used to find our vector index.
-            QString strIndex = ui->homeStadTbl->item(i, 0)->text();
+void PrimeWin::on_homeTurfCB_clicked()
+{filterStads();}
 
-            int vecIndex = strIndex.toInt();    //Convert strIndex to an int.
-
-            //IF - Here we find if the team league at the team indicated then
-            //     it will hide all the rows that are National League team.
-            if(data.getTeamLeague(vecIndex, 0).toLower()=="national")
-            {
-                ui->homeStadTbl->setRowHidden(i, true);
-            } //end if(data.getTeamLeague(vecIndex, 0)=="American")
-
-        } //end  for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
-
-    } // end if(checked)
-    else
-    {
-        //FOR LOOP- This loop will traverse the homeStadTbl
-        for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
-        {
-            //IF- if the row at the given index is hidden then here
-            //    it will 'unhide' the row.
-            if(ui->homeStadTbl->isRowHidden(i))
-            {
-                if(ui->homeTurfCB->isChecked())
-                {
-                    if(data.getStadGrass(i).toLower() !="astro turf")
-                    {
-                        ui->homeStadTbl->setRowHidden(i, false);
-                    }
-                }
-                else if(ui->homeSynthCB->isChecked())
-                {
-                    if(data.getStadGrass(i).toLower()!="grass")
-                    {
-                        ui->homeStadTbl->setRowHidden(i, false);
-                    }
-                }
-                else if(ui->homeNationalCB->isChecked())
-                {
-                    if(data.getTeamLeague(i, 0).toLower()!="american")
-                    {
-                        ui->homeStadTbl->setRowHidden(i, false);
-                    }
-                }
-                else
-                {
-                    ui->homeStadTbl->setRowHidden(i, false);
-                }
-            }// end if(ui->homeStadTbl->isRowHidden(i))
-
-        }// end for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
-
-    }// end else
-}//end void on_homeAmericanCB_toggled(bool checked)
-
-
-
-void PrimeWin::on_homeTurfCB_toggled(bool checked)
-{
-    //IF-This if statement will look for the checkbox that we made is checked
-    //   and if it is then it will look for all stadiums that use natural grass
-    //   and filter them out.
-    if(checked)
-    {
-        //FOR-Loops through each item of each table to find the items in the
-        //    homeStadTble to filter out.
-
-        for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
-        {
-            //This QString will be used to find our vector index.
-            QString strIndex = ui->homeStadTbl->item(i, 0)->text();
-
-            int vecIndex = strIndex.toInt();    //Convert strIndex to an int.
-
-            //IF-The item at the given index has 'grass' then it will filter it
-            //   out the grass.
-            if(data.getStadGrass(vecIndex).toLower() == "astro turf")
-            {
-                ui->homeStadTbl->setRowHidden(i, true);
-            }// if(data.getStadGrass(vecIndex) == "Astro Turf")
-
-        }// end for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
-
-    }// end if(checked)
-    else
-    {
-        //FOR LOOP- This loop will traverse the homeStadTbl
-        for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
-        {
-            //IF- if the row at the given index is hidden then here
-            //    it will 'unhide' the row.
-            if(ui->homeStadTbl->isRowHidden(i))
-            {
-                //IF- if the row at the given index is hidden then here
-                //    it will 'unhide' the row.
-                if(ui->homeStadTbl->isRowHidden(i))
-                {
-                    if(ui->homeNationalCB->isChecked())
-                    {
-                        if(data.getTeamLeague(i, 0).toLower() !="american")
-                        {
-                            ui->homeStadTbl->setRowHidden(i, false);
-                        }
-                    }
-                    else if(ui->homeSynthCB->isChecked())
-                    {
-                        if(data.getStadGrass(i).toLower()!="astro turf")
-                        {
-                            ui->homeStadTbl->setRowHidden(i, false);
-                        }
-                    }
-                    else if(ui->homeAmericanCB->isChecked())
-                    {
-                        if(data.getTeamLeague(i, 0).toLower()!="national")
-                        {
-                            ui->homeStadTbl->setRowHidden(i, false);
-                        }
-                    }
-                    else
-                    {
-                        ui->homeStadTbl->setRowHidden(i, false);
-                    }
-                }// end if(ui->homeStadTbl->isRowHidden(i))
-
-            }// end if(ui->homeStadTbl->isRowHidden(i))
-
-        }// end for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
-
-    }// end else
-
-}// end void PrimeWin::on_homeTurfCB_toggled(bool checked)
-
-
-void PrimeWin::on_homeSynthCB_toggled(bool checked)
-{
-    //IF-This if statement will look for the checkbox that we made is checked
-    //   and if it is then it will look for all stadiums that use natural grass
-    //   and filter them out.
-    if(checked)
-    {
-        //FOR-Loops through each item of each table to find the items in the
-        //    homeStadTble to filter out.
-
-        for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
-        {
-            //This QString will be used to find our vector index.
-            QString strIndex = ui->homeStadTbl->item(i, 0)->text();
-
-            int vecIndex = strIndex.toInt();    //Convert strIndex to an int.
-
-            //IF-The item at the given index has 'grass' then it will filter it
-            //   out the grass.
-            if(data.getStadGrass(vecIndex).toLower() == "grass")
-            {
-                ui->homeStadTbl->setRowHidden(i, true);
-            }// if(data.getStadGrass(vecIndex) == "Astro Turf")
-
-        }// end for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
-
-    }// end if(checked)
-    else
-    {
-        //FOR LOOP- This loop will traverse the homeStadTbl
-        for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
-        {
-            //IF- if the row at the given index is hidden then here
-            //    it will 'unhide' the row.
-            if(ui->homeStadTbl->isRowHidden(i))
-            {
-                //IF- if the row at the given index is hidden then here
-                //    it will 'unhide' the row.
-                if(ui->homeStadTbl->isRowHidden(i))
-                {
-                    if(ui->homeNationalCB->isChecked())
-                    {
-                        if(data.getTeamLeague(i, 0).toLower() !="american")
-                        {
-                            ui->homeStadTbl->setRowHidden(i, false);
-                        }
-                    }
-                    else if(ui->homeTurfCB->isChecked())
-                    {
-                        if(data.getStadGrass(i).toLower()!="astro turf")
-                        {
-                            ui->homeStadTbl->setRowHidden(i, false);
-                        }
-                    }
-                    else if(ui->homeAmericanCB->isChecked())
-                    {
-                        if(data.getTeamLeague(i, 0).toLower()!="national")
-                        {
-                            ui->homeStadTbl->setRowHidden(i, false);
-                        }
-                    }
-                    else
-                    {
-                        ui->homeStadTbl->setRowHidden(i, false);
-                    }
-                }// end if(ui->homeStadTbl->isRowHidden(i))
-
-            }// end if(ui->homeStadTbl->isRowHidden(i))
-
-        }// end for(int i = 0; i < ui->homeStadTbl->rowCount(); i++)
-
-    }// end else
-}// end void
+void PrimeWin::on_homeSynthCB_clicked()
+{filterStads();}
 
 void PrimeWin::on_homeNameRd_toggled(bool checked)
 //Sorts home's stadium table alphabetically by stadium name
@@ -884,20 +636,109 @@ void PrimeWin::on_homeNameRd_toggled(bool checked)
     //Perform sort when radio toggle is checked
     if (checked)
     {
-        vector<int> stadNums;   //Vector of stadNums to be sorted
-        CustomSorts use(data);  //Sorting class
+        pair<int,QString> data;                //Data to be sorted
+        vector<pair<int,QString> > sortThese;  //Vector of data to sort
+        vector<int> stadNumOrder;              //Vector of stadNums
+        CustomSorts use;                       //Sorting class
 
         //Create a list of stadNums to match the order the table is in now
         for (int x = 0; x < ui->homeStadTbl->rowCount(); x++)
         {
-            stadNums.push_back(ui->homeStadTbl
-                               ->item(x,0)->text().toInt());
+            data = make_pair(ui->homeStadTbl->item(x,0)->text().toInt(),
+                             ui->homeStadTbl->item(x,2)->text());
+            sortThese.push_back(data);
         }
         //Ask insertion sort to reorder the stadiums
-        stadNums = use.InsertionSort(stadNums);
+        sortThese = use.InsertionSort(sortThese);
 
+        //Build a vector of just stadNums that mirrors sortThese
+        for (int x = 0; x < (int)sortThese.size(); x++)
+        {
+            stadNumOrder.push_back(sortThese.at(x).first);
+        }
         //Refresh home table
-        refreshHomeTbl(stadNums);
+        refreshHomeTbl(stadNumOrder);
+    }
+}
+
+void PrimeWin::on_homeCapRd_toggled(bool checked)
+//Sorts home table by capacity
+{
+    //Perform sort when radio toggle is checked
+    if (checked)
+    {
+        pair<int,QString> dataP;                //Data to be sorted
+        vector<pair<int,QString> > sortThese;   //Vector of data to sort
+        vector<int> stadNumOrder;               //Vector of stadNums
+        CustomSorts use;                        //Sorting class
+        int stadNum;
+
+        //Create a list of stadNums to match the order the table is in now
+        for (int x = 0; x < ui->homeStadTbl->rowCount(); x++)
+        {
+            stadNum = ui->homeStadTbl->item(x,0)->text().toInt();
+            dataP = make_pair(stadNum,QString::number
+                              (data.getStadCapactiy(stadNum)));
+            sortThese.push_back(dataP);
+        }
+        //Ask insertion sort to reorder the stadiums
+        sortThese = use.InsertionSort(sortThese);
+
+        //Build a vector of just stadNums that mirrors sortThese
+        for (int x = 0; x < (int)sortThese.size(); x++)
+        {
+            stadNumOrder.push_back(sortThese.at(x).first);
+        }
+        //Refresh home table
+        refreshHomeTbl(stadNumOrder);
+
+        //Make the capacity label stand out
+        ui->homeCapLbl->setStyleSheet("font-weight: bold; color: red");
+    }
+    else
+    {
+        //Restore capacity label
+        ui->homeCapLbl->setStyleSheet("");
+    }
+}
+
+void PrimeWin::on_homeTypeRd_toggled(bool checked)
+//Sorts home table by park typology
+{
+    //Perform sort when radio toggle is checked
+    if (checked)
+    {
+        pair<int,QString> dataP;                //Data to be sorted
+        vector<pair<int,QString> > sortThese;   //Vector of data to sort
+        vector<int> stadNumOrder;               //Vector of stadNums
+        CustomSorts use;                         //Sorting class
+        int stadNum;
+
+        //Create a list of stadNums to match the order the table is in now
+        for (int x = 0; x < ui->homeStadTbl->rowCount(); x++)
+        {
+            stadNum = ui->homeStadTbl->item(x,0)->text().toInt();
+            dataP = make_pair(stadNum,data.getStadType(stadNum));
+            sortThese.push_back(dataP);
+        }
+        //Ask insertion sort to reorder the stadiums
+        sortThese = use.InsertionSort(sortThese);
+
+        //Build a vector of just stadNums that mirrors sortThese
+        for (int x = 0; x < (int)sortThese.size(); x++)
+        {
+            stadNumOrder.push_back(sortThese.at(x).first);
+        }
+        //Refresh home table
+        refreshHomeTbl(stadNumOrder);
+
+        //Make the typology label stand out
+        ui->homeTypeLbl->setStyleSheet("font-weight: bold; color: red");
+    }
+    else
+    {
+        //Restore capacity label
+        ui->homeTypeLbl->setStyleSheet("");
     }
 }
 
@@ -911,96 +752,113 @@ void PrimeWin::on_itinStartOverBt_clicked()
 
 void PrimeWin::on_itinOptimizeBt_clicked()
 //Optimizes order of the itinerary
+//Complexity: O(n^2)
 {
-    int UNFINISHED;//Needs a list of itinObjects
-//    //Needs a matrix to pass in
+    //Check if there are enough stadiums to optimizeS
+    if (itinList.size() > 2)
+    {
+        list<ItinObj> newItin;      //New itinerary
+        std::deque<int> optimized;  //Optimized order of stadNums
+        std::deque<int> djMap;      //Map of costs to visit each stadium
+        int totalTripDist = 0;      //Total trip distance
+        int shortest;               //Stores current shortest distance
+        int nextStad;               //Stores next stad to visit
 
-//    //Let's say itinerary is 2,3,6,1
-//    itin.push_back(2);
-//    itin.push_back(3);
-//    itin.push_back(6);
-//    itin.push_back(1);
+        //Create and initialize a list iterator
+        std::list<ItinObj>::iterator it = itinList.begin();
 
-//    Dijkstra pathFind(matrix);  //Dijkstra's algorithm
-//    std::deque<int> optimized;  //Optimized order of stadNums
-//    std::vector<int> djMap;     //Map of costs to visit each stadium
-//    int totalTripDist = 0;      //Total trip distance
-//    int shortest;               //Stores current shortest distance
-//    int nextStad;               //Stores next stad to visit
+        //Struct to represent a stadium in the itinerary
+        struct visitObj
+        {
+            bool visited;   //If visited
+            bool valid;     //If in itinerary
+        };
+        //Array of visited booleans where index is stadNum
+        visitObj visitAr[data.size()];
 
-//    //Create and initialize a list iterator
-//    std::list<int>::iterator it = itin.begin();
+        //Initialize the array to the uninitialized states
+        for (unsigned int x = 0; x < data.size(); x++)
+        {
+            visitAr[x].visited = false;
+            visitAr[x].valid = false;
+        }
+        //Make stadiums in the itin valid within the array
+        for (it = itinList.begin(); it != itinList.end(); it++)
+        {
+            visitAr[(*it).getStadNum()].valid = true;
+        }
+        //Reset itin iterator
+        it = itinList.begin();
 
-//    //Struct to represent a stadium in the itinerary
-//    struct visitObj
-//    {
-//        bool visited;   //If visited
-//        bool valid;     //If in itinerary
-//    };
+        //Mark current true in the hash map, visiting itin's first
+        visitAr[(*it).getStadNum()].visited = true;
 
-//    //Array of visited booleans where index is stadNum
-//    visitObj visitAr[matrix.size()];
+        //Add it to the NEW itinerary
+        optimized.push_back((*it).getStadNum());
 
-//    //Initialize the array to the uninitialized states
-//    for (unsigned int x = 0; x < matrix.size(); x++)
-//    {
-//        visitAr[x].visited = false;
-//        visitAr[x].valid = false;
-//    }
+        //Build the optimized itinerary
+        for (int i = 0; i < (int)itinList.size() - 1; i++)
+        {
+            //Call Dijkstra's on the last stadium on the optimized itin
+            djMap = data.askDijkstra(optimized.back());
 
-//    //Make stadiums in the itin valid within the array
-//    for (it = itin.begin(); it != itin.end(); it++)
-//    {
-//        visitAr[*it].valid = true;
-//    }
+            //Reinitialize temporary values
+            shortest = INT_MAX;
+            nextStad = -1;
 
-//    //Reset itin iterator
-//    it = itin.begin();
+            //Find next stad in the itin that has the shortest dist
+            for (int x = 0; x < (int)djMap.size(); x++)
+            {
+                //If stad is in the itin, unvisited, & has a shorter dist
+                if (visitAr[x].valid
+                    && !visitAr[x].visited && djMap[x] < shortest)
+                {
+                    //Update shortest and the next stad to visit
+                    shortest = djMap[x];
+                    nextStad = x;
+                }
+            }
+            //Add that distance to a running total
+            totalTripDist += shortest;
 
-//    //Mark current true (visited) in the hash map, visiting itin's first
-//    visitAr[*it].visited = true;
+            //Mark it as visited on the visited array
+            visitAr[nextStad].visited = true;
 
-//    //Add it to the NEW itinerary
-//    optimized.push_back(*it);
-
-//    //Build the optimized itinerary
-//    for (int i = 0; i < (int)itin.size() - 1; i++)
-//    {
-//        //Call Dijkstra's on the last stadium on the optimized itinerary
-//        djMap = pathFind.getDistanceMap(optimized.back());
-
-//        //Reinitialize temporary values
-//        shortest = INT_MAX;
-//        nextStad = -1;
-
-//        //Find next stad in the itin that has the shortest dist
-//        for (int x = 0; x < matrix.size(); x++)
-//        {
-//            //If stad is in the itin & not visited & it has a shorter dist
-//            if (visitAr[x].valid && !visitAr[x].visited && djMap[x] < shortest)
-//            {
-//                //Update shortest and the next stad to visit
-//                shortest = djMap[x];
-//                nextStad = x;
-//            }
-//        }
-//        //Add that distance to a running total
-//        totalTripDist += shortest;
-
-//        //Mark it as visited on the visited array
-//        visitAr[nextStad].visited = true;
-
-//        //Add it to the NEW itinerary
-//        optimized.push_back(nextStad);
-//    }
-
-//    //Return new itinerary and the total distance travelled
-//    qDebug() << "OPTIMAL";
-//    for (int x = 0; x < optimized.size(); x++)
-//    {
-//        qDebug() << optimized[x];
-//    }
-//    qDebug() << totalTripDist;
+            //Add it to the NEW itinerary
+            optimized.push_back(nextStad);
+        }
+        //Build the new itinerary
+        for (int x = 0; x < (int)optimized.size(); x++)
+        {
+            it = itinList.begin();
+            while (it != itinList.end())
+            {
+                if (optimized.at(x) == (*it).getStadNum())
+                {
+                    newItin.push_back(*it);
+                    it = itinList.end();
+                }
+                else
+                {
+                    it++;
+                }
+            }
+        }
+        //Update the old itin wiht the new, updated one
+        itinList = newItin;
+        refreshItin();
+        ui->itinDistLbl->setText("Total Distance: "
+                                 + QString::number(totalTripDist)
+                                 + " miles");
+    }
+    //Otherwise show an error
+    else
+    {
+        QMessageBox::warning(this, tr("Not Enough Stadiums"),
+                             tr("There needs to be at least three "
+                                "stadiums queued in your itinerary."),
+                             QMessageBox::Ok);
+    }
 }
 
 //Index3 - Summary Page===================================================
@@ -1119,6 +977,7 @@ void PrimeWin::on_adminStadTbl_cellChanged(int row, int column)
         break;
     case 8://Opened
         data.modStadOpened(row,input);
+        int ValidateThis;
         break;
     case 9://Type
         data.modStadType(row,input);
@@ -1134,6 +993,124 @@ void PrimeWin::on_adminStadTbl_cellChanged(int row, int column)
         break;
     }
     refreshAdminTbl();
+}
+
+QString PrimeWin::phoneCheck(QString phone)
+//Validates phone numbers and returns a formatted number
+{
+    QString bareNumber;     //Cleaned up input
+    bool hasPlus = false;   //Determines if there's a plus or not
+    bool morePlus = false;  //Determines if there are duplicate + signs
+    bool throwGen = false;  //Determines if generic error is necessary
+
+    //Iterate through all characters, keeping only + and numbers
+    for(QString::iterator it = phone.begin(); it != phone.end(); it++)
+    {
+        if (*it == '0' || *it == '1' || *it == '2' || *it == '3'
+            || *it == '4' || *it == '5' || *it == '6' || *it == '7'
+            || *it == '8' || *it == '9' || *it == '+')
+        {
+            bareNumber += *it;
+
+            //If there's a plus, flag it
+            if (*it == '+')
+            {
+                //If hasPlus is already true, then mark flag duplicate
+                if (hasPlus)
+                {
+                    morePlus = true;
+                }
+                //Otherwise just mark it true
+                else
+                {
+                    hasPlus = true;
+    }   }   }   }
+    //Check if there are duplicate +'s
+    if (morePlus)
+    {
+        QMessageBox::warning(this, tr("Invalid Phone Number"),
+                             tr("There can only be one \"+\" in a "
+                                "phone number."),
+                             QMessageBox::Ok);
+        return "NULL";
+    }
+    //Check if phone number is the correct length if it has a +
+    if (hasPlus && (bareNumber.size() - bareNumber.indexOf("+") == 12
+                    || bareNumber.size() - bareNumber.indexOf("+") == 11))
+    {}//It's good, I'm just too lazy to DeMorganize the conditional
+    //Check if phone number has the correct length if there's no +
+    else if (!hasPlus && (bareNumber.size() == 11
+                          || bareNumber.size() == 10))
+    {}//Same deal
+    else
+    {throwGen = true;}
+
+    //Format the number if nothing's wrong
+    if (!throwGen)
+    {
+        //Insert the start of the area code
+        //If there's a +
+        if (hasPlus)
+        {
+            //If the size is 11
+            if (bareNumber.size() - bareNumber.indexOf("+") == 12)
+            {
+                //Insert space after the first character after the +
+                bareNumber.insert(bareNumber.indexOf("+") + 2, " (");
+            }
+            //If the size is 10
+            else
+            {
+                //Insert ( after the +
+                bareNumber.insert(bareNumber.indexOf("+") + 1, "(");
+            }
+        }
+        //If there's no +
+        else
+        {
+            //If size is 11
+            if (bareNumber.size() == 11)
+            {
+                bareNumber.insert(1, " (");
+            }
+            //If size is 10
+            else
+            {
+                bareNumber.insert(0, "(");
+            }
+        }
+        //Finish area code
+        bareNumber.insert(bareNumber.indexOf("(") + 4, ") ");
+        //Add the dash
+        bareNumber.insert(bareNumber.lastIndexOf(" ") + 4,"-");
+        return bareNumber;
+    }
+    //Otherwise throw the generic error
+    else
+    {
+        QMessageBox::warning(this, tr("Invalid Phone Number"),
+                             tr("Phone number is not valid."),
+                             QMessageBox::Ok);
+        return "NULL";
+    }
+}
+
+void PrimeWin::on_adminPrimBt_clicked()
+//Pulls up a QMessageBox that displays everything about Prim's MST
+{
+    QMessageBox msgBox;             //Message box to display tree info
+    vector<pair<int,int> > edges;   //Vector of edges
+    int mileage;                    //MST mileage
+
+    //Ask Prim for the MST
+    mileage = data.askPrim(edges);
+
+    msgBox.setWindowTitle("Prim's MST");
+    msgBox.setIcon(QMessageBox::Information);
+    msgBox.setText("Minimum Spanning Tree Mileage: "
+                   + QString::number(mileage) + " miles");
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.exec();
 }
 
 //Index5 - Database Management Page=======================================
@@ -1176,36 +1153,38 @@ void PrimeWin::on_dataTxtBt_clicked()
     }
 }
 
-// refreshes souvenir table (admin page)
 void PrimeWin::refreshSouvenirTableAdmin()
+//Refreshes admin page's souvenir table
 {
-    int stadNum = ui->adminStadTbl->item(ui->adminStadTbl->currentRow(),0)->text().toInt();
+    int stadNum = ui->adminStadTbl->item(ui->adminStadTbl->currentRow(),
+                                         0)->text().toInt();
     QTableWidget *widget = ui->adminSouvTable;
 
     //REFRESH SOUVENIR TABLE
     widget->clear();
-    widget->setRowCount(0);
-    widget->setColumnCount(2);
-    widget->setHorizontalHeaderLabels(QStringList() << "Item Name" << "Price");
-    QTableWidgetItem *item; //Item to populate table cell
+    widget->setRowCount(2);
+    widget->setColumnCount(0);
+    QTableWidgetItem *item;
 
     //Loop to populate table
-    for (unsigned int x = 0; x < data.getSouvListSize(stadNum); x++)
+    for (int x = 0; x < data.getSouvListSize(stadNum); x++)
     {
-        //Add a row
-        widget->insertRow(widget->rowCount());
+        //Add a col
+        widget->insertColumn(widget->columnCount());
 
-        //Populate second column with souvName
+        //Populate first row with souvName
         item = new QTableWidgetItem;
         item->setData(0,data.getSouvName(stadNum, x));
-        widget->setItem(x,0,item);
+        widget->setItem(0,x,item);
 
-        //Populate third column with souvPrice
+        //Populate second row with souvPrice
         item = new QTableWidgetItem;
         item->setData(0,data.getSouvPrice(stadNum, x));
-        widget->setItem(x,1,item);
+        widget->setItem(1,x,item);
     }
     widget->resizeColumnsToContents();
+    widget->setRowHeight(0,60);
+    widget->setRowHeight(1,60);
 }
 
 // when an index is selected, the bottom panel will display a list of souvenirs
@@ -1228,9 +1207,6 @@ void PrimeWin::on_pushButton_9_clicked()
 void PrimeWin::catchNewSouvenirData(Data caughtData)
 {data = caughtData;}
 
-void PrimeWin::on_adminBackBtn_clicked()
-{ ui->adminHome->hide();  ui->start->show();}
-
 // on Delete Souvenir Button
 void PrimeWin::on_deleteSouvBtn_clicked()
 {
@@ -1248,9 +1224,8 @@ void PrimeWin::on_deleteSouvBtn_clicked()
    else
    {
        //notify admin to make a selection on souvenir
-       QMessageBox::information(this, tr("Error"),
-                            tr("Please select a stadium and a souvenir to remove."),
+       QMessageBox::warning(this, tr("Error"),
+                            tr("Select a stadium and a souvenir."),
                             QMessageBox::Ok);
    }
 }
-

@@ -1,0 +1,103 @@
+jerryberry Doxygen Standards
+
+At the very top of every file you make, type an example like this:
+/**
+  @file
+  @author Xavier
+  @date 27 April 2016
+
+  The MinMeap class methods are implemented in this file.
+  */
+So type the @file
+Then type @author then your name
+Then type @date and the date in dd MMMM yyyy format
+Then skip a space <IMPORTANT
+Then write a description of what's in your file. It can be however long you want
+
+--------------------------------------------------------------------------------------
+
+
+If you write a class, type an example like this:
+/**
+ * @brief This class implements a combination data structure of a minumum
+ * binary heap and a map.
+ *
+ * This class blah blah blah
+ *
+ * More about this class (notice the skipped space)
+ *
+ * Skipping spaces, makes newlines in Doxygen. So if I keep typing and press enter
+ * here, then Doxygen will treat the line above and this line as one continous line.
+ *
+ * @par REQUIREMENTS:
+ * #include <deque>     <br>
+ * #include <string>    <br>
+ * #include <utility>   <br>
+ * #include <stdexcept> <br>
+ * #include <sstream>   <br>
+ * using namespace std;
+ * @warning The first integer of all integer pairs that get pushed into
+ * the MinMeap must be contiguous, start at 0, and cannot be negative.
+ * @warning The size of MinMeap is fixed, and cannot be resized.
+ */
+class MinMeap
+{ your class implentation or whatever...
+
+So right above where you type "class >YourClass<", type /** and hit enter/return
+
+Then type @brief and a short description of your class. USE A COMPLETE SENTENCE.
+
+Then skip a line and type a more detailed description of your class. It can be as long as you want it to be. Whatever.
+
+Then type @par REQUIREMENTS:
+
+Then type your #includes that your class needs followed by <br> (which is Doxygen's version of "\n"
+
+You can type @warning if you want to warn the client about anything or whatever.
+
+
+------------------------------------------------------------------------------------
+
+
+In your class, comment method declarations that aren't obvious.
+For example:
+class MinMeap
+{
+public:
+    /**
+     * @brief The default constructor
+     * @param meapInitSize : The fixed size of the meap
+     */
+    MinMeap(unsigned int meapInitSize);         //Constructor
+...
+See, my default constructor has a weird parameter, so I describe it.
+Here's another example:
+...
+/**
+     * @brief Get a specific integer pair from the meap querying the
+     * meap's map
+     * @param data : Query for the meap's map
+     * @return Returns the integer pair whose first integer matches the
+     * map query
+     */
+    pair<int,int> mapQuery(int data) const;     //Returns data's pair
+...
+Wth is mapQuery? See? It's not obvious, so I Doxygen commented it.
+
+Type @brief , then a short description of what the method does
+Type @param, THEN A SPACE, THEN A COLON, THEN A SPACE, then a description of the parameter
+Repeat for other parameters if you have any more.
+If your method returns something, type @return Then "Returns " whatever it returns.
+
+Xavier, should I DoxyComment my bool empty() const; function?
+No. Size obviously returns the size of the the data structure, so don't DoxyComment because it's obvious.
+
+
+-----------------------------------------------------------------------------------------
+
+
+Also, it's not necessary to DoxyComment private variables.
+
+
+
+Sigh...

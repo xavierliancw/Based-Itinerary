@@ -17,16 +17,18 @@ SOURCES += main.cpp\
         primewin.cpp \
     adminlogin.cpp \
     datastructures.cpp \
-    customimplementations.cpp \
     editdistances.cpp \
-    addsouvdialog.cpp
+    addsouvdialog.cpp \
+    customsorts.cpp \
+    minmeap.cpp
 
 HEADERS  += primewin.h \
     adminlogin.h \
     datastructures.h \
-    customimplementations.h \
     editdistances.h \
-    addsouvdialog.h
+    addsouvdialog.h \
+    customsorts.h \
+    minmeap.h
 
 FORMS    += primewin.ui \
     adminlogin.ui \
