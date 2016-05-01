@@ -750,6 +750,22 @@ void PrimeWin::on_itinStartOverBt_clicked()
     int UNFINISHED;//needs to clear itinerary
 }
 
+//Struct to represent a stadium in the itinerary
+/**
+ * @brief The visitObj struct helps the itinerary to optimze its order
+ *
+ * This struct holds two variables. The first is a boolean that tells
+ * the optimizing algorithm if the stadium the struct is representing
+ * has already been visited by the algorithm. The second boolean tells
+ * the algorithm if the stadium is actually in the itinerary, and is
+ * valid to be optimized.
+ */
+struct visitObj
+{
+    bool visited;   //If visited
+    bool valid;     //If in itinerary
+};
+
 void PrimeWin::on_itinOptimizeBt_clicked()
 //Optimizes order of the itinerary
 //Complexity: O(n^2)
@@ -767,14 +783,9 @@ void PrimeWin::on_itinOptimizeBt_clicked()
         //Create and initialize a list iterator
         std::list<ItinObj>::iterator it = itinList.begin();
 
-        //Struct to represent a stadium in the itinerary
-        struct visitObj
-        {
-            bool visited;   //If visited
-            bool valid;     //If in itinerary
-        };
         //Array of visited booleans where index is stadNum
-        visitObj visitAr[data.size()];
+        vector<visitObj> visitAr;
+        visitAr.resize(data.size());
 
         //Initialize the array to the uninitialized states
         for (unsigned int x = 0; x < data.size(); x++)
@@ -832,7 +843,7 @@ void PrimeWin::on_itinOptimizeBt_clicked()
         {
             it = itinList.begin();
             while (it != itinList.end())
-            {
+            {int ImproveThis;//It makes this algo run in n^3
                 if (optimized.at(x) == (*it).getStadNum())
                 {
                     newItin.push_back(*it);
