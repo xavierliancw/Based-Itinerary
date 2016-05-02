@@ -9,6 +9,7 @@
 #include <vector>
 #include <utility>
 #include <QString>
+#include <QDate>
 using namespace std;
 
 /*************************************************************************
