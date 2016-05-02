@@ -16,7 +16,11 @@
 #include <QMessageBox>
 #include <QFileSystemModel>
 #include <QSignalBlocker>
+//<<<<<<< Updated upstream
 #include <QDragEnterEvent>
+//=======
+#include <QDate>
+//>>>>>>> Stashed changes
 
 #include "datastructures.h"
 #include "customsorts.h"
@@ -184,6 +188,8 @@ private slots:
     void on_homeCapRd_toggled(bool checked);
 
     void on_homeTypeRd_toggled(bool checked);
+
+    void on_homeDateRd_toggled(bool checked);
 
 //Index2==================================================================
     void on_itinStartOverBt_clicked();

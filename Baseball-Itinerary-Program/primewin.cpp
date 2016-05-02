@@ -656,9 +656,16 @@ void PrimeWin::on_homeNameRd_toggled(bool checked)
         {
             stadNumOrder.push_back(sortThese.at(x).first);
         }
-        //Refresh home table
-        refreshHomeTbl(stadNumOrder);
-    }
+            //Refresh home table
+            refreshHomeTbl(stadNumOrder);
+            //Make the capacity label stand out
+            ui->homeStadzLbl->setStyleSheet("font-weight: bold; color: red");
+        }
+        else
+        {
+            //Restore capacity label
+            ui->homeStadzLbl->setStyleSheet("");
+        }
 }
 
 void PrimeWin::on_homeCapRd_toggled(bool checked)
@@ -711,7 +718,7 @@ void PrimeWin::on_homeTypeRd_toggled(bool checked)
         pair<int,QString> dataP;                //Data to be sorted
         vector<pair<int,QString> > sortThese;   //Vector of data to sort
         vector<int> stadNumOrder;               //Vector of stadNums
-        CustomSorts use;                         //Sorting class
+        CustomSorts use;                        //Sorting class
         int stadNum;
 
         //Create a list of stadNums to match the order the table is in now
@@ -739,6 +746,46 @@ void PrimeWin::on_homeTypeRd_toggled(bool checked)
     {
         //Restore capacity label
         ui->homeTypeLbl->setStyleSheet("");
+    }
+}
+
+void PrimeWin::on_homeDateRd_toggled(bool checked)
+// Sorts the stadiums by their opening dates (Chronological Order)
+{
+    //Perform sort when radio toggle is checked
+    if (checked)
+    {
+        pair<int,QString> dataP;                //Data to be sorted
+        vector<pair<int,QString> > sortThese;   //Vector of data to sort
+        vector<int> stadNumOrder;               //Vector of stadNums
+        CustomSorts use;                        //Sorting class
+        int stadNum;
+
+        //Create a list of stadNums to match the order the table is in now
+        for (int x = 0; x < ui->homeStadTbl->rowCount(); x++)
+        {
+            stadNum = ui->homeStadTbl->item(x,0)->text().toInt();
+            dataP = make_pair(stadNum,data.getStadOpened(stadNum, false)); // pass in false to return yyyyMMdd
+            sortThese.push_back(dataP);
+        }
+        //Ask insertion sort to reorder the stadiums
+        sortThese = use.InsertionSort(sortThese);
+
+        //Build a vector of just stadNums that mirrors sortThese
+        for (int x = 0; x < (int)sortThese.size(); x++)
+        {
+            stadNumOrder.push_back(sortThese.at(x).first);
+        }
+        //Refresh home table
+        refreshHomeTbl(stadNumOrder);
+
+        //Make the typology label stand out
+        ui->homeDateLbl->setStyleSheet("font-weight: bold; color: red");
+    }
+    else
+    {
+        //Restore capacity label
+        ui->homeDateLbl->setStyleSheet("");
     }
 }
 
@@ -1229,3 +1276,5 @@ void PrimeWin::on_deleteSouvBtn_clicked()
                             QMessageBox::Ok);
    }
 }
+
+
