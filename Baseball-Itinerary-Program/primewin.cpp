@@ -908,6 +908,7 @@ void PrimeWin::on_adminDistBt_clicked()
 void PrimeWin::on_adminStadTbl_cellChanged(int row, int column)
 //Applies edits from the admin table to the data structure
 {
+    qDebug() << "Here";
     QString input;
     QIntValidator validate(1,1000000,NULL);
     int valid = 0;
@@ -993,6 +994,8 @@ void PrimeWin::on_adminStadTbl_cellChanged(int row, int column)
         break;
     }
     refreshAdminTbl();
+    // update database
+    data.exportSQL();
 }
 
 QString PrimeWin::phoneCheck(QString phone)
@@ -1196,7 +1199,6 @@ void PrimeWin::on_adminStadTbl_itemSelectionChanged()
 void PrimeWin::on_pushButton_9_clicked()
 {
     //Construct new dialog
-    // also pass in data object so we can access data structures
     addSouvDialog newAddSouvWin(data, this);
     connect(&newAddSouvWin,SIGNAL(throwNewSouvData(Data)),
             this,SLOT(catchNewSouvenirData(Data)));
@@ -1205,14 +1207,18 @@ void PrimeWin::on_pushButton_9_clicked()
 
 // process new souvenir data
 void PrimeWin::catchNewSouvenirData(Data caughtData)
-{data = caughtData;}
+{
+    data = caughtData;
+    // update database
+    data.exportSQL();
+}
 
 // on Delete Souvenir Button
 void PrimeWin::on_deleteSouvBtn_clicked()
 {
    // get selected row
    int stadNum = ui->adminStadTbl->selectionModel()->currentIndex().row();
-   int itemNum = ui->adminSouvTable->selectionModel()->currentIndex().row();
+   int itemNum = ui->adminSouvTable->selectionModel()->currentIndex().column();
 
    // error checking
    if(stadNum != -1 && itemNum != -1)
@@ -1220,6 +1226,8 @@ void PrimeWin::on_deleteSouvBtn_clicked()
           // delete souvenir
           data.deleteSouv(stadNum, itemNum);
           refreshSouvenirTableAdmin();
+          // update database
+          data.exportSQL();
    }
    else
    {
@@ -1228,4 +1236,39 @@ void PrimeWin::on_deleteSouvBtn_clicked()
                             tr("Select a stadium and a souvenir."),
                             QMessageBox::Ok);
    }
+}
+
+void PrimeWin::on_adminSouvTable_cellChanged(int row, int column)
+{
+// needs to be implemented... ask xavier for help :D
+}
+
+// Admin Page - On Add New Team (and corresponding stadium) Button
+void PrimeWin::on_addNewTeamBtn_clicked()
+{
+    //Construct new dialog
+    AddStadiumWin newWin(data, this);
+    connect(&newWin,SIGNAL(throwNewTeamData(Data)),
+            this,SLOT(catchNewTeamData(Data)));
+    newWin.exec();
+}
+
+// process new Team data
+void PrimeWin::catchNewTeamData(Data caughtData)
+{
+    data = caughtData;
+    // update database
+    data.exportSQL();
+}
+
+// Deletes a team from admin screen
+void PrimeWin::on_deleteTeamBtn_clicked()
+{
+
+}
+
+// Deletes a stadium from admin screen
+void PrimeWin::on_deleteStadBtn_clicked()
+{
+
 }

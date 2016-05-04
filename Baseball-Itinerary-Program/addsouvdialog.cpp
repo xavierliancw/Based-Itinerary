@@ -13,6 +13,7 @@ addSouvDialog::addSouvDialog(Data inData, QWidget *parent) :
 {
     ui->setupUi(this);
     data = inData;
+    stadNum = -1;
 
     // setup table
     ui->souvTableWidget->clear();
@@ -33,7 +34,6 @@ addSouvDialog::addSouvDialog(Data inData, QWidget *parent) :
         ui->souvTableWidget->setItem(x,0,item);
     }
     ui->souvTableWidget->resizeColumnsToContents();
-
 }
 
 addSouvDialog::~addSouvDialog()
@@ -41,19 +41,28 @@ addSouvDialog::~addSouvDialog()
     delete ui;
 }
 
-// okay button
-// Adds new Souv name and new Souv price to master vector
-void addSouvDialog::on_buttonBox_accepted()
-{
-    QString souvName = ui->souvNameLE->text();
-    double souvPrice = ui->souvPriceDB->value();
-    data.addSouv(stadNum, souvName, souvPrice);
-    // throw data
-    emit throwNewSouvData(data);
-}
 
+// okay button
+void addSouvDialog::on_okBtn_clicked()
+{
+    // verifies user input all required data
+    if(stadNum != -1 && ui->souvNameLE->text() != "")
+    {
+        QString souvName = ui->souvNameLE->text();
+        double souvPrice = ui->souvPriceDB->value();
+        data.addSouv(stadNum, souvName, souvPrice);
+        // throw data
+        emit throwNewSouvData(data);
+    }
+    else // notify user to enter all info
+    {
+        QMessageBox::warning(this, tr("Error"),
+                             tr("Whoops! Missing some info."),
+                             QMessageBox::Ok);
+    }
+}
 // cancel button
-void addSouvDialog::on_buttonBox_rejected()
+void addSouvDialog::on_cancelBtn_clicked()
 {
     this->close();
 }
@@ -64,3 +73,4 @@ void addSouvDialog::on_souvTableWidget_itemSelectionChanged()
 {
     stadNum = ui->souvTableWidget->selectionModel()->currentIndex().row();
 }
+

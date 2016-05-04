@@ -477,6 +477,12 @@ public:
      */
     int getSouvListSize(int stadNum) const;
 
+    /**
+     * @brief Obtain the total size of masterVect (list of stadiums)
+     * @return Returns the size of the stadium vector.
+     */
+    int getStadListSize() const;
+
     //Returns distance between two stadiums
     int getDistBetween(unsigned int here, unsigned int there) const;
 

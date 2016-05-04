@@ -864,6 +864,9 @@ QString Data::getStadGrass(int stadNum) const
 //Returns grass type of stadium at stadNum
 {return masterVect.at(stadNum).grass;}
 
+int Data::getStadListSize() const
+{ return masterVect.size(); }
+
 QString Data::getStadType(int stadNum) const
 //Returns type of stadium at stadNum
 {return masterVect.at(stadNum).type;}
