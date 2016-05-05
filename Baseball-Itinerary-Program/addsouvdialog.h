@@ -45,7 +45,7 @@ signals:
      * back to PrimeWin
      * @see PrimeWin::catchDataUpdate()
      */
-    void throwNewSouvData(Data throwThis);
+    void throwNewSouvData(Data throwThis, int stadChanged);
 
 private slots:
     void on_souvTableWidget_itemSelectionChanged();
