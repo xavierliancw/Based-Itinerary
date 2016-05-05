@@ -281,6 +281,7 @@ void PrimeWin::calcTrip()
     deque<int> distMap;
     int tripDist = 0;
 
+
     it = itinList.begin();
 
     while (it != itinList.end())
@@ -1051,6 +1052,45 @@ void PrimeWin::on_adminStadTbl_cellChanged(int row, int column)
         break;
     }
     refreshAdminTbl();
+    // update database
+    data.exportSQL();
+}
+
+// when a cell in admin souvenir is modified
+void PrimeWin::on_adminSouvTable_cellChanged(int row, int column)
+{
+    int stadNum   = ui->adminStadTbl->selectionModel()->currentIndex().row();
+    QString newName;
+    double newPrice;
+    //Grab the input
+    if(row == 0) // if souvenir name is selected
+    {
+        newName = ui->adminSouvTable->item(row,column)->text();
+    }
+    else // if souvenir price is selected
+    {
+        QString newPriceStr = ui->adminSouvTable->item(row,column)->text();
+        newPrice = newPriceStr.toDouble();
+    }
+
+    switch(row)
+    {
+        // Souvenir item name
+        case 0:
+            data.modSouvName(stadNum, column, newName);
+            break;
+        // Souvenir item price
+        case 1:
+            data.modSouvPrice(stadNum, column, newPrice);
+            break;
+    default:
+        QMessageBox::critical(this, tr("Editing Critical Error"),
+                              tr("Row switch case defaulted!"),
+                              QMessageBox::Ok);
+    }
+
+    // update database
+    data.exportSQL();
 }
 
 QString PrimeWin::phoneCheck(QString phone)
@@ -1254,7 +1294,6 @@ void PrimeWin::on_adminStadTbl_itemSelectionChanged()
 void PrimeWin::on_pushButton_9_clicked()
 {
     //Construct new dialog
-    // also pass in data object so we can access data structures
     addSouvDialog newAddSouvWin(data, this);
     connect(&newAddSouvWin,SIGNAL(throwNewSouvData(Data)),
             this,SLOT(catchNewSouvenirData(Data)));
@@ -1263,14 +1302,18 @@ void PrimeWin::on_pushButton_9_clicked()
 
 // process new souvenir data
 void PrimeWin::catchNewSouvenirData(Data caughtData)
-{data = caughtData;}
+{
+    data = caughtData;
+    // update database
+    data.exportSQL();
+}
 
 // on Delete Souvenir Button
 void PrimeWin::on_deleteSouvBtn_clicked()
 {
    // get selected row
    int stadNum = ui->adminStadTbl->selectionModel()->currentIndex().row();
-   int itemNum = ui->adminSouvTable->selectionModel()->currentIndex().row();
+   int itemNum = ui->adminSouvTable->selectionModel()->currentIndex().column();
 
    // error checking
    if(stadNum != -1 && itemNum != -1)
@@ -1278,6 +1321,8 @@ void PrimeWin::on_deleteSouvBtn_clicked()
           // delete souvenir
           data.deleteSouv(stadNum, itemNum);
           refreshSouvenirTableAdmin();
+          // update database
+          data.exportSQL();
    }
    else
    {
@@ -1288,4 +1333,24 @@ void PrimeWin::on_deleteSouvBtn_clicked()
    }
 }
 
+<<<<<<< HEAD
+// Admin Page - On Add New Team (and corresponding stadium) Button
+void PrimeWin::on_addNewTeamBtn_clicked()
+{
+    //Construct new dialog
+    AddStadiumWin newWin(data, this);
+    connect(&newWin,SIGNAL(throwNewTeamData(Data)),
+            this,SLOT(catchNewTeamData(Data)));
+    newWin.exec();
+}
 
+// process new Team data
+void PrimeWin::catchNewTeamData(Data caughtData)
+{
+    data = caughtData;
+    // update database
+    data.exportSQL();
+}
+=======
+
+>>>>>>> master

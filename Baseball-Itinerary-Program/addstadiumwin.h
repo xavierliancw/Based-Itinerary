@@ -1,30 +1,29 @@
 /**
   @file
   @author Blake
-  @date 28 April 2016
-  @brief This file contains the addSouvDialog class declaration.
+  @date 02 May 2016
+  @brief This file contains the addStadiumWin class declaration.
   */
-#ifndef ADDSOUVDIALOG_H
-#define ADDSOUVDIALOG_H
+
+#ifndef ADDSTADIUMWIN_H
+#define ADDSTADIUMWIN_H
 #include <QDialog>
-#include "datastructures.h"
 #include <QMessageBox>
-#include <QPushButton>
+#include "datastructures.h"
+
 
 namespace Ui {
-class addSouvDialog;
+class AddStadiumWin;
 }
 /**
- * @brief This class handles the dialog window that adds new souvenirs
- * to stadiums.
+ * @brief This class handles the dialog window that adds new Teams
+ * and corresponding Stadiums to the Stadium vector (mastervect).
  *
- * This dialog has a listing of stadiums. When one is selected, the
- * a new souvenir can be added to that stadium.
  * @par REQUIREMENTS:
  * #include <QDialog>           <br>
  * #include "datastructures.h"
  */
-class addSouvDialog : public QDialog
+class AddStadiumWin : public QDialog
 {
     Q_OBJECT
 
@@ -35,8 +34,8 @@ public:
      * @param inData : Data variable from PrimeWin that gets updated
      * @param parent : QWidget parent pointer
      */
-    explicit addSouvDialog(Data inData, QWidget *parent = 0);
-    ~addSouvDialog();
+    explicit AddStadiumWin(Data inData, QWidget *parent = 0);
+    ~AddStadiumWin();
 
 signals:
     /**
@@ -45,16 +44,21 @@ signals:
      * back to PrimeWin
      * @see PrimeWin::catchDataUpdate()
      */
-    void throwNewSouvData(Data throwThis);
+    void throwNewTeamData(Data throwThis);
 
 private slots:
-    void on_souvTableWidget_itemSelectionChanged();
     void on_okBtn_clicked();
     void on_cancelBtn_clicked();
+    void on_aLeagueBtn_toggled(bool checked);
+    void on_nLeagueButn_toggled(bool checked);
+
 
 private:
     int stadNum;
+    bool aLeague;
+    bool nLeague;
     Data data;
-    Ui::addSouvDialog *ui;
+    Ui::AddStadiumWin *ui;
 };
-#endif // ADDSOUVDIALOG_H
+
+#endif // ADDSTADIUMWIN_H

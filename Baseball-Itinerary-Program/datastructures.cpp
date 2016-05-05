@@ -225,16 +225,16 @@ void Data::addSouv(int stadNum, QString newName, double newPrice)
     masterVect.at(stadNum).souvVect.push_back(newSouv);
 }
 
-void Data::modSouvName()
+void Data::modSouvName(int stadNum, int souvNum, QString newName)
 {
-    qDebug() << "Data::modSouvName() is not implemented";
-    int UNIMPLEMENTED;
+// modifies a souvenir name
+    masterVect.at(stadNum).souvVect.at(souvNum).name = newName;
 }
 
-void Data::modSouvPrice()
+void Data::modSouvPrice(int stadNum, int souvNum, double newPrice)
 {
-    qDebug()  << "Data::modSouvPrice() is not implemented";
-    int UNIMPLEMENTED;
+// modifies a souvenir price
+    masterVect.at(stadNum).souvVect.at(souvNum).price = newPrice;
 }
 
 void Data::deleteSouv(int stadNum, int souvNum)

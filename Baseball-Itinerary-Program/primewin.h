@@ -27,6 +27,7 @@
 #include "adminlogin.h"
 #include "editdistances.h"
 #include "addsouvdialog.h"
+#include "addstadiumwin.h"
 using namespace std;
 
 namespace Ui {
@@ -220,6 +221,10 @@ private slots:
     // Catch data from Add New Souv Button
     void catchNewSouvenirData(Data caughtData);
 
+    // Catch data from Add New Team Button
+    void catchNewTeamData(Data caughtData);
+
+    // Deletes a souvenir from a specific stadium
     void on_deleteSouvBtn_clicked();
 
     void on_adminPrimBt_clicked();
@@ -228,6 +233,10 @@ private slots:
     void on_dataBackBt_clicked();
 
     void on_dataTxtBt_clicked();
+
+    void on_adminSouvTable_cellChanged(int row, int column);
+
+    void on_addNewTeamBtn_clicked();
 
 private:
     Ui::PrimeWin *ui;           //User interface
