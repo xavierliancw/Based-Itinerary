@@ -40,6 +40,7 @@ PrimeWin::PrimeWin(QWidget *parent, int dummyVarForNow) :
     ui->adminStadTbl->horizontalHeader()
             ->setDefaultAlignment(Qt::AlignLeft);
     ui->listWidget->viewport()->installEventFilter(this);
+    ui->tableWidget->setHorizontalHeader(new myHeaderView(this));
 
     //Keystroke to pull up admin login window
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return),
@@ -171,7 +172,7 @@ void PrimeWin::refreshItinBuilder()
     ui->tableWidget->resizeColumnsToContents();
     ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "Stadium"
                                                << "Team"
-                                               << "");
+                                               << "ADD ALL");
 }
 
 void PrimeWin::refreshItin()
@@ -436,6 +437,68 @@ bool PrimeWin::eventFilter(QObject *object, QEvent *event)
     return false;
 }
 
+void PrimeWin::catchAddAllStadsCmd()
+//Catches command to add all stadiums to the itinerary
+//Complexity: O(nlogn)
+{
+    //Block signals for itinWidget to stop it from showing randomly
+    QSignalBlocker blockSignals(ui->listWidget);
+
+    list<int> alreadyQd;        //List to see what stads are already in
+    list<ItinObj>::iterator it; //Itinerary iterator
+
+    //Build a list of stads that are already in the itin
+    it = itinList.begin();
+    while (it != itinList.end())
+    {
+        alreadyQd.push_back((*it).getStadNum());
+        it++;
+    }
+    //Sort the stadNums
+    alreadyQd.sort();
+
+    //Loop until all stads are added while adding existing queued stads
+    for (int x = 0; x < data.size(); x++)
+    {
+        //If the stadNum is already queued, don't push it in
+        if (x == alreadyQd.front())
+        {
+            //Pop it off the list
+            alreadyQd.pop_front();
+        }
+        //Otherwise, just add an empty stad to the new itin
+        else
+        {
+            //Create an ItinObj to push in where x is the stadNum
+            ItinObj newItinObj(x);
+            itinList.push_back(newItinObj);
+        }
+    }
+    //Refresh the itin's view
+    refreshItin();
+    calcTrip();
+
+    //Rebuild the buttons in the itinBuilder list to say "Remove"
+    for (int x = 0; x < data.size(); x++)               //MAYBE NEEDS A -1
+    {
+        //Create a remove button for column 3
+        QPushButton *remBt = new QPushButton();
+        remBt->setText("Remove");
+
+        //Set a custom property to the button to send the stad's num
+        remBt->setProperty("stadNum", x);
+
+        //Connect each button to addItinCatcher
+        connect(remBt, SIGNAL(clicked(bool)),
+                this, SLOT(catchAddItin()));
+
+        //Put the remove button in column 3
+        ui->tableWidget->setCellWidget(x, 2, remBt);
+    }
+    //Unblock signals
+    blockSignals.unblock();
+}
+
 /*PAGE INDEX============================================================*/
 //Index 0 = start page
 //Index 1 = home page
@@ -661,7 +724,8 @@ void PrimeWin::on_homeNameRd_toggled(bool checked)
             //Refresh home table
             refreshHomeTbl(stadNumOrder);
             //Make the capacity label stand out
-            ui->homeStadzLbl->setStyleSheet("font-weight: bold; color: red");
+            ui->homeStadzLbl
+              ->setStyleSheet("font-weight: bold; color: red");
         }
         else
         {
