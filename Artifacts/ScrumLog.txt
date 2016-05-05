@@ -45,3 +45,9 @@ Scrum Log
 25 April
 - Fixed bug #77 where Macbook Clang compilers had issues compiling
 - Closed issues #13, #12, #10, #38, #75, #86, #92
+
+04 May
+- Client clarification of certain requirements
+- Addressed some Waffle issues with some group members
+- Updated Doxygen standards
+- Planning poker for various issues

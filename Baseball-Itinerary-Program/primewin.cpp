@@ -1052,8 +1052,6 @@ void PrimeWin::on_adminStadTbl_cellChanged(int row, int column)
         break;
     }
     refreshAdminTbl();
-    // update database
-    data.exportSQL();
 }
 
 // when a cell in admin souvenir is modified
@@ -1088,9 +1086,6 @@ void PrimeWin::on_adminSouvTable_cellChanged(int row, int column)
                               tr("Row switch case defaulted!"),
                               QMessageBox::Ok);
     }
-
-    // update database
-    data.exportSQL();
 }
 
 QString PrimeWin::phoneCheck(QString phone)
@@ -1304,8 +1299,6 @@ void PrimeWin::on_pushButton_9_clicked()
 void PrimeWin::catchNewSouvenirData(Data caughtData)
 {
     data = caughtData;
-    // update database
-    data.exportSQL();
 }
 
 // on Delete Souvenir Button
@@ -1321,19 +1314,16 @@ void PrimeWin::on_deleteSouvBtn_clicked()
           // delete souvenir
           data.deleteSouv(stadNum, itemNum);
           refreshSouvenirTableAdmin();
-          // update database
-          data.exportSQL();
    }
    else
    {
        //notify admin to make a selection on souvenir
-       QMessageBox::warning(this, tr("Error"),
-                            tr("Select a stadium and a souvenir."),
+       QMessageBox::warning(this, tr("Deletion Error"),
+                            tr("Select a stadium and a souvenir first."),
                             QMessageBox::Ok);
    }
 }
 
-<<<<<<< HEAD
 // Admin Page - On Add New Team (and corresponding stadium) Button
 void PrimeWin::on_addNewTeamBtn_clicked()
 {
@@ -1348,9 +1338,4 @@ void PrimeWin::on_addNewTeamBtn_clicked()
 void PrimeWin::catchNewTeamData(Data caughtData)
 {
     data = caughtData;
-    // update database
-    data.exportSQL();
 }
-=======
-
->>>>>>> master
