@@ -388,11 +388,11 @@ public:
     /**
      * @brief Modify the name of a particular souvenir
      */
-    void modSouvName();
+    void modSouvName(int stadNum, int souvNum, QString newName);
     /**
      * @brief Modify the price of a particular souvenir
      */
-    void modSouvPrice();
+    void modSouvPrice(int stadNum, int souvNum, double newPrice);
     /**
      * @brief Delete a particular souvenir
      * @param stadNum : Index location of the stadium of interest
@@ -476,12 +476,6 @@ public:
      * StadObj
      */
     int getSouvListSize(int stadNum) const;
-
-    /**
-     * @brief Obtain the total size of masterVect (list of stadiums)
-     * @return Returns the size of the stadium vector.
-     */
-    int getStadListSize() const;
 
     //Returns distance between two stadiums
     int getDistBetween(unsigned int here, unsigned int there) const;

@@ -281,6 +281,7 @@ void PrimeWin::calcTrip()
     deque<int> distMap;
     int tripDist = 0;
 
+
     it = itinList.begin();
 
     while (it != itinList.end())
@@ -908,7 +909,6 @@ void PrimeWin::on_adminDistBt_clicked()
 void PrimeWin::on_adminStadTbl_cellChanged(int row, int column)
 //Applies edits from the admin table to the data structure
 {
-    qDebug() << "Here";
     QString input;
     QIntValidator validate(1,1000000,NULL);
     int valid = 0;
@@ -994,6 +994,43 @@ void PrimeWin::on_adminStadTbl_cellChanged(int row, int column)
         break;
     }
     refreshAdminTbl();
+    // update database
+    data.exportSQL();
+}
+
+// when a cell in admin souvenir is modified
+void PrimeWin::on_adminSouvTable_cellChanged(int row, int column)
+{
+    int stadNum   = ui->adminStadTbl->selectionModel()->currentIndex().row();
+    QString newName;
+    double newPrice;
+    //Grab the input
+    if(row == 0) // if souvenir name is selected
+    {
+        newName = ui->adminSouvTable->item(row,column)->text();
+    }
+    else // if souvenir price is selected
+    {
+        QString newPriceStr = ui->adminSouvTable->item(row,column)->text();
+        newPrice = newPriceStr.toDouble();
+    }
+
+    switch(row)
+    {
+        // Souvenir item name
+        case 0:
+            data.modSouvName(stadNum, column, newName);
+            break;
+        // Souvenir item price
+        case 1:
+            data.modSouvPrice(stadNum, column, newPrice);
+            break;
+    default:
+        QMessageBox::critical(this, tr("Editing Critical Error"),
+                              tr("Row switch case defaulted!"),
+                              QMessageBox::Ok);
+    }
+
     // update database
     data.exportSQL();
 }
@@ -1238,11 +1275,6 @@ void PrimeWin::on_deleteSouvBtn_clicked()
    }
 }
 
-void PrimeWin::on_adminSouvTable_cellChanged(int row, int column)
-{
-// needs to be implemented... ask xavier for help :D
-}
-
 // Admin Page - On Add New Team (and corresponding stadium) Button
 void PrimeWin::on_addNewTeamBtn_clicked()
 {
@@ -1259,16 +1291,4 @@ void PrimeWin::catchNewTeamData(Data caughtData)
     data = caughtData;
     // update database
     data.exportSQL();
-}
-
-// Deletes a team from admin screen
-void PrimeWin::on_deleteTeamBtn_clicked()
-{
-
-}
-
-// Deletes a stadium from admin screen
-void PrimeWin::on_deleteStadBtn_clicked()
-{
-
 }

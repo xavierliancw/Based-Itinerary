@@ -221,12 +221,6 @@ private slots:
     // Deletes a souvenir from a specific stadium
     void on_deleteSouvBtn_clicked();
 
-    // Deletes a team from a specific stadium
-    void on_deleteTeamBtn_clicked();
-
-    // Deletes a stadium
-    void on_deleteStadBtn_clicked();
-
     void on_adminPrimBt_clicked();
 
 //Index5==================================================================
