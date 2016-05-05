@@ -16,11 +16,8 @@
 #include <QMessageBox>
 #include <QFileSystemModel>
 #include <QSignalBlocker>
-//<<<<<<< Updated upstream
 #include <QDragEnterEvent>
-//=======
 #include <QDate>
-//>>>>>>> Stashed changes
 
 #include "datastructures.h"
 #include "customsorts.h"
