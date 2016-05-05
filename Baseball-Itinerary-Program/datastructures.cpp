@@ -853,6 +853,11 @@ QString Data::getStadOpened(int stadNum,bool format) const
     {
         return masterVect.at(stadNum).opened.toString("dd MMMM yyyy");
     }
+    else
+    {
+        return masterVect.at(stadNum).opened.toString("yyyyMMdd"); // used to compare dates
+
+    }
     return "";
 }
 
