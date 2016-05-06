@@ -28,6 +28,7 @@
 #include "editdistances.h"
 #include "addsouvdialog.h"
 #include "addstadiumwin.h"
+#include "mstprim.h"
 using namespace std;
 
 namespace Ui {

@@ -1353,21 +1353,13 @@ QString PrimeWin::phoneCheck(QString phone)
 }
 
 void PrimeWin::on_adminPrimBt_clicked()
-//Pulls up a QMessageBox that displays everything about Prim's MST
+//Opens Prim's dialog
 {
-    QMessageBox msgBox;             //Message box to display tree info
-    vector<pair<int,int> > edges;   //Vector of edges
-    int mileage;                    //MST mileage
+    //Construct new dialog
+    MstPrim newPrimDialog(data,this);
 
-    //Ask Prim for the MST
-    mileage = data.askPrim(edges);
-
-    msgBox.setWindowTitle("Prim's MST");
-    msgBox.setIcon(QMessageBox::Information);
-    msgBox.setText("Minimum Spanning Tree Mileage: "
-                   + QString::number(mileage) + " miles");
-    msgBox.setStandardButtons(QMessageBox::Ok);
-    msgBox.exec();
+    //Display the dialog
+    newPrimDialog.exec();
 }
 
 // Admin Page - On Add New Team (and corresponding stadium) Button
