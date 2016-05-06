@@ -18,6 +18,7 @@
 #include <QSignalBlocker>
 #include <QDragEnterEvent>
 #include <QDate>
+#include <QHeaderView>
 
 #include "datastructures.h"
 #include "customsorts.h"
@@ -146,6 +147,11 @@ public slots:
      */
     bool eventFilter(QObject *object, QEvent *event);
 
+    /**
+     * @brief Command to queue all stadiums into the itinerary
+     */
+    void catchAddAllStadsCmd();
+
 private slots:
 /*PAGE INDEX============================================================*/
 //Index 0 = start page
@@ -245,4 +251,51 @@ private:
     ItinObj dragDrop;           //Data that's being dragged in the itin
     int pickup;                 //Row of dragged data
 };
+
+/**
+ * @brief This class overloads QTableWidget headers, and gives custom
+ * behavior when the headers are clicked.
+ *
+ * More specifically, this is used to add all stadiums into the itinerary.
+ * @par REQUIREMENTS:
+ * #include <QHeaderView>
+ */
+class myHeaderView : public QHeaderView
+{
+Q_OBJECT
+public:
+    myHeaderView(QWidget *parent):QHeaderView(Qt::Horizontal)
+    {
+        //Make the headers clickable
+        setSectionsClickable(true);
+
+        //Setup connections within this class and to the calling parent
+        connect(this,SIGNAL(sectionClicked(int)),
+                this,SLOT(sectionClicked(int)));
+        connect(this,SIGNAL(addAllTheStads()),
+                parent,SLOT(catchAddAllStadsCmd()));
+    }
+    ~myHeaderView(){}
+public slots:
+    /**
+     * @brief Emit a signal when the third header is clicked
+     * @param index : Index number of header being clicked
+     */
+    void sectionClicked(int index)
+    {
+        //If the "ADD ALL" header is clicked
+        if (index == 2)
+        {
+            emit addAllTheStads();
+        }
+    }
+signals:
+    /**
+     * @brief Throw a signal back to let PrimeWin know to add all stadiums
+     * into the itinerary
+     * @see PrimeWin::catchAddAllStadsCmd() at line 837 of primewin.cpp
+     */
+    void addAllTheStads();
+};
+
 #endif // PRIMEWIN_H
