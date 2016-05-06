@@ -42,16 +42,19 @@ public:
      * Each stadium is identified through its own unique stadNum.
      * @see Data
      */
-    int stadNum;    //The stadium this team belongs to
+    int stadNum;        //The stadium this team belongs to
     /**
      * @brief The name of the baseball team
      */
-    QString name;   //The team's name
+    QString name;       //The team's name
     /**
      * @brief The baseball league this baseball team belongs to
      */
-    QString league; //The team's baseball league
-    //PERHAPS A LOGO alkjfeiaj;fkejrlaj;lkja;lfkj;ejf;ajf;aiejf;lakjdf;lajeoilfj;
+    QString league;     //The team's baseball league
+    /**
+     * @brief The path to the team's logo
+     */
+    QString logoPath;   //The team's path to its logo
 };
 /*======================================================================*/
 /**
@@ -133,7 +136,10 @@ public:
      * @brief This stadium's baseball team
      */
     TeamObj team;              //This stadium's team
-    //PERHAPS A PIC OF THE FIELD d;alskfjeoijfalkajgl;aijerlkajmsdlkjiejr;alkjr(like the wiki page)
+    /**
+     * @brief This stadium's field picture
+     */
+    QString fieldPicPath;   //Path to stadium's field picture
     /**
      * @brief This stadium's vector of souvenir objects
      */
@@ -459,11 +465,13 @@ public:
     int getStadCapactiy(int stadNum) const;
     QString getStadGrass(int stadNum) const;
     QString getStadType(int stadNum) const;
+    QString getStadFieldPicPath(int stadNum) const;
 
     //Return various data points pertaining to teams
     QString getTeamName(int stadNum) const;
     QString getTeamLeague(int stadNum) const;
     int getTeamStad() const;
+    QString getTeamLogoPath(int stadNum) const;
 
     //Return various data points pertaining to souvenirs
     QString getSouvName(int stadNum, int souvNum) const;

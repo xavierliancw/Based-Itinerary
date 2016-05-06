@@ -1,0 +1,70 @@
+<RCC>
+    <qresource prefix="/stadiums">
+        <file>Angel Stadium of Anaheim.jpg</file>
+        <file>AT&amp;T Park.jpg</file>
+        <file>Busch Stadium.jpg</file>
+        <file>Chase Field.jpg</file>
+        <file>Citi Field.jpg</file>
+        <file>Citizens Bank Park.jpg</file>
+        <file>Comerica Park.jpg</file>
+        <file>Coors Field.jpg</file>
+        <file>Dodger Stadium.jpg</file>
+        <file>Fenway Park.jpg</file>
+        <file>Globe Life Park in Arlington.jpg</file>
+        <file>Great American Ball Park.jpg</file>
+        <file>Kauffman Stadium.jpg</file>
+        <file>Marlins Park.jpg</file>
+        <file>Miller Park.jpg</file>
+        <file>Minute Maid Park.jpg</file>
+        <file>Nationals Park.jpg</file>
+        <file>O.co Coliseum.jpg</file>
+        <file>Oriole Park at Camden Yards.jpg</file>
+        <file>Petco Park.jpg</file>
+        <file>Progressive Field.jpg</file>
+        <file>Rogers Centre.jpg</file>
+        <file>Safeco Field.jpg</file>
+        <file>Target Field.jpg</file>
+        <file>Tropicana Field.jpg</file>
+        <file>Turner Field.jpg</file>
+        <file>U.S. Cellular Field.jpg</file>
+        <file>Wrigley Field.jpg</file>
+        <file>Yankee Stadium.jpg</file>
+        <file>PNC Park.jpg</file>
+    </qresource>
+    <qresource prefix="/teamlogos">
+        <file>Arizona Diamondbacks.gif</file>
+        <file>Atlanta Braves.gif</file>
+        <file>Baltimore Orioles.gif</file>
+        <file>Boston Red Sox.gif</file>
+        <file>Chicago Cubs.gif</file>
+        <file>Chicago White Sox.gif</file>
+        <file>Cincinnati Reds.gif</file>
+        <file>Cleveland Indians.gif</file>
+        <file>Colorado Rockies.gif</file>
+        <file>Detroit Tigers.gif</file>
+        <file>Houston Astros.gif</file>
+        <file>Kansas City Royals.gif</file>
+        <file>Los Angeles Angels of Anaheim.gif</file>
+        <file>Los Angeles Dodgers.gif</file>
+        <file>Miami Marlins.gif</file>
+        <file>Milwaukee Brewers.gif</file>
+        <file>Minnesota Twins.gif</file>
+        <file>New York Mets.gif</file>
+        <file>New York Yankees.gif</file>
+        <file>Oakland Athletics.gif</file>
+        <file>Philadelphia Phillies.gif</file>
+        <file>Pittsburgh Pirates.gif</file>
+        <file>San Diego Padres.gif</file>
+        <file>San Francisco Giants.gif</file>
+        <file>Seattle Mariners.gif</file>
+        <file>St. Louis Cardinals.gif</file>
+        <file>Tampa Bay Rays.gif</file>
+        <file>Texas Rangers.gif</file>
+        <file>Toronto Blue Jays.gif</file>
+        <file>Washington Nationals.gif</file>
+    </qresource>
+    <qresource prefix="/defaults">
+        <file>title.gif</file>
+        <file>windowicon.png</file>
+    </qresource>
+</RCC>
