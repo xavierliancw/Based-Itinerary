@@ -340,9 +340,7 @@ void PrimeWin::catchLoginStatus(bool status)
 
 void PrimeWin::catchDataUpdate(Data caughtThis)
 //Catches signal to update data structures
-{
-    data = caughtThis;
-}
+{data = caughtThis;changesMade();}
 
 void PrimeWin::catchAddItin()
 //Catches signal to update itin
@@ -1136,6 +1134,10 @@ void PrimeWin::on_adminDistBt_clicked()
     newDistDialog.exec();
 }
 
+void PrimeWin::changesMade()
+//Updates the changes made label to show that changes need to be saved
+{ui->adminChangesLbl->setText("There are unsaved changes...");}
+
 void PrimeWin::on_adminStadTbl_cellChanged(int row, int column)
 //Applies edits from the admin table to the data structure
 {
@@ -1224,6 +1226,7 @@ void PrimeWin::on_adminStadTbl_cellChanged(int row, int column)
         break;
     }
     refreshAdminTbl();
+    changesMade();
 }
 
 // when a cell in admin souvenir is modified
@@ -1254,7 +1257,6 @@ void PrimeWin::on_adminSouvTable_cellChanged(int row, int column)
             ok = false;
         }
     }
-
     switch(row)
     {
         // Souvenir item name
@@ -1286,6 +1288,7 @@ void PrimeWin::on_adminSouvTable_cellChanged(int row, int column)
                               QMessageBox::Ok);
     }
     refreshSouvenirTableAdmin();
+    changesMade();
 }
 
 QString PrimeWin::phoneCheck(QString phone)
@@ -1438,6 +1441,7 @@ void PrimeWin::on_dataTxtBt_clicked()
                                      tr("Data overwritten."),
                                      QMessageBox::Ok);
         }
+        changesMade();
     }
     else
     {
@@ -1510,11 +1514,12 @@ void PrimeWin::catchNewSouvenirData(Data caughtData, int stadChanged)
     data = caughtData;
     ui->adminStadTbl->selectRow(stadChanged);
     refreshSouvenirTableAdmin();
+    changesMade();
 }
 
 // process new Team data
 void PrimeWin::catchNewTeamData(Data caughtData)
-{data = caughtData;}
+{data = caughtData;changesMade();}
 
 // on Delete Souvenir Button
 void PrimeWin::on_deleteSouvBtn_clicked()
@@ -1529,6 +1534,7 @@ void PrimeWin::on_deleteSouvBtn_clicked()
           // delete souvenir
           data.deleteSouv(stadNum, itemNum);
           refreshSouvenirTableAdmin();
+          changesMade();
    }
    else
    {
