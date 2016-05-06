@@ -30,7 +30,7 @@
        <string notr="true"/>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="start">
        <property name="styleSheet">
@@ -1287,7 +1287,7 @@ background-color: qradialgradient(spread:repeat, cx:0.5, cy:0.5, radius:0.5, fx:
               </size>
              </property>
              <property name="text">
-              <string>View Prim's MST</string>
+              <string>Prim's MST</string>
              </property>
             </widget>
            </item>
