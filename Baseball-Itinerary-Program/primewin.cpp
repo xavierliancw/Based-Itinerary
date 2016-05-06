@@ -458,7 +458,7 @@ void PrimeWin::catchAddAllStadsCmd()
     alreadyQd.sort();
 
     //Loop until all stads are added while adding existing queued stads
-    for (int x = 0; x < data.size(); x++)
+    for (int x = 0; x < (int)data.size(); x++)
     {
         //If the stadNum is already queued, don't push it in
         if (x == alreadyQd.front())
@@ -479,7 +479,7 @@ void PrimeWin::catchAddAllStadsCmd()
     calcTrip();
 
     //Rebuild the buttons in the itinBuilder list to say "Remove"
-    for (int x = 0; x < data.size(); x++)               //MAYBE NEEDS A -1
+    for (int x = 0; x < (int)data.size(); x++)
     {
         //Create a remove button for column 3
         QPushButton *remBt = new QPushButton();
@@ -652,13 +652,9 @@ void PrimeWin::filterStads()
     if (ui->homeNameRd->isChecked())
     {on_homeNameRd_toggled(true);}
     else if (ui->homeTeamRd->isChecked())
-    {
-        int UNIMPLEMENTED;
-    }
+    {on_homeTeamRd_toggled(true);}
     else if (ui->homeDateRd->isChecked())
-    {
-        int NOTIMPLEMENTED;
-    }
+    {on_homeDateRd_toggled(true);}
     else if (ui->homeCapRd->isChecked())
     {on_homeCapRd_toggled(true);}
     else if (ui->homeTypeRd->isChecked())
@@ -871,7 +867,9 @@ void PrimeWin::on_homeDateRd_toggled(bool checked)
         for (int x = 0; x < ui->homeStadTbl->rowCount(); x++)
         {
             stadNum = ui->homeStadTbl->item(x,0)->text().toInt();
-            dataP = make_pair(stadNum,data.getStadOpened(stadNum, false)); // pass in false to return yyyyMMdd
+
+            // pass in false to return yyyyMMdd
+            dataP = make_pair(stadNum,data.getStadOpened(stadNum, false));
             sortThese.push_back(dataP);
         }
         //Ask insertion sort to reorder the stadiums
@@ -919,87 +917,97 @@ struct visitObj
     bool valid;     //If in itinerary
 };
 
+/**
+ * @brief The based_on_second struct provides instructions for std::sort
+ * to compare only the second integer of integer std::pairs
+ *
+ * It does this by overloading the () operator
+ *
+ * PrimeWin::on_itinOptimizeBt_clicked() uses this to sort an std::list of
+ * edges to determine which one is the shortest in O(nlogn) time.
+ * @see PrimeWin::on_itinOptimizeBt_clicked()
+ */
+struct based_on_second
+//Instructs list.sort() functions to sort using the cost
+{
+    bool operator()(const std::pair<int,int> &left,
+                    const std::pair<int,int> &right)
+    {return left.second < right.second;}
+};
+
 void PrimeWin::on_itinOptimizeBt_clicked()
 //Optimizes order of the itinerary
 //Complexity: O(n^2)
+//n+i+i(elogn+n+ilogi+i) - n^2 proof
 {
     //Check if there are enough stadiums to optimizeS
     if (itinList.size() > 2)
     {
-        list<ItinObj> newItin;      //New itinerary
-        std::deque<int> optimized;  //Optimized order of stadNums
-        std::deque<int> djMap;      //Map of costs to visit each stadium
-        int totalTripDist = 0;      //Total trip distance
-        int shortest;               //Stores current shortest distance
-        int nextStad;               //Stores next stad to visit
+        pair<bool,bool> optStatus;          //Valid,Visited
+        vector<pair<bool,bool> > valvisMap; //Map of valid/visited stads
+        list<ItinObj>::iterator it;         //Itin iterator
+        list<ItinObj> optimal;              //New optimal itin
+        deque<int> djMap;                   //Map of shortest dists
+        pair<int,int> stadDist;             //stadNum/dist pair
+        list<pair<int,int> > sortThese;     //List that gets sorted
+        int totalTripDist = 0;              //Tracks trip distance
 
-        //Create and initialize a list iterator
-        std::list<ItinObj>::iterator it = itinList.begin();
-
-        //Array of visited booleans where index is stadNum
-        vector<visitObj> visitAr;
-        visitAr.resize(data.size());
-
-        //Initialize the array to the uninitialized states
-        for (unsigned int x = 0; x < data.size(); x++)
+        //Initialize valid/visited map such that all are invalid/unvisted
+        for (int x = 0; x < (int)data.size(); x++)
         {
-            visitAr[x].visited = false;
-            visitAr[x].valid = false;
+            optStatus = make_pair(false,false);
+            valvisMap.push_back(optStatus);
         }
-        //Make stadiums in the itin valid within the array
-        for (it = itinList.begin(); it != itinList.end(); it++)
-        {
-            visitAr[(*it).getStadNum()].valid = true;
-        }
-        //Reset itin iterator
+        //See what's queued in the itin, and mark them as valid stads
         it = itinList.begin();
-
-        //Mark current true in the hash map, visiting itin's first
-        visitAr[(*it).getStadNum()].visited = true;
-
-        //Add it to the NEW itinerary
-        optimized.push_back((*it).getStadNum());
-
-        //Build the optimized itinerary
-        for (int i = 0; i < (int)itinList.size() - 1; i++)
+        while (it != itinList.end())
         {
-            //Call Dijkstra's on the last stadium on the optimized itin
-            djMap = data.askDijkstra(optimized.back());
+            valvisMap.at((*it).getStadNum()).first = true;
+            it++;
+        }
+        //Push itin's starting stad into the new itin
+        it = itinList.begin();
+        optimal.push_back(*it);
 
-            //Reinitialize temporary values
-            shortest = INT_MAX;
-            nextStad = -1;
+        //Loop until the size of the new itin matches the old itin
+        while (optimal.size() < itinList.size())    //O(i), i = # queued
+        {
+            //Mark the back of optimal as visited in the map
+            valvisMap.at(optimal.back().getStadNum()).second = true;
 
-            //Find next stad in the itin that has the shortest dist
-            for (int x = 0; x < (int)djMap.size(); x++)
+            //Ask Dijkstra for shortest paths from optimal's back
+            djMap = data.askDijkstra(optimal.back().getStadNum());//elogn
+
+            //Build a list of VALID & UNVISITED stads
+            for (int x = 0; x < (int)djMap.size(); x++)//O(n), n = # stads
             {
-                //If stad is in the itin, unvisited, & has a shorter dist
-                if (visitAr[x].valid
-                    && !visitAr[x].visited && djMap[x] < shortest)
+                //If a stadium is in the itin and it's unvisited
+                if (valvisMap.at(x).first == true
+                    && valvisMap.at(x).second == false)
                 {
-                    //Update shortest and the next stad to visit
-                    shortest = djMap[x];
-                    nextStad = x;
+                    //Make a stadNum/it's-dist-from-optimal's-back pair
+                    stadDist = make_pair(x,djMap.at(x));
+                    sortThese.push_back(stadDist);
                 }
             }
-            //Add that distance to a running total
-            totalTripDist += shortest;
+            //Sort that list to figure out which valid stad is closest
+            sortThese.sort(based_on_second());
 
-            //Mark it as visited on the visited array
-            visitAr[nextStad].visited = true;
-
-            //Add it to the NEW itinerary
-            optimized.push_back(nextStad);
-        }
-        //Build the new itinerary
-        for (int x = 0; x < (int)optimized.size(); x++)
-        {
+            //Push sortThese's top stad into optimal
+            //Look for the stad in the original itin
             it = itinList.begin();
-            while (it != itinList.end())
-            {int ImproveThis;//It makes this algo run in n^3
-                if (optimized.at(x) == (*it).getStadNum())
+            while (it != itinList.end())    //O(i), i = #queued
+            {
+                //If it's found
+                if ((*it).getStadNum() == sortThese.front().first)
                 {
-                    newItin.push_back(*it);
+                    //Push it into the optimal list
+                    optimal.push_back(*it);
+
+                    //Update the trip distance
+                    totalTripDist += djMap.at((*it).getStadNum());
+
+                    //Leave the loop
                     it = itinList.end();
                 }
                 else
@@ -1007,9 +1015,10 @@ void PrimeWin::on_itinOptimizeBt_clicked()
                     it++;
                 }
             }
+            sortThese.clear();
         }
-        //Update the old itin wiht the new, updated one
-        itinList = newItin;
+        //Update itinList to most optimal trip
+        itinList = optimal;
         refreshItin();
         ui->itinDistLbl->setText("Total Distance: "
                                  + QString::number(totalTripDist)
