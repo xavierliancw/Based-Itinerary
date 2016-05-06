@@ -916,6 +916,42 @@ void PrimeWin::on_homeDateRd_toggled(bool checked)
 }
 
 //Index2 - Itinerary Page=================================================
+void PrimeWin::on_itinSearchBarLE_textChanged(const QString &arg1)
+//Handles the search bar function
+{
+    //If the bar is empty, show everything again
+    if (arg1 == "")
+    {
+        for (int x = 0; x < (int)data.size(); x++)
+        {
+            ui->tableWidget->showRow(x);
+        }
+    }
+    //Otherwise, filter
+    else
+    {
+        itinSearchFilter(arg1);
+    }
+}
+
+void PrimeWin::itinSearchFilter(QString filter)
+//Filters itin stad table to show only things that have filter
+{
+    QList<QTableWidgetItem *> items;
+    items = ui->tableWidget->findItems(filter, Qt::MatchContains);
+
+    //Hide all rows
+    for (int x = 0; x < (int)data.size(); x++)
+    {
+        ui->tableWidget->hideRow(x);
+    }
+    //Make rows appear that match search
+    for (int x = 0; x < items.count(); x++)
+    {
+        ui->tableWidget->showRow(items.at(x)->row());
+    }
+}
+
 void PrimeWin::on_itinStartOverBt_clicked()
 //Index 2 to 0
 {

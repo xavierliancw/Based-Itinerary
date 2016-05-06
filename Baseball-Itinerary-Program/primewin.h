@@ -201,6 +201,10 @@ private slots:
     void on_homeDateRd_toggled(bool checked);
 
 //Index2==================================================================
+    void on_itinSearchBarLE_textChanged(const QString &arg1);
+
+    void itinSearchFilter(QString filter);
+
     void on_itinStartOverBt_clicked();
 
     void on_itinOptimizeBt_clicked();
