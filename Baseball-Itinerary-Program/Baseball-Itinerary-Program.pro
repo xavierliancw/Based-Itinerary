@@ -37,3 +37,6 @@ FORMS    += primewin.ui \
     editdistances.ui \
     addsouvdialog.ui \
     addstadiumwin.ui
+
+RESOURCES += \
+    APPDATA/GRAPHICS/imagedirectory.qrc

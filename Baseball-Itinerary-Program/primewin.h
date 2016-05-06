@@ -19,6 +19,8 @@
 #include <QDragEnterEvent>
 #include <QDate>
 #include <QHeaderView>
+#include <QMovie>
+#include <QStackedLayout>
 
 #include "datastructures.h"
 #include "customsorts.h"
@@ -262,7 +264,7 @@ private:
  */
 class myHeaderView : public QHeaderView
 {
-Q_OBJECT
+    Q_OBJECT
 public:
     myHeaderView(QWidget *parent):QHeaderView(Qt::Horizontal)
     {

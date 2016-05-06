@@ -42,6 +42,21 @@ PrimeWin::PrimeWin(QWidget *parent, int dummyVarForNow) :
     ui->listWidget->viewport()->installEventFilter(this);
     ui->tableWidget->setHorizontalHeader(new myHeaderView(this));
 
+    //Setup start screen's gif
+    QMovie *titleMovie = new QMovie(":/defaults/title.gif");
+    QLabel *movieLabel = new QLabel(ui->start);
+    movieLabel->setMovie(titleMovie);
+    movieLabel->setAlignment(Qt::AlignCenter);
+    QStackedLayout *stackLay = new QStackedLayout;
+    stackLay->addWidget(ui->frame_17);
+    stackLay->addWidget(movieLabel);
+    stackLay->setStackingMode(QStackedLayout::StackAll);
+    QVBoxLayout *lay = new QVBoxLayout;
+    lay->addLayout(stackLay);
+    ui->start->setLayout(lay);
+    movieLabel->show();
+    titleMovie->start();
+
     //Keystroke to pull up admin login window
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return),
                   this, SLOT(on_adminLoginBt_clicked()));
@@ -65,6 +80,7 @@ void PrimeWin::refreshHomeTbl(vector<int> stadNumOrder)
     {
         //Add a row
         ui->homeStadTbl->insertRow(ui->homeStadTbl->rowCount());
+        ui->homeStadTbl->setRowHeight(x,75);
 
         //First col has hidden stadNum
         item = new QTableWidgetItem;
@@ -72,10 +88,12 @@ void PrimeWin::refreshHomeTbl(vector<int> stadNumOrder)
         ui->homeStadTbl->setItem(x,0,item);
 
         //Second col has field pic
-        int UNIMPLEMENTED;
-        //item = new QTableWidgetItem;
-        //item->setData(0,data.getPicOrSomething(*it));
-        ui->homeStadTbl->setItem(x,1,new QTableWidgetItem("NO_PIC"));
+        QTableWidgetItem *fieldPic = new QTableWidgetItem();
+        fieldPic->setData(Qt::DecorationRole,
+                          QPixmap(data.getStadFieldPicPath(*it))
+                          .scaled(100,100,Qt::KeepAspectRatio,
+                                  Qt::SmoothTransformation));
+        ui->homeStadTbl->setItem(x,1,fieldPic);
 
         //Third col has stadium name
         item = new QTableWidgetItem;
@@ -139,6 +157,9 @@ void PrimeWin::refreshHomeDetails()
     ui->homeCapLbl->setText(capacity);
     ui->homeTurfLbl->setText(data.getStadGrass(stadNum));
     ui->homeTypeLbl->setText(data.getStadType(stadNum));
+    QPixmap logo(data.getTeamLogoPath(stadNum));
+    ui->homeLogoLbl->setPixmap(logo.scaled(150,100,Qt::KeepAspectRatio,
+                                           Qt::SmoothTransformation));
 }
 
 void PrimeWin::refreshItinBuilder()
@@ -146,6 +167,7 @@ void PrimeWin::refreshItinBuilder()
 {
     //Clear table
     ui->tableWidget->clear();
+    ui->tableWidget->setRowCount(0);
 
     for(unsigned int i = 0; i < data.size(); i ++)
     {
