@@ -149,6 +149,7 @@ void Data::addStad(QString name, QString address,
     newStad.capacity = capacity;
     newStad.grass = grass;
     newStad.type = type;
+    newStad.fieldPicPath = ":/stadiums/" + name + ".jpg";
 
     //Push the stadium into the vector (it's vector index is its stadNum)
     masterVect.push_back(newStad);
@@ -188,10 +189,6 @@ void Data::modStadType(int stadNum, QString newType)
 void Data::delStad(int stadNum)
 //Deletes stadNum from the vector
 {
-    //WHAT HAPPENS IF A TEAM IS STILL IN THE STADIUM
-//    masterVect.erase(masterVect.begin() + stadNum);
-    //NEED TO CLEAR OUT DISTANCE ROW AND COLUMN IN THE MATRIX TOO FJSDKL:JROIWEJ:KDJFL:SKHGer
-    //IF YOU WANT TO PROGRAM THIS, BRING IT UP IN THE NEXT SCRUM MEETING
     qDebug() << "Data::delStad is unimplemented" << stadNum;
     bool NOTIMPLEMENTED;
 }
@@ -203,7 +200,7 @@ void Data::addTeam(int stadNum, QString newTeam, QString newLeague/*LOGOVARIABLE
     addingTeam.name = newTeam;
     addingTeam.stadNum = stadNum;
     addingTeam.league = newLeague;
-    //maybe add a logo?
+    addingTeam.logoPath = ":/teamlogos/" + newTeam + ".gif";
     masterVect.at(stadNum).team = addingTeam;
 }
 
@@ -873,6 +870,10 @@ QString Data::getStadType(int stadNum) const
 //Returns type of stadium at stadNum
 {return masterVect.at(stadNum).type;}
 
+QString Data::getStadFieldPicPath(int stadNum) const
+//Returns path to stadium's field pic
+{return masterVect.at(stadNum).fieldPicPath;}
+
 QString Data::getTeamName(int stadNum) const
 //Returns team name
 {return masterVect.at(stadNum).team.name;}
@@ -887,6 +888,10 @@ int Data::getTeamStad() const
     int NOTIMPLEMENTED;
     return NOTIMPLEMENTED;
 }
+
+QString Data::getTeamLogoPath(int stadNum) const
+//Returns a team's path to its logo
+{return masterVect.at(stadNum).team.logoPath;}
 
 QString Data::getSouvName(int stadNum, int souvNum) const
 {return masterVect.at(stadNum).souvVect.at(souvNum).name;}

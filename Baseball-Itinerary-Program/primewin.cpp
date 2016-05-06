@@ -40,6 +40,22 @@ PrimeWin::PrimeWin(QWidget *parent, int dummyVarForNow) :
     ui->adminStadTbl->horizontalHeader()
             ->setDefaultAlignment(Qt::AlignLeft);
     ui->listWidget->viewport()->installEventFilter(this);
+    ui->tableWidget->setHorizontalHeader(new myHeaderView(this));
+
+    //Setup start screen's gif
+    QMovie *titleMovie = new QMovie(":/defaults/title.gif");
+    QLabel *movieLabel = new QLabel(ui->start);
+    movieLabel->setMovie(titleMovie);
+    movieLabel->setAlignment(Qt::AlignCenter);
+    QStackedLayout *stackLay = new QStackedLayout;
+    stackLay->addWidget(ui->frame_17);
+    stackLay->addWidget(movieLabel);
+    stackLay->setStackingMode(QStackedLayout::StackAll);
+    QVBoxLayout *lay = new QVBoxLayout;
+    lay->addLayout(stackLay);
+    ui->start->setLayout(lay);
+    movieLabel->show();
+    titleMovie->start();
 
     //Keystroke to pull up admin login window
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return),
@@ -64,6 +80,7 @@ void PrimeWin::refreshHomeTbl(vector<int> stadNumOrder)
     {
         //Add a row
         ui->homeStadTbl->insertRow(ui->homeStadTbl->rowCount());
+        ui->homeStadTbl->setRowHeight(x,75);
 
         //First col has hidden stadNum
         item = new QTableWidgetItem;
@@ -71,10 +88,12 @@ void PrimeWin::refreshHomeTbl(vector<int> stadNumOrder)
         ui->homeStadTbl->setItem(x,0,item);
 
         //Second col has field pic
-        int UNIMPLEMENTED;
-        //item = new QTableWidgetItem;
-        //item->setData(0,data.getPicOrSomething(*it));
-        ui->homeStadTbl->setItem(x,1,new QTableWidgetItem("NO_PIC"));
+        QTableWidgetItem *fieldPic = new QTableWidgetItem();
+        fieldPic->setData(Qt::DecorationRole,
+                          QPixmap(data.getStadFieldPicPath(*it))
+                          .scaled(100,100,Qt::KeepAspectRatio,
+                                  Qt::SmoothTransformation));
+        ui->homeStadTbl->setItem(x,1,fieldPic);
 
         //Third col has stadium name
         item = new QTableWidgetItem;
@@ -138,6 +157,9 @@ void PrimeWin::refreshHomeDetails()
     ui->homeCapLbl->setText(capacity);
     ui->homeTurfLbl->setText(data.getStadGrass(stadNum));
     ui->homeTypeLbl->setText(data.getStadType(stadNum));
+    QPixmap logo(data.getTeamLogoPath(stadNum));
+    ui->homeLogoLbl->setPixmap(logo.scaled(150,100,Qt::KeepAspectRatio,
+                                           Qt::SmoothTransformation));
 }
 
 void PrimeWin::refreshItinBuilder()
@@ -145,6 +167,7 @@ void PrimeWin::refreshItinBuilder()
 {
     //Clear table
     ui->tableWidget->clear();
+    ui->tableWidget->setRowCount(0);
 
     for(unsigned int i = 0; i < data.size(); i ++)
     {
@@ -171,7 +194,7 @@ void PrimeWin::refreshItinBuilder()
     ui->tableWidget->resizeColumnsToContents();
     ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "Stadium"
                                                << "Team"
-                                               << "");
+                                               << "ADD ALL");
 }
 
 void PrimeWin::refreshItin()
@@ -317,9 +340,7 @@ void PrimeWin::catchLoginStatus(bool status)
 
 void PrimeWin::catchDataUpdate(Data caughtThis)
 //Catches signal to update data structures
-{
-    data = caughtThis;
-}
+{data = caughtThis;changesMade();}
 
 void PrimeWin::catchAddItin()
 //Catches signal to update itin
@@ -436,6 +457,68 @@ bool PrimeWin::eventFilter(QObject *object, QEvent *event)
     return false;
 }
 
+void PrimeWin::catchAddAllStadsCmd()
+//Catches command to add all stadiums to the itinerary
+//Complexity: O(nlogn)
+{
+    //Block signals for itinWidget to stop it from showing randomly
+    QSignalBlocker blockSignals(ui->listWidget);
+
+    list<int> alreadyQd;        //List to see what stads are already in
+    list<ItinObj>::iterator it; //Itinerary iterator
+
+    //Build a list of stads that are already in the itin
+    it = itinList.begin();
+    while (it != itinList.end())
+    {
+        alreadyQd.push_back((*it).getStadNum());
+        it++;
+    }
+    //Sort the stadNums
+    alreadyQd.sort();
+
+    //Loop until all stads are added while adding existing queued stads
+    for (int x = 0; x < (int)data.size(); x++)
+    {
+        //If the stadNum is already queued, don't push it in
+        if (x == alreadyQd.front())
+        {
+            //Pop it off the list
+            alreadyQd.pop_front();
+        }
+        //Otherwise, just add an empty stad to the new itin
+        else
+        {
+            //Create an ItinObj to push in where x is the stadNum
+            ItinObj newItinObj(x);
+            itinList.push_back(newItinObj);
+        }
+    }
+    //Refresh the itin's view
+    refreshItin();
+    calcTrip();
+
+    //Rebuild the buttons in the itinBuilder list to say "Remove"
+    for (int x = 0; x < (int)data.size(); x++)
+    {
+        //Create a remove button for column 3
+        QPushButton *remBt = new QPushButton();
+        remBt->setText("Remove");
+
+        //Set a custom property to the button to send the stad's num
+        remBt->setProperty("stadNum", x);
+
+        //Connect each button to addItinCatcher
+        connect(remBt, SIGNAL(clicked(bool)),
+                this, SLOT(catchAddItin()));
+
+        //Put the remove button in column 3
+        ui->tableWidget->setCellWidget(x, 2, remBt);
+    }
+    //Unblock signals
+    blockSignals.unblock();
+}
+
 /*PAGE INDEX============================================================*/
 //Index 0 = start page
 //Index 1 = home page
@@ -530,7 +613,8 @@ void PrimeWin::refreshHomeSouvTbl()
         //Populate second row with souvPrice
         item = new QTableWidgetItem;
         item->setData(0,"$"
-                      + QString::number(data.getSouvPrice(stadNum, x)));
+                      + QString::number(data.getSouvPrice(stadNum,
+                                                          x),'f',2));
         item->setTextAlignment(Qt::AlignCenter);
         widget->setItem(1,x,item);
     }
@@ -588,13 +672,9 @@ void PrimeWin::filterStads()
     if (ui->homeNameRd->isChecked())
     {on_homeNameRd_toggled(true);}
     else if (ui->homeTeamRd->isChecked())
-    {
-        int UNIMPLEMENTED;
-    }
+    {on_homeTeamRd_toggled(true);}
     else if (ui->homeDateRd->isChecked())
-    {
-        int NOTIMPLEMENTED;
-    }
+    {on_homeDateRd_toggled(true);}
     else if (ui->homeCapRd->isChecked())
     {on_homeCapRd_toggled(true);}
     else if (ui->homeTypeRd->isChecked())
@@ -660,13 +740,54 @@ void PrimeWin::on_homeNameRd_toggled(bool checked)
             //Refresh home table
             refreshHomeTbl(stadNumOrder);
             //Make the capacity label stand out
-            ui->homeStadzLbl->setStyleSheet("font-weight: bold; color: red");
+            ui->homeStadzLbl
+              ->setStyleSheet("font-weight: bold; color: red");
         }
         else
         {
             //Restore capacity label
             ui->homeStadzLbl->setStyleSheet("");
         }
+}
+
+void PrimeWin::on_homeTeamRd_toggled(bool checked)
+//Sorts home stadium table by team name, alphabetically
+{
+    //Perform sort when radio toggle is checked
+    if (checked)
+    {
+        pair<int,QString> dataP;                //Data to be sorted
+        vector<pair<int,QString> > sortThese;   //Vector of data to sort
+        vector<int> stadNumOrder;               //Vector of stadNums
+        CustomSorts use;                        //Sorting class
+        int stadNum;
+
+        //Create a list of stadNums to match the order the table is in now
+        for (int x = 0; x < ui->homeStadTbl->rowCount(); x++)
+        {
+            stadNum = ui->homeStadTbl->item(x,0)->text().toInt();
+            dataP = make_pair(stadNum, data.getTeamName(stadNum));
+            sortThese.push_back(dataP);
+        }
+        //Ask insertion sort to reorder the stadiums
+        sortThese = use.InsertionSort(sortThese);
+
+        //Build a vector of just stadNums that mirrors sortThese
+        for (int x = 0; x < (int)sortThese.size(); x++)
+        {
+            stadNumOrder.push_back(sortThese.at(x).first);
+        }
+        //Refresh home table
+        refreshHomeTbl(stadNumOrder);
+
+        //Make the team label stand out
+        ui->homeTeamLbl->setStyleSheet("font-weight: bold; color: red");
+    }
+    else
+    {
+        //Restore team label
+        ui->homeTeamLbl->setStyleSheet("");
+    }
 }
 
 void PrimeWin::on_homeCapRd_toggled(bool checked)
@@ -766,7 +887,9 @@ void PrimeWin::on_homeDateRd_toggled(bool checked)
         for (int x = 0; x < ui->homeStadTbl->rowCount(); x++)
         {
             stadNum = ui->homeStadTbl->item(x,0)->text().toInt();
-            dataP = make_pair(stadNum,data.getStadOpened(stadNum, false)); // pass in false to return yyyyMMdd
+
+            // pass in false to return yyyyMMdd
+            dataP = make_pair(stadNum,data.getStadOpened(stadNum, false));
             sortThese.push_back(dataP);
         }
         //Ask insertion sort to reorder the stadiums
@@ -791,11 +914,49 @@ void PrimeWin::on_homeDateRd_toggled(bool checked)
 }
 
 //Index2 - Itinerary Page=================================================
+void PrimeWin::on_itinSearchBarLE_textChanged(const QString &arg1)
+//Handles the search bar function
+{
+    //If the bar is empty, show everything again
+    if (arg1 == "")
+    {
+        for (int x = 0; x < (int)data.size(); x++)
+        {
+            ui->tableWidget->showRow(x);
+        }
+    }
+    //Otherwise, filter
+    else
+    {
+        itinSearchFilter(arg1);
+    }
+}
+
+void PrimeWin::itinSearchFilter(QString filter)
+//Filters itin stad table to show only things that have filter
+{
+    QList<QTableWidgetItem *> items;
+    items = ui->tableWidget->findItems(filter, Qt::MatchContains);
+
+    //Hide all rows
+    for (int x = 0; x < (int)data.size(); x++)
+    {
+        ui->tableWidget->hideRow(x);
+    }
+    //Make rows appear that match search
+    for (int x = 0; x < items.count(); x++)
+    {
+        ui->tableWidget->showRow(items.at(x)->row());
+    }
+}
+
 void PrimeWin::on_itinStartOverBt_clicked()
 //Index 2 to 0
 {
     ui->stackWidg->setCurrentIndex(0);
-    int UNFINISHED;//needs to clear itinerary
+    itinList.clear();
+    refreshItin();
+    calcTrip();
 }
 
 //Struct to represent a stadium in the itinerary
@@ -814,87 +975,97 @@ struct visitObj
     bool valid;     //If in itinerary
 };
 
+/**
+ * @brief The based_on_second struct provides instructions for std::sort
+ * to compare only the second integer of integer std::pairs
+ *
+ * It does this by overloading the () operator
+ *
+ * PrimeWin::on_itinOptimizeBt_clicked() uses this to sort an std::list of
+ * edges to determine which one is the shortest in O(nlogn) time.
+ * @see PrimeWin::on_itinOptimizeBt_clicked()
+ */
+struct based_on_second
+//Instructs list.sort() functions to sort using the cost
+{
+    bool operator()(const std::pair<int,int> &left,
+                    const std::pair<int,int> &right)
+    {return left.second < right.second;}
+};
+
 void PrimeWin::on_itinOptimizeBt_clicked()
 //Optimizes order of the itinerary
 //Complexity: O(n^2)
+//n+i+i(elogn+n+ilogi+i) - n^2 proof
 {
     //Check if there are enough stadiums to optimizeS
     if (itinList.size() > 2)
     {
-        list<ItinObj> newItin;      //New itinerary
-        std::deque<int> optimized;  //Optimized order of stadNums
-        std::deque<int> djMap;      //Map of costs to visit each stadium
-        int totalTripDist = 0;      //Total trip distance
-        int shortest;               //Stores current shortest distance
-        int nextStad;               //Stores next stad to visit
+        pair<bool,bool> optStatus;          //Valid,Visited
+        vector<pair<bool,bool> > valvisMap; //Map of valid/visited stads
+        list<ItinObj>::iterator it;         //Itin iterator
+        list<ItinObj> optimal;              //New optimal itin
+        deque<int> djMap;                   //Map of shortest dists
+        pair<int,int> stadDist;             //stadNum/dist pair
+        list<pair<int,int> > sortThese;     //List that gets sorted
+        int totalTripDist = 0;              //Tracks trip distance
 
-        //Create and initialize a list iterator
-        std::list<ItinObj>::iterator it = itinList.begin();
-
-        //Array of visited booleans where index is stadNum
-        vector<visitObj> visitAr;
-        visitAr.resize(data.size());
-
-        //Initialize the array to the uninitialized states
-        for (unsigned int x = 0; x < data.size(); x++)
+        //Initialize valid/visited map such that all are invalid/unvisted
+        for (int x = 0; x < (int)data.size(); x++)
         {
-            visitAr[x].visited = false;
-            visitAr[x].valid = false;
+            optStatus = make_pair(false,false);
+            valvisMap.push_back(optStatus);
         }
-        //Make stadiums in the itin valid within the array
-        for (it = itinList.begin(); it != itinList.end(); it++)
-        {
-            visitAr[(*it).getStadNum()].valid = true;
-        }
-        //Reset itin iterator
+        //See what's queued in the itin, and mark them as valid stads
         it = itinList.begin();
-
-        //Mark current true in the hash map, visiting itin's first
-        visitAr[(*it).getStadNum()].visited = true;
-
-        //Add it to the NEW itinerary
-        optimized.push_back((*it).getStadNum());
-
-        //Build the optimized itinerary
-        for (int i = 0; i < (int)itinList.size() - 1; i++)
+        while (it != itinList.end())
         {
-            //Call Dijkstra's on the last stadium on the optimized itin
-            djMap = data.askDijkstra(optimized.back());
+            valvisMap.at((*it).getStadNum()).first = true;
+            it++;
+        }
+        //Push itin's starting stad into the new itin
+        it = itinList.begin();
+        optimal.push_back(*it);
 
-            //Reinitialize temporary values
-            shortest = INT_MAX;
-            nextStad = -1;
+        //Loop until the size of the new itin matches the old itin
+        while (optimal.size() < itinList.size())    //O(i), i = # queued
+        {
+            //Mark the back of optimal as visited in the map
+            valvisMap.at(optimal.back().getStadNum()).second = true;
 
-            //Find next stad in the itin that has the shortest dist
-            for (int x = 0; x < (int)djMap.size(); x++)
+            //Ask Dijkstra for shortest paths from optimal's back
+            djMap = data.askDijkstra(optimal.back().getStadNum());//elogn
+
+            //Build a list of VALID & UNVISITED stads
+            for (int x = 0; x < (int)djMap.size(); x++)//O(n), n = # stads
             {
-                //If stad is in the itin, unvisited, & has a shorter dist
-                if (visitAr[x].valid
-                    && !visitAr[x].visited && djMap[x] < shortest)
+                //If a stadium is in the itin and it's unvisited
+                if (valvisMap.at(x).first == true
+                    && valvisMap.at(x).second == false)
                 {
-                    //Update shortest and the next stad to visit
-                    shortest = djMap[x];
-                    nextStad = x;
+                    //Make a stadNum/it's-dist-from-optimal's-back pair
+                    stadDist = make_pair(x,djMap.at(x));
+                    sortThese.push_back(stadDist);
                 }
             }
-            //Add that distance to a running total
-            totalTripDist += shortest;
+            //Sort that list to figure out which valid stad is closest
+            sortThese.sort(based_on_second());
 
-            //Mark it as visited on the visited array
-            visitAr[nextStad].visited = true;
-
-            //Add it to the NEW itinerary
-            optimized.push_back(nextStad);
-        }
-        //Build the new itinerary
-        for (int x = 0; x < (int)optimized.size(); x++)
-        {
+            //Push sortThese's top stad into optimal
+            //Look for the stad in the original itin
             it = itinList.begin();
-            while (it != itinList.end())
-            {int ImproveThis;//It makes this algo run in n^3
-                if (optimized.at(x) == (*it).getStadNum())
+            while (it != itinList.end())    //O(i), i = #queued
+            {
+                //If it's found
+                if ((*it).getStadNum() == sortThese.front().first)
                 {
-                    newItin.push_back(*it);
+                    //Push it into the optimal list
+                    optimal.push_back(*it);
+
+                    //Update the trip distance
+                    totalTripDist += djMap.at((*it).getStadNum());
+
+                    //Leave the loop
                     it = itinList.end();
                 }
                 else
@@ -902,9 +1073,10 @@ void PrimeWin::on_itinOptimizeBt_clicked()
                     it++;
                 }
             }
+            sortThese.clear();
         }
-        //Update the old itin wiht the new, updated one
-        itinList = newItin;
+        //Update itinList to most optimal trip
+        itinList = optimal;
         refreshItin();
         ui->itinDistLbl->setText("Total Distance: "
                                  + QString::number(totalTripDist)
@@ -963,6 +1135,10 @@ void PrimeWin::on_adminDistBt_clicked()
     //Display the dialog
     newDistDialog.exec();
 }
+
+void PrimeWin::changesMade()
+//Updates the changes made label to show that changes need to be saved
+{ui->adminChangesLbl->setText("There are unsaved changes...");}
 
 void PrimeWin::on_adminStadTbl_cellChanged(int row, int column)
 //Applies edits from the admin table to the data structure
@@ -1052,10 +1228,74 @@ void PrimeWin::on_adminStadTbl_cellChanged(int row, int column)
         break;
     }
     refreshAdminTbl();
-    // update database
-    data.exportSQL();
+    changesMade();
 }
 
+<<<<<<< HEAD
+=======
+// when a cell in admin souvenir is modified
+void PrimeWin::on_adminSouvTable_cellChanged(int row, int column)
+{
+    int stadNum   = ui->adminStadTbl->selectionModel()->currentIndex().row();
+    QString newName;
+    double newPrice;
+    bool ok;
+    QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
+    QLocale us; // Constructs a default QLocale
+
+    //Grab the input
+    if(row == 0) // if souvenir name is selected
+    {
+        newName = ui->adminSouvTable->item(row,column)->text();
+    }
+    else // if souvenir price is selected
+    {
+        //Also format and validate
+        QString newPriceStr = ui->adminSouvTable->item(row,column)->text();
+        us.toDouble(newPriceStr, &ok);
+        newPrice = newPriceStr.toDouble();
+        newPriceStr = QString::number(newPrice, 'f', 2);
+        newPrice = newPriceStr.toDouble();
+        if (newPrice > 99999.99 || newPrice < 0)
+        {
+            ok = false;
+        }
+    }
+    switch(row)
+    {
+        // Souvenir item name
+        case 0:
+            //If the name is left blank, don't do anything
+            if (newName != "")
+            {
+                data.modSouvName(stadNum, column, newName);
+            }
+            break;
+        // Souvenir item price
+        case 1:
+           //If the price is validated
+            if (ok)
+            {
+                data.modSouvPrice(stadNum, column, newPrice);
+            }
+            else
+            {
+                QMessageBox::warning(this, tr("Souvenir Editing Error"),
+                                     tr("Price must be valid and less"
+                                        " than $99999.99."),
+                                     QMessageBox::Ok);
+            }
+            break;
+    default:
+        QMessageBox::critical(this, tr("Editing Critical Error"),
+                              tr("Row switch case defaulted!"),
+                              QMessageBox::Ok);
+    }
+    refreshSouvenirTableAdmin();
+    changesMade();
+}
+
+>>>>>>> master
 QString PrimeWin::phoneCheck(QString phone)
 //Validates phone numbers and returns a formatted number
 {
@@ -1157,21 +1397,23 @@ QString PrimeWin::phoneCheck(QString phone)
 }
 
 void PrimeWin::on_adminPrimBt_clicked()
-//Pulls up a QMessageBox that displays everything about Prim's MST
+//Opens Prim's dialog
 {
-    QMessageBox msgBox;             //Message box to display tree info
-    vector<pair<int,int> > edges;   //Vector of edges
-    int mileage;                    //MST mileage
+    //Construct new dialog
+    MstPrim newPrimDialog(data,this);
 
-    //Ask Prim for the MST
-    mileage = data.askPrim(edges);
+    //Display the dialog
+    newPrimDialog.exec();
+}
 
-    msgBox.setWindowTitle("Prim's MST");
-    msgBox.setIcon(QMessageBox::Information);
-    msgBox.setText("Minimum Spanning Tree Mileage: "
-                   + QString::number(mileage) + " miles");
-    msgBox.setStandardButtons(QMessageBox::Ok);
-    msgBox.exec();
+// Admin Page - On Add New Team (and corresponding stadium) Button
+void PrimeWin::on_addNewTeamBtn_clicked()
+{
+    //Construct new dialog
+    AddStadiumWin newWin(data, this);
+    connect(&newWin,SIGNAL(throwNewTeamData(Data)),
+            this,SLOT(catchNewTeamData(Data)));
+    newWin.exec();
 }
 
 //Index5 - Database Management Page=======================================
@@ -1204,6 +1446,7 @@ void PrimeWin::on_dataTxtBt_clicked()
                                      tr("Data overwritten."),
                                      QMessageBox::Ok);
         }
+        changesMade();
     }
     else
     {
@@ -1218,7 +1461,10 @@ void PrimeWin::refreshSouvenirTableAdmin()
 //Refreshes admin page's souvenir table
 {
     QSignalBlocker stopSignalsFrom(ui->adminSouvTable);
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
     int stadNum = ui->adminStadTbl->item(ui->adminStadTbl->currentRow(),
                                          0)->text().toInt();
     QTableWidget *widget = ui->adminSouvTable;
@@ -1242,19 +1488,27 @@ void PrimeWin::refreshSouvenirTableAdmin()
 
         //Populate second row with souvPrice
         item = new QTableWidgetItem;
-        item->setData(0,data.getSouvPrice(stadNum, x));
+        item->setData(0,QString::number(data.getSouvPrice(stadNum,
+                                                          x),'f',2));
         widget->setItem(1,x,item);
     }
     widget->resizeColumnsToContents();
     widget->setRowHeight(0,60);
     widget->setRowHeight(1,60);
 
+<<<<<<< HEAD
+=======
+    //Update feedback label
+    ui->adminSouvFeedbackLbl->setText("Souvenirs at: "
+                                      + data.getStadName(stadNum));
+>>>>>>> master
     stopSignalsFrom.unblock();
 }
 
 // when an index is selected, the bottom panel will display a list of souvenirs
 // that corresponds to its stadium
 void PrimeWin::on_adminStadTbl_itemSelectionChanged()
+<<<<<<< HEAD
 {
     refreshSouvenirTableAdmin();
 }
@@ -1296,24 +1550,32 @@ void PrimeWin::on_adminSouvTable_cellChanged(int row, int column)
     // update database
     data.exportSQL();
 }
+=======
+{refreshSouvenirTableAdmin();}
+>>>>>>> master
 
 // on Add New Souvenir Button
 void PrimeWin::on_pushButton_9_clicked()
 {
     //Construct new dialog
     addSouvDialog newAddSouvWin(data, this);
-    connect(&newAddSouvWin,SIGNAL(throwNewSouvData(Data)),
-            this,SLOT(catchNewSouvenirData(Data)));
+    connect(&newAddSouvWin,SIGNAL(throwNewSouvData(Data,int)),
+            this,SLOT(catchNewSouvenirData(Data,int)));
     newAddSouvWin.exec();
 }
 
-// process new souvenir data
-void PrimeWin::catchNewSouvenirData(Data caughtData)
+// process new souvenir data and refresh the ui
+void PrimeWin::catchNewSouvenirData(Data caughtData, int stadChanged)
 {
     data = caughtData;
-    // update database
-    data.exportSQL();
+    ui->adminStadTbl->selectRow(stadChanged);
+    refreshSouvenirTableAdmin();
+    changesMade();
 }
+
+// process new Team data
+void PrimeWin::catchNewTeamData(Data caughtData)
+{data = caughtData;changesMade();}
 
 // on Delete Souvenir Button
 void PrimeWin::on_deleteSouvBtn_clicked()
@@ -1328,17 +1590,31 @@ void PrimeWin::on_deleteSouvBtn_clicked()
           // delete souvenir
           data.deleteSouv(stadNum, itemNum);
           refreshSouvenirTableAdmin();
-          // update database
-          data.exportSQL();
+          changesMade();
    }
    else
    {
-       //notify admin to make a selection on souvenir
-       QMessageBox::warning(this, tr("Error"),
-                            tr("Select a stadium and a souvenir."),
-                            QMessageBox::Ok);
+       if (stadNum == -1)
+       {
+           //notify admin to make a selection on souvenir
+           QMessageBox::warning(this, tr("Deletion Error"),
+                                tr("Please select a stadium first."),
+                                QMessageBox::Ok);
+       }
+       else if (itemNum == -1)
+       {
+           QMessageBox::warning(this, tr("Deletion Error"),
+                                tr("Please select a souvenir to delete."),
+                                QMessageBox::Ok);
+       }
+       else
+       {
+           qDebug() << "Wow, another kind of error happened in "
+                       "PrimeWin::on_deleteSouvBtn_clicked().";
+       }
    }
 }
+<<<<<<< HEAD
 
 // Admin Page - On Add New Team (and corresponding stadium) Button
 void PrimeWin::on_addNewTeamBtn_clicked()
@@ -1358,3 +1634,5 @@ void PrimeWin::catchNewTeamData(Data caughtData)
     data.exportSQL();
 }
 
+=======
+>>>>>>> master

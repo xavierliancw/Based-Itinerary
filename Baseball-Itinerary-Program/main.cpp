@@ -33,7 +33,11 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     PrimeWin w(NULL,0);
-    w.resize(900,500);
+    w.resize(900,600);
+
+    //Set window icon
+    w.setWindowIcon(QIcon(":/defaults/windowicon.png"));
+    w.showMaximized();
     w.show();
     return a.exec();
 }

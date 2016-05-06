@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     addsouvdialog.cpp \
     customsorts.cpp \
     minmeap.cpp \
-    addstadiumwin.cpp
+    addstadiumwin.cpp \
+    mstprim.cpp
 
 HEADERS  += primewin.h \
     adminlogin.h \
@@ -30,10 +31,15 @@ HEADERS  += primewin.h \
     addsouvdialog.h \
     customsorts.h \
     minmeap.h \
-    addstadiumwin.h
+    addstadiumwin.h \
+    mstprim.h
 
 FORMS    += primewin.ui \
     adminlogin.ui \
     editdistances.ui \
     addsouvdialog.ui \
-    addstadiumwin.ui
+    addstadiumwin.ui \
+    mstprim.ui
+
+RESOURCES += \
+    APPDATA/GRAPHICS/imagedirectory.qrc

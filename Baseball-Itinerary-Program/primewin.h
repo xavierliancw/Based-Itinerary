@@ -16,11 +16,11 @@
 #include <QMessageBox>
 #include <QFileSystemModel>
 #include <QSignalBlocker>
-//<<<<<<< Updated upstream
 #include <QDragEnterEvent>
-//=======
 #include <QDate>
-//>>>>>>> Stashed changes
+#include <QHeaderView>
+#include <QMovie>
+#include <QStackedLayout>
 
 #include "datastructures.h"
 #include "customsorts.h"
@@ -28,6 +28,7 @@
 #include "editdistances.h"
 #include "addsouvdialog.h"
 #include "addstadiumwin.h"
+#include "mstprim.h"
 using namespace std;
 
 namespace Ui {
@@ -149,6 +150,11 @@ public slots:
      */
     bool eventFilter(QObject *object, QEvent *event);
 
+    /**
+     * @brief Command to queue all stadiums into the itinerary
+     */
+    void catchAddAllStadsCmd();
+
 private slots:
 /*PAGE INDEX============================================================*/
 //Index 0 = start page
@@ -186,6 +192,8 @@ private slots:
 
     void on_homeNameRd_toggled(bool checked);
 
+    void on_homeTeamRd_toggled(bool checked);
+
     void on_homeCapRd_toggled(bool checked);
 
     void on_homeTypeRd_toggled(bool checked);
@@ -193,6 +201,10 @@ private slots:
     void on_homeDateRd_toggled(bool checked);
 
 //Index2==================================================================
+    void on_itinSearchBarLE_textChanged(const QString &arg1);
+
+    void itinSearchFilter(QString filter);
+
     void on_itinStartOverBt_clicked();
 
     void on_itinOptimizeBt_clicked();
@@ -206,7 +218,11 @@ private slots:
 
     void on_adminDistBt_clicked();
 
+    void changesMade();
+
     void on_adminStadTbl_cellChanged(int row, int column);
+
+    void on_adminSouvTable_cellChanged(int row, int column);
 
     //Validates phone numbers and returns a formatted number
     QString phoneCheck(QString phone);
@@ -219,7 +235,7 @@ private slots:
     void on_pushButton_9_clicked();
 
     // Catch data from Add New Souv Button
-    void catchNewSouvenirData(Data caughtData);
+    void catchNewSouvenirData(Data caughtData, int stadChanged);
 
     // Catch data from Add New Team Button
     void catchNewTeamData(Data caughtData);
@@ -229,14 +245,12 @@ private slots:
 
     void on_adminPrimBt_clicked();
 
+    void on_addNewTeamBtn_clicked();
+
 //Index5==================================================================
     void on_dataBackBt_clicked();
 
     void on_dataTxtBt_clicked();
-
-    void on_adminSouvTable_cellChanged(int row, int column);
-
-    void on_addNewTeamBtn_clicked();
 
 private:
     Ui::PrimeWin *ui;           //User interface
@@ -246,4 +260,51 @@ private:
     ItinObj dragDrop;           //Data that's being dragged in the itin
     int pickup;                 //Row of dragged data
 };
+
+/**
+ * @brief This class overloads QTableWidget headers, and gives custom
+ * behavior when the headers are clicked.
+ *
+ * More specifically, this is used to add all stadiums into the itinerary.
+ * @par REQUIREMENTS:
+ * #include <QHeaderView>
+ */
+class myHeaderView : public QHeaderView
+{
+    Q_OBJECT
+public:
+    myHeaderView(QWidget *parent):QHeaderView(Qt::Horizontal)
+    {
+        //Make the headers clickable
+        setSectionsClickable(true);
+
+        //Setup connections within this class and to the calling parent
+        connect(this,SIGNAL(sectionClicked(int)),
+                this,SLOT(sectionClicked(int)));
+        connect(this,SIGNAL(addAllTheStads()),
+                parent,SLOT(catchAddAllStadsCmd()));
+    }
+    ~myHeaderView(){}
+public slots:
+    /**
+     * @brief Emit a signal when the third header is clicked
+     * @param index : Index number of header being clicked
+     */
+    void sectionClicked(int index)
+    {
+        //If the "ADD ALL" header is clicked
+        if (index == 2)
+        {
+            emit addAllTheStads();
+        }
+    }
+signals:
+    /**
+     * @brief Throw a signal back to let PrimeWin know to add all stadiums
+     * into the itinerary
+     * @see PrimeWin::catchAddAllStadsCmd() at line 837 of primewin.cpp
+     */
+    void addAllTheStads();
+};
+
 #endif // PRIMEWIN_H
