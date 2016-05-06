@@ -1056,43 +1056,6 @@ void PrimeWin::on_adminStadTbl_cellChanged(int row, int column)
     data.exportSQL();
 }
 
-// when a cell in admin souvenir is modified
-void PrimeWin::on_adminSouvTable_cellChanged(int row, int column)
-{
-    int stadNum   = ui->adminStadTbl->selectionModel()->currentIndex().row();
-    QString newName;
-    double newPrice;
-    //Grab the input
-    if(row == 0) // if souvenir name is selected
-    {
-        newName = ui->adminSouvTable->item(row,column)->text();
-    }
-    else // if souvenir price is selected
-    {
-        QString newPriceStr = ui->adminSouvTable->item(row,column)->text();
-        newPrice = newPriceStr.toDouble();
-    }
-
-    switch(row)
-    {
-        // Souvenir item name
-        case 0:
-            data.modSouvName(stadNum, column, newName);
-            break;
-        // Souvenir item price
-        case 1:
-            data.modSouvPrice(stadNum, column, newPrice);
-            break;
-    default:
-        QMessageBox::critical(this, tr("Editing Critical Error"),
-                              tr("Row switch case defaulted!"),
-                              QMessageBox::Ok);
-    }
-
-    // update database
-    data.exportSQL();
-}
-
 QString PrimeWin::phoneCheck(QString phone)
 //Validates phone numbers and returns a formatted number
 {
@@ -1254,6 +1217,8 @@ void PrimeWin::on_dataTxtBt_clicked()
 void PrimeWin::refreshSouvenirTableAdmin()
 //Refreshes admin page's souvenir table
 {
+    QSignalBlocker stopSignalsFrom(ui->adminSouvTable);
+
     int stadNum = ui->adminStadTbl->item(ui->adminStadTbl->currentRow(),
                                          0)->text().toInt();
     QTableWidget *widget = ui->adminSouvTable;
@@ -1283,12 +1248,54 @@ void PrimeWin::refreshSouvenirTableAdmin()
     widget->resizeColumnsToContents();
     widget->setRowHeight(0,60);
     widget->setRowHeight(1,60);
+
+    stopSignalsFrom.unblock();
 }
 
 // when an index is selected, the bottom panel will display a list of souvenirs
 // that corresponds to its stadium
 void PrimeWin::on_adminStadTbl_itemSelectionChanged()
-{ refreshSouvenirTableAdmin(); }
+{
+    refreshSouvenirTableAdmin();
+}
+
+// when a cell in admin souvenir is modified
+void PrimeWin::on_adminSouvTable_cellChanged(int row, int column)
+// ***** bug ******
+{
+    int stadNum   = ui->adminStadTbl->selectionModel()->currentIndex().row();
+    QString newName;
+    double newPrice;
+    //Grab the input
+    if(row == 0) // if souvenir name is selected
+    {
+        newName = ui->adminSouvTable->item(row,column)->text();
+    }
+    else // if souvenir price is selected
+    {
+        QString newPriceStr = ui->adminSouvTable->item(row,column)->text();
+        newPrice = newPriceStr.toDouble();
+    }
+
+    switch(row)
+    {
+        // Souvenir item name
+        case 0:
+            data.modSouvName(stadNum, column, newName);
+            break;
+        // Souvenir item price
+        case 1:
+            data.modSouvPrice(stadNum, column, newPrice);
+            break;
+    default:
+        QMessageBox::critical(this, tr("Editing Critical Error"),
+                              tr("Row switch case defaulted!"),
+                              QMessageBox::Ok);
+    }
+
+    // update database
+    data.exportSQL();
+}
 
 // on Add New Souvenir Button
 void PrimeWin::on_pushButton_9_clicked()
@@ -1333,7 +1340,6 @@ void PrimeWin::on_deleteSouvBtn_clicked()
    }
 }
 
-<<<<<<< HEAD
 // Admin Page - On Add New Team (and corresponding stadium) Button
 void PrimeWin::on_addNewTeamBtn_clicked()
 {
@@ -1351,6 +1357,4 @@ void PrimeWin::catchNewTeamData(Data caughtData)
     // update database
     data.exportSQL();
 }
-=======
 
->>>>>>> master

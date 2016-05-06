@@ -53,6 +53,7 @@ void addSouvDialog::on_okBtn_clicked()
         data.addSouv(stadNum, souvName, souvPrice);
         // throw data
         emit throwNewSouvData(data);
+        this->close();
     }
     else // notify user to enter all info
     {

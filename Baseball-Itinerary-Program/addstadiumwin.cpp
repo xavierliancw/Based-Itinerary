@@ -50,7 +50,7 @@ void AddStadiumWin::on_okBtn_clicked()
         // adds new stadium
         data.addStad(stadName, stadAddress, stadPhoneNum,
                      openDate, stadCapacity, turfType, stadType);
-        data.addTeam(data.size()+1, newTeamName, leagueType); // ***causing crashes ***
+        data.addTeam(data.size(), newTeamName, leagueType); // ***causing crashes ***
         emit throwNewTeamData(data);
     }
     else // notify user to enter all info
