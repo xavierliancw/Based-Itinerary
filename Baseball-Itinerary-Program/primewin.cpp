@@ -954,7 +954,9 @@ void PrimeWin::on_itinStartOverBt_clicked()
 //Index 2 to 0
 {
     ui->stackWidg->setCurrentIndex(0);
-    int UNFINISHED;//needs to clear itinerary
+    itinList.clear();
+    refreshItin();
+    calcTrip();
 }
 
 //Struct to represent a stadium in the itinerary
