@@ -530,7 +530,8 @@ void PrimeWin::refreshHomeSouvTbl()
         //Populate second row with souvPrice
         item = new QTableWidgetItem;
         item->setData(0,"$"
-                      + QString::number(data.getSouvPrice(stadNum, x)));
+                      + QString::number(data.getSouvPrice(stadNum,
+                                                          x),'f',2));
         item->setTextAlignment(Qt::AlignCenter);
         widget->setItem(1,x,item);
     }
@@ -1060,6 +1061,10 @@ void PrimeWin::on_adminSouvTable_cellChanged(int row, int column)
     int stadNum   = ui->adminStadTbl->selectionModel()->currentIndex().row();
     QString newName;
     double newPrice;
+    bool ok;
+    QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
+    QLocale us; // Constructs a default QLocale
+
     //Grab the input
     if(row == 0) // if souvenir name is selected
     {
@@ -1067,25 +1072,49 @@ void PrimeWin::on_adminSouvTable_cellChanged(int row, int column)
     }
     else // if souvenir price is selected
     {
+        //Also format and validate
         QString newPriceStr = ui->adminSouvTable->item(row,column)->text();
+        us.toDouble(newPriceStr, &ok);
         newPrice = newPriceStr.toDouble();
+        newPriceStr = QString::number(newPrice, 'f', 2);
+        newPrice = newPriceStr.toDouble();
+        if (newPrice > 99999.99 || newPrice < 0)
+        {
+            ok = false;
+        }
     }
 
     switch(row)
     {
         // Souvenir item name
         case 0:
-            data.modSouvName(stadNum, column, newName);
+            //If the name is left blank, don't do anything
+            if (newName != "")
+            {
+                data.modSouvName(stadNum, column, newName);
+            }
             break;
         // Souvenir item price
         case 1:
-            data.modSouvPrice(stadNum, column, newPrice);
+           //If the price is validated
+            if (ok)
+            {
+                data.modSouvPrice(stadNum, column, newPrice);
+            }
+            else
+            {
+                QMessageBox::warning(this, tr("Souvenir Editing Error"),
+                                     tr("Price must be valid and less"
+                                        " than $99999.99."),
+                                     QMessageBox::Ok);
+            }
             break;
     default:
         QMessageBox::critical(this, tr("Editing Critical Error"),
                               tr("Row switch case defaulted!"),
                               QMessageBox::Ok);
     }
+    refreshSouvenirTableAdmin();
 }
 
 QString PrimeWin::phoneCheck(QString phone)
@@ -1206,6 +1235,16 @@ void PrimeWin::on_adminPrimBt_clicked()
     msgBox.exec();
 }
 
+// Admin Page - On Add New Team (and corresponding stadium) Button
+void PrimeWin::on_addNewTeamBtn_clicked()
+{
+    //Construct new dialog
+    AddStadiumWin newWin(data, this);
+    connect(&newWin,SIGNAL(throwNewTeamData(Data)),
+            this,SLOT(catchNewTeamData(Data)));
+    newWin.exec();
+}
+
 //Index5 - Database Management Page=======================================
 void PrimeWin::on_dataBackBt_clicked()
 //Index 5 to 4
@@ -1249,6 +1288,7 @@ void PrimeWin::on_dataTxtBt_clicked()
 void PrimeWin::refreshSouvenirTableAdmin()
 //Refreshes admin page's souvenir table
 {
+    QSignalBlocker stopSignalsFrom(ui->adminSouvTable);
     int stadNum = ui->adminStadTbl->item(ui->adminStadTbl->currentRow(),
                                          0)->text().toInt();
     QTableWidget *widget = ui->adminSouvTable;
@@ -1272,34 +1312,46 @@ void PrimeWin::refreshSouvenirTableAdmin()
 
         //Populate second row with souvPrice
         item = new QTableWidgetItem;
-        item->setData(0,data.getSouvPrice(stadNum, x));
+        item->setData(0,QString::number(data.getSouvPrice(stadNum,
+                                                          x),'f',2));
         widget->setItem(1,x,item);
     }
     widget->resizeColumnsToContents();
     widget->setRowHeight(0,60);
     widget->setRowHeight(1,60);
+
+    //Update feedback label
+    ui->adminSouvFeedbackLbl->setText("Souvenirs at: "
+                                      + data.getStadName(stadNum));
+    stopSignalsFrom.unblock();
 }
 
 // when an index is selected, the bottom panel will display a list of souvenirs
 // that corresponds to its stadium
 void PrimeWin::on_adminStadTbl_itemSelectionChanged()
-{ refreshSouvenirTableAdmin(); }
+{refreshSouvenirTableAdmin();}
 
 // on Add New Souvenir Button
 void PrimeWin::on_pushButton_9_clicked()
 {
     //Construct new dialog
     addSouvDialog newAddSouvWin(data, this);
-    connect(&newAddSouvWin,SIGNAL(throwNewSouvData(Data)),
-            this,SLOT(catchNewSouvenirData(Data)));
+    connect(&newAddSouvWin,SIGNAL(throwNewSouvData(Data,int)),
+            this,SLOT(catchNewSouvenirData(Data,int)));
     newAddSouvWin.exec();
 }
 
-// process new souvenir data
-void PrimeWin::catchNewSouvenirData(Data caughtData)
+// process new souvenir data and refresh the ui
+void PrimeWin::catchNewSouvenirData(Data caughtData, int stadChanged)
 {
     data = caughtData;
+    ui->adminStadTbl->selectRow(stadChanged);
+    refreshSouvenirTableAdmin();
 }
+
+// process new Team data
+void PrimeWin::catchNewTeamData(Data caughtData)
+{data = caughtData;}
 
 // on Delete Souvenir Button
 void PrimeWin::on_deleteSouvBtn_clicked()
@@ -1317,25 +1369,24 @@ void PrimeWin::on_deleteSouvBtn_clicked()
    }
    else
    {
-       //notify admin to make a selection on souvenir
-       QMessageBox::warning(this, tr("Deletion Error"),
-                            tr("Select a stadium and a souvenir first."),
-                            QMessageBox::Ok);
+       if (stadNum == -1)
+       {
+           //notify admin to make a selection on souvenir
+           QMessageBox::warning(this, tr("Deletion Error"),
+                                tr("Please select a stadium first."),
+                                QMessageBox::Ok);
+       }
+       else if (itemNum == -1)
+       {
+           QMessageBox::warning(this, tr("Deletion Error"),
+                                tr("Please select a souvenir to delete."),
+                                QMessageBox::Ok);
+       }
+       else
+       {
+           qDebug() << "Wow, another kind of error happened in "
+                       "PrimeWin::on_deleteSouvBtn_clicked().";
+       }
    }
 }
 
-// Admin Page - On Add New Team (and corresponding stadium) Button
-void PrimeWin::on_addNewTeamBtn_clicked()
-{
-    //Construct new dialog
-    AddStadiumWin newWin(data, this);
-    connect(&newWin,SIGNAL(throwNewTeamData(Data)),
-            this,SLOT(catchNewTeamData(Data)));
-    newWin.exec();
-}
-
-// process new Team data
-void PrimeWin::catchNewTeamData(Data caughtData)
-{
-    data = caughtData;
-}

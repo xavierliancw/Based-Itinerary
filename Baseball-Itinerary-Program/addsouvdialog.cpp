@@ -14,12 +14,15 @@ addSouvDialog::addSouvDialog(Data inData, QWidget *parent) :
     ui->setupUi(this);
     data = inData;
     stadNum = -1;
+    this->setWindowFlags(this->windowFlags()
+                         & ~Qt::WindowContextHelpButtonHint);
 
     // setup table
     ui->souvTableWidget->clear();
     ui->souvTableWidget->setRowCount(0);
     ui->souvTableWidget->setColumnCount(1);
-    ui->souvTableWidget->setHorizontalHeaderLabels(QStringList() << "Select Stadium");
+    ui->souvTableWidget->setHorizontalHeaderLabels(QStringList()
+                                                   << "Select a Stadium");
     QTableWidgetItem *item; //Item to populate table cell
 
     //Loop to populate table
@@ -31,16 +34,14 @@ addSouvDialog::addSouvDialog(Data inData, QWidget *parent) :
         //Populate second column with stadName
         item = new QTableWidgetItem;
         item->setData(0,data.getStadName(x));
+        item->setTextAlignment(Qt::AlignCenter);
         ui->souvTableWidget->setItem(x,0,item);
     }
     ui->souvTableWidget->resizeColumnsToContents();
 }
 
 addSouvDialog::~addSouvDialog()
-{
-    delete ui;
-}
-
+{delete ui;}
 
 // okay button
 void addSouvDialog::on_okBtn_clicked()
@@ -52,25 +53,35 @@ void addSouvDialog::on_okBtn_clicked()
         double souvPrice = ui->souvPriceDB->value();
         data.addSouv(stadNum, souvName, souvPrice);
         // throw data
-        emit throwNewSouvData(data);
+        emit throwNewSouvData(data, stadNum);
+        this->close();
     }
     else // notify user to enter all info
     {
-        QMessageBox::warning(this, tr("Error"),
-                             tr("Whoops! Missing some info."),
-                             QMessageBox::Ok);
+        if (ui->souvNameLE->text() == "")
+        {
+            QMessageBox::warning(this, tr("Whoops! Missing Some Info!"),
+                                 tr("Name your souvenir."),
+                                 QMessageBox::Ok);
+        }
+        else
+        {
+            QMessageBox::warning(this, tr("Whoops! Missing Some Info!"),
+                                 tr("A stadium is not selected."),
+                                 QMessageBox::Ok);
+        }
     }
 }
 // cancel button
 void addSouvDialog::on_cancelBtn_clicked()
-{
-    this->close();
-}
+{this->close();}
 
 // allows admin to select which stadium they want to add
 // the new souvenir object to
 void addSouvDialog::on_souvTableWidget_itemSelectionChanged()
 {
     stadNum = ui->souvTableWidget->selectionModel()->currentIndex().row();
+    ui->stadFeedbackLbl->setText("Selected Stadium: "
+                                 + data.getStadName(stadNum));
 }
 

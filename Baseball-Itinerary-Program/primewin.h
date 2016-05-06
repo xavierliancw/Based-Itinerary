@@ -205,6 +205,8 @@ private slots:
 
     void on_adminStadTbl_cellChanged(int row, int column);
 
+    void on_adminSouvTable_cellChanged(int row, int column);
+
     //Validates phone numbers and returns a formatted number
     QString phoneCheck(QString phone);
 
@@ -216,7 +218,7 @@ private slots:
     void on_pushButton_9_clicked();
 
     // Catch data from Add New Souv Button
-    void catchNewSouvenirData(Data caughtData);
+    void catchNewSouvenirData(Data caughtData, int stadChanged);
 
     // Catch data from Add New Team Button
     void catchNewTeamData(Data caughtData);
@@ -226,14 +228,12 @@ private slots:
 
     void on_adminPrimBt_clicked();
 
+    void on_addNewTeamBtn_clicked();
+
 //Index5==================================================================
     void on_dataBackBt_clicked();
 
     void on_dataTxtBt_clicked();
-
-    void on_adminSouvTable_cellChanged(int row, int column);
-
-    void on_addNewTeamBtn_clicked();
 
 private:
     Ui::PrimeWin *ui;           //User interface
