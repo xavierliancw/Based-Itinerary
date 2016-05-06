@@ -218,6 +218,8 @@ private slots:
 
     void on_adminDistBt_clicked();
 
+    void changesMade();
+
     void on_adminStadTbl_cellChanged(int row, int column);
 
     void on_adminSouvTable_cellChanged(int row, int column);
