@@ -53,11 +53,7 @@ void addSouvDialog::on_okBtn_clicked()
         double souvPrice = ui->souvPriceDB->value();
         data.addSouv(stadNum, souvName, souvPrice);
         // throw data
-<<<<<<< HEAD
-        emit throwNewSouvData(data);
-=======
         emit throwNewSouvData(data, stadNum);
->>>>>>> master
         this->close();
     }
     else // notify user to enter all info
