@@ -197,6 +197,112 @@ void PrimeWin::refreshItinBuilder()
                                                << "ADD ALL");
 }
 
+void PrimeWin::refreshItinSouv(int stadNum)
+//Refreshes the view of the souvenir list (Index 2)
+{
+    list<ItinObj>::iterator itinPosn;
+    list<int> existingSouv;
+
+    //Look for stadium in itinList
+    for(list<ItinObj>::iterator it = itinList.begin();
+        it != itinList.end(); it++)
+    {
+        //If the stadium is found
+        if(it->getStadNum() == stadNum)
+        {
+            //Push its souvenir into the list
+            for(int i = 0; i < it->getCartSize(); i++)
+            {
+                existingSouv.push_back(it->getSouvNumAt(i));
+            }
+            //Record position
+            itinPosn = it;
+        }
+    }
+    //Sort the list to allow for easy popping
+    if (!existingSouv.empty())
+    {
+        existingSouv.sort();
+    }
+
+    //Refresh the menu's view
+    ui->itinSouvTbl->clear();
+    ui->itinSouvTbl->setColumnCount(data.getSouvListSize(stadNum));
+    ui->itinSouvTbl->setRowCount(2);
+    for (int i = 0; i < data.getSouvListSize(stadNum); i++)
+    {
+        //Construct button to add to wish list
+        QToolButton *addWish = new QToolButton();
+
+        //Construct text label and layout to word wrap
+        QHBoxLayout *boundary = new QHBoxLayout();
+        QLabel *wordWrap = new QLabel();
+        wordWrap->setText(data.getSouvName(stadNum,i) + "\n$"
+                          + QString::number
+                          (data.getSouvPrice(stadNum,i)));
+        wordWrap->setWordWrap(true);
+        wordWrap->setAlignment(Qt::AlignCenter);
+        wordWrap->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
+        wordWrap->setMaximumHeight(100);
+        wordWrap->setMaximumWidth(100);
+        boundary->addWidget(wordWrap);
+        addWish->setText("");
+        addWish->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
+        addWish->setMinimumHeight(100);
+        addWish->setMinimumWidth(100);
+        addWish->setMaximumHeight(100);
+        addWish->setMaximumWidth(100);
+        addWish->setLayout(boundary);
+
+        //Set a custom property to associate souvNum with button
+        addWish->setProperty("souvNum",i);
+
+        //Set a custom property to track if clicked
+        addWish->setProperty("Add/Remove",0);
+
+//        //Connect each button to a public slot in PrimeWindow
+//        connect(addWish, SIGNAL(clicked(bool)),
+//                this, SLOT(addToCart()));
+
+        //Draw the button on the table
+        ui->itinSouvTbl->setCellWidget(0,i,addWish);
+
+        //Add a spinbox to the second row if the souv is found in the itin
+        if (i == existingSouv.front() && !existingSouv.empty())
+        {
+            //Pop the front off of existing souvs
+            existingSouv.pop_front();
+
+            //Construct a quantity spinbox widget
+            QFrame *qtyFrame = new QFrame();
+            QHBoxLayout *qtySpinLayout = new QHBoxLayout();
+            QLabel *qtySpinLbl = new QLabel();
+            QSpinBox *qtySpinBox = new QSpinBox();
+            qtySpinLbl->setText("Qty:");
+            qtySpinBox->setRange(1,99);
+            qtySpinBox->setValue(itinPosn->getQtyFor(i));
+            qtySpinLayout->addWidget(qtySpinLbl);
+            qtySpinLayout->addWidget(qtySpinBox);
+            qtyFrame->setLayout(qtySpinLayout);
+
+            //Set custom property to track location of spinbox
+            qtySpinBox->setProperty("stadNum",stadNum);
+//            qtySpinBox->setProperty("itinPosn",itinPosn);
+            qtySpinBox->setProperty("souvNum",i);
+
+//            //Connect each spinbox to a public slot in MainWindow
+//            connect(qtySpinBox, SIGNAL(valueChanged(int)),
+//                   this, SLOT(updateQuantity(int)));
+
+            //Add frame to ui
+            ui->itinSouvTbl->setCellWidget(1,i,qtyFrame);
+        }
+    }
+
+    ui->itinSouvTbl->resizeColumnsToContents();
+    ui->itinSouvTbl->resizeRowsToContents();
+}
+
 void PrimeWin::refreshItin()
 //Refreshes the itineray view (Index 2)
 {
@@ -393,7 +499,7 @@ void PrimeWin::catchAddItin()
 
     //Refresh the itinerary
     refreshItin();
-    //?????????show possible souvenirs??????????
+    refreshItinSouv(stadNum);
     blockSignals.unblock();
 }
 
@@ -948,6 +1054,11 @@ void PrimeWin::itinSearchFilter(QString filter)
     {
         ui->tableWidget->showRow(items.at(x)->row());
     }
+}
+
+void PrimeWin::on_tableWidget_cellClicked(int row/*, int column*/)
+{
+    refreshItinSouv(row);
 }
 
 void PrimeWin::on_itinStartOverBt_clicked()

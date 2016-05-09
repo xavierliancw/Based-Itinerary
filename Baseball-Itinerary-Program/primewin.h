@@ -21,6 +21,8 @@
 #include <QHeaderView>
 #include <QMovie>
 #include <QStackedLayout>
+#include <QToolButton>
+#include <QSpinBox>
 
 #include "datastructures.h"
 #include "customsorts.h"
@@ -97,6 +99,12 @@ public:
      * @brief Redraw the stadium listing on the itinerary builder page
      */
     void refreshItinBuilder();
+
+    //Refreshes the view of the souvenir list (Index 2)
+    /**
+     * @brief Redraw the souvenir listing on the itinerary builder page
+     */
+    void refreshItinSouv(int stadNum);
 
     //Refreshes the itineray view (Index 2)
     /**
@@ -204,6 +212,8 @@ private slots:
     void on_itinSearchBarLE_textChanged(const QString &arg1);
 
     void itinSearchFilter(QString filter);
+
+    void on_tableWidget_cellClicked(int row/*, int column*/);
 
     void on_itinStartOverBt_clicked();
 
