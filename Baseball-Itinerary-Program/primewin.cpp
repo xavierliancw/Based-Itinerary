@@ -195,11 +195,15 @@ void PrimeWin::refreshItinBuilder()
     ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "Stadium"
                                                << "Team"
                                                << "ADD ALL");
+
+    qDebug() << "itin menu refreshed";
 }
 
 void PrimeWin::refreshItinSouv(int stadNum)
 //Refreshes the view of the souvenir list (Index 2)
 {
+    QSignalBlocker blockSignals(ui->itinSouvTbl);
+
     list<ItinObj>::iterator itinPosn;
     list<int> existingSouv;
 
@@ -217,6 +221,8 @@ void PrimeWin::refreshItinSouv(int stadNum)
             }
             //Record position
             itinPosn = it;
+            it = itinList.end();
+            it--;
         }
     }
     //Sort the list to allow for easy popping
@@ -260,9 +266,9 @@ void PrimeWin::refreshItinSouv(int stadNum)
         //Set a custom property to track if clicked
         addWish->setProperty("Add/Remove",0);
 
-//        //Connect each button to a public slot in PrimeWindow
-//        connect(addWish, SIGNAL(clicked(bool)),
-//                this, SLOT(addToCart()));
+        //Connect each button to a public slot in PrimeWindow
+        connect(addWish, SIGNAL(clicked(bool)),
+                this, SLOT(catchAddWish()));
 
         //Draw the button on the table
         ui->itinSouvTbl->setCellWidget(0,i,addWish);
@@ -287,7 +293,6 @@ void PrimeWin::refreshItinSouv(int stadNum)
 
             //Set custom property to track location of spinbox
             qtySpinBox->setProperty("stadNum",stadNum);
-//            qtySpinBox->setProperty("itinPosn",itinPosn);
             qtySpinBox->setProperty("souvNum",i);
 
 //            //Connect each spinbox to a public slot in MainWindow
@@ -301,6 +306,10 @@ void PrimeWin::refreshItinSouv(int stadNum)
 
     ui->itinSouvTbl->resizeColumnsToContents();
     ui->itinSouvTbl->resizeRowsToContents();
+
+    qDebug() << "souv menu refreshed" << data.getStadName(stadNum);
+
+    blockSignals.unblock();
 }
 
 void PrimeWin::refreshItin()
@@ -316,7 +325,15 @@ void PrimeWin::refreshItin()
     {
         ui->listWidget->addItem(data.getStadName(it->getStadNum()));
     }
+
+    qDebug() << "itin refreshed";
+
     blockSignals.unblock();
+}
+
+void PrimeWin::refreshWishList()
+{
+
 }
 
 void PrimeWin::refreshAdminTbl()
@@ -466,8 +483,7 @@ void PrimeWin::catchAddItin()
         //Add to the itin
         itinList.push_back(ItinObj(stadNum));
 
-        //?????????show possible souvenirs??????????
-        int UNIMPLEMENTED;
+        ui->tableWidget->selectRow(stadNum);
 
         //Change the bt's text to remove
         addBt->setText("Remove");
@@ -500,6 +516,88 @@ void PrimeWin::catchAddItin()
     //Refresh the itinerary
     refreshItin();
     refreshItinSouv(stadNum);
+    blockSignals.unblock();
+}
+
+void PrimeWin::catchAddWish()
+{
+    QSignalBlocker blockSignals(ui->itinSouvTbl);
+
+    QToolButton *addWish;
+    int stadNum;
+    int souvNum;
+    bool stadIsQueued;
+    bool souvIsQueued;
+    list<ItinObj>::iterator itinPos;
+
+    addWish = qobject_cast<QToolButton*>(sender());
+    stadNum = ui->tableWidget->currentRow();
+    souvNum = addWish->property("souvNum").toInt();
+    stadIsQueued = false;
+    souvIsQueued = false;
+
+    for(list<ItinObj>::iterator it = itinList.begin();
+        it != itinList.end(); it++)
+    {
+        if(it->getStadNum() == stadNum)
+        {
+            stadIsQueued = true;
+            itinPos = it;
+
+            for(int i = 0; i < it->getCartSize(); i ++)
+            {
+                if(it->getSouvNumAt(i) == souvNum)
+                {
+                    souvIsQueued = true;
+                    i = it->getCartSize();
+                }
+            }
+
+            it = itinList.end();
+            it --;
+        }
+    }
+
+    if(!stadIsQueued)
+    {
+        itinList.push_back(stadNum);
+        itinPos = itinList.end();
+        itinPos --;
+
+        QPushButton *addBt = new QPushButton();
+        addBt->setText("Remove");
+
+        addBt->setProperty("stadNum", stadNum);
+
+        connect(addBt, SIGNAL(clicked(bool)), this,
+                SLOT(catchAddItin()));
+
+        ui->tableWidget->setCellWidget(stadNum, 2, addBt);
+    }
+
+    if(!souvIsQueued)
+    {
+        itinPos->pushCart(souvNum, 1);
+
+        qDebug() << "cow"
+                 << data.getStadName(itinPos->getStadNum())
+                 << data.getSouvName(itinPos->getStadNum(),
+                                     itinPos->getSouvNumAt(0));
+
+        refreshItinSouv(stadNum);
+    }
+    else
+    {
+        qDebug() << "cowabunga";
+        itinPos->delCart(souvNum);
+        refreshItinSouv(stadNum);
+    }
+
+//    //REFRESH WHISHLIST
+//    bool uninplemented;
+    refreshItin();
+//    refreshItinBuilder();
+
     blockSignals.unblock();
 }
 

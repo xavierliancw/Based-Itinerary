@@ -41,6 +41,7 @@ void ItinObj::delCart(int souvNum)
         //If the souvenir in question is found
         if (itinSouvList.at(x) == souvNum)
         {
+            qDebug() << "really bicth" << x;
             //Delete it
             std::vector<int>::iterator it = itinSouvList.begin() + x;
             itinSouvList.erase(it);
@@ -51,6 +52,7 @@ void ItinObj::delCart(int souvNum)
 
             //Exit loop
             x = itinSouvList.size();
+            qDebug() << "really bicth";
         }
     }
     //Throw an exception if souvenir is not found

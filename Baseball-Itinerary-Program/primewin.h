@@ -112,6 +112,8 @@ public:
      */
     void refreshItin();
 
+    void refreshWishList();
+
     //Refreshes admin stadium table
     /**
      * @brief Redraw the administrator's stadium table that contains all
@@ -145,6 +147,11 @@ public slots:
      * @brief Update itinerary with newly queued or dequeued stadium
      */
     void catchAddItin();
+
+    /**
+     * @brief Update whish list with newly queued or dequeued souvenir
+     */
+    void catchAddWish();
 
     //Event filter to detect drag and drops
     /**
