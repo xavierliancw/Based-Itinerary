@@ -95,6 +95,9 @@ private slots:
     void on_matrixTbl_cellChanged(int row, int column);
 
 private:
+    //Checks if there are any disconnected stadiums
+    bool thereAreDisconnects();
+
     Ui::editdistances *ui;
     Data data;
     bool editOk;
