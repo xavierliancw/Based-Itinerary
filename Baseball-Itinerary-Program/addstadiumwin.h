@@ -53,12 +53,17 @@ private slots:
     void on_nLeagueButn_toggled(bool checked);
 
 
+    void on_stadPhone_editingFinished();
+
 private:
     int stadNum;
     bool aLeague;
     bool nLeague;
     Data data;
     Ui::AddStadiumWin *ui;
+
+    //Validate phone numbers
+    QString phoneCheck(QString phone);
 };
 
 #endif // ADDSTADIUMWIN_H

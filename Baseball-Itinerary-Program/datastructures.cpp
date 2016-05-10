@@ -136,7 +136,7 @@ Data::~Data()
 
 void Data::addStad(QString name, QString address,
                    QString phone, QString opened, int capacity,
-                   QString grass, QString type)
+                   QString grass, QString type, bool manual)
 //Add a stadium to the end of the vector
 {
     StadObj newStad;    //New stadium object
@@ -153,6 +153,28 @@ void Data::addStad(QString name, QString address,
 
     //Push the stadium into the vector (it's vector index is its stadNum)
     masterVect.push_back(newStad);
+
+    //If a user is manually adding a stadium
+    if (manual)
+    {
+        //Resize the distance matrix
+        vector<int> newDists;
+        for (int x = 0; x < (int)size(); x++)
+        {
+            newDists.push_back(-1);
+        }
+        matrix.push_back(newDists);
+        for (int x = 0; x < (int)size(); x++)
+        {
+            matrix.at(x).resize(size());
+        }
+        //Write empty connections
+        for (int x = 0; x < (int)size(); x++)
+        {
+            matrix[size() - 1][x] = -1;
+            matrix[x][size() - 1] = -1;
+        }
+    }
 }
 
 void Data::modStadName(int stadNum, QString newName)
@@ -193,7 +215,7 @@ void Data::delStad(int stadNum)
     bool NOTIMPLEMENTED;
 }
 
-void Data::addTeam(int stadNum, QString newTeam, QString newLeague/*LOGOVARIABLE*/)
+void Data::addTeam(int stadNum, QString newTeam, QString newLeague)
 //Adds a team to stadNum
 {
     TeamObj addingTeam;
@@ -355,7 +377,7 @@ void Data::importSQL()
             addStad(query.value(0).toString(),query.value(1).toString(),
                     query.value(2).toString(),query.value(3).toString(),
                     query.value(4).toInt(),query.value(5).toString(),
-                    query.value(6).toString());
+                    query.value(6).toString(), false);
         }
         //Import teams
         query.exec("SELECT stadnum,name,league FROM teams");

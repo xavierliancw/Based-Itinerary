@@ -1135,6 +1135,57 @@ void PrimeWin::on_adminDistBt_clicked()
 
     //Display the dialog
     newDistDialog.exec();
+
+    //Check for isolated stadiums
+    checkForIsolatedStads();
+}
+
+void PrimeWin::checkForIsolatedStads()
+//Check for stadiums that are not connected to the graph
+{
+    int checker;
+    bool aDisconnectExists = true;
+    QString offendingStad;
+
+    //Loop through all stadiums and check if any have only -1's
+    for (int x = 0; x < data.size(); x++)
+    {
+        aDisconnectExists = true;
+        checker = -1;               //Start with a failure conditions
+
+        //Loop through all possible stadium connections
+        for (int y = 0; y < data.size(); y++)
+        {
+            //If at least one connection exists
+            if (data.getDistBetween(x,y) > -1)
+            {
+                checker++;
+                y = data.size();//Leave loop, check next stad
+            }
+        }
+        //If no connections were found
+        if (checker == -1)
+        {
+            offendingStad = data.getStadName(x);
+            x = data.size();//Leave the loop and return failure condition
+        }
+        //Otherwise this stadium is fine
+        else
+        {
+            aDisconnectExists = false;
+        }
+    }
+    //If there's an isolated stadium, bring up the distance edit window
+    if (aDisconnectExists)
+    {
+        offendingStad += " is not connected. "
+                         "Connect it before proceeding.";
+        QMessageBox::warning(this, tr("Distance Error"),
+                             QObject::tr(qPrintable(offendingStad)),
+                             QMessageBox::Ok);
+        on_adminDistBt_clicked();
+    }
+    //Otherwise, it's all good
 }
 
 void PrimeWin::changesMade()
@@ -1412,6 +1463,14 @@ void PrimeWin::on_addNewTeamBtn_clicked()
     connect(&newWin,SIGNAL(throwNewTeamData(Data)),
             this,SLOT(catchNewTeamData(Data)));
     newWin.exec();
+int UNFINISHED;
+//NEEDS AN IF STATEMENT SO THE FOLLOWING DOESN"T GET CALLED IF USER DECIDES TO CANCEL ADDING A NEW STADIUM
+    //Pull up distance window to prompt user to connect the stadium
+    QMessageBox::information(this, tr("New Stadium"),
+                             tr("Now make at least one connection to "
+                                "another stadium on the map."),
+                             QMessageBox::Ok);
+    on_adminDistBt_clicked();
 }
 
 //Index5 - Database Management Page=======================================

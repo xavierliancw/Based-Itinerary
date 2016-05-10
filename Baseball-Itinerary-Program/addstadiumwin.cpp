@@ -22,11 +22,12 @@ AddStadiumWin::~AddStadiumWin()
 void AddStadiumWin::on_okBtn_clicked()
 {
     // verifies user input all required data
-    if(ui->newNameLE->text() != "" && (aLeague != false || nLeague != false)
-            && ui->stadNameLE->text() != "" && ui->stadPhone->text() != ""
-            && ui->stadAddress->text() != "" && ui->stadCapacity != 0
-            && ui->openDate->text() != "" && ui->turfType->text() != ""
-            && ui->stadType->text() != "")
+    if(ui->newNameLE->text() != ""
+       && (aLeague != false || nLeague != false)
+       && ui->stadNameLE->text() != "" && ui->stadPhone->text() != ""
+       && ui->stadAddress->text() != "" && ui->stadCapacity != 0
+       && ui->openDate->text() != "" && ui->turfType->text() != ""
+       && ui->stadType->text() != "")
     {
         // new team info
         QString newTeamName = ui->newNameLE->text();
@@ -52,20 +53,13 @@ void AddStadiumWin::on_okBtn_clicked()
         // adds new team
         // adds new stadium
         data.addStad(stadName, stadAddress, stadPhoneNum,
-                     openDate, stadCapacity, turfType, stadType);
-        data.addTeam(data.size()-1, newTeamName, leagueType);
-
-//        // assign default souvenirs
-//        data.addSouv(data.size()-1, "Baseball Cap", 23.99);
-//        data.addSouv(data.size()-1, "Baseball Bat", 45.39);
-//        data.addSouv(data.size()-1, "Team Pennant", 15.99);
-//        data.addSouv(data.size()-1, "Autographed Baseball", 19.99);
-//        data.addSouv(data.size()-1, "Team Jersey", 85.99);
+                     openDate, stadCapacity, turfType, stadType, true);
+        data.addTeam(data.size() - 1, newTeamName, leagueType);
 
         emit throwNewTeamData(data);
         this->close();
     }
-    else // notify user to enter all info
+    else // notify user there's missing information
     {
         QMessageBox::warning(this, tr("Error"),
                              tr("Whoops! Missing some info."),
@@ -95,5 +89,119 @@ void AddStadiumWin::on_nLeagueButn_toggled(bool checked)
     if(checked)
     {
        nLeague = true;
+    }
+}
+
+QString AddStadiumWin::phoneCheck(QString phone)
+//Validates phone numbers and returns a formatted number
+{
+    QString bareNumber;     //Cleaned up input
+    bool hasPlus = false;   //Determines if there's a plus or not
+    bool morePlus = false;  //Determines if there are duplicate + signs
+    bool throwGen = false;  //Determines if generic error is necessary
+
+    //Iterate through all characters, keeping only + and numbers
+    for(QString::iterator it = phone.begin(); it != phone.end(); it++)
+    {
+        if (*it == '0' || *it == '1' || *it == '2' || *it == '3'
+            || *it == '4' || *it == '5' || *it == '6' || *it == '7'
+            || *it == '8' || *it == '9' || *it == '+')
+        {
+            bareNumber += *it;
+
+            //If there's a plus, flag it
+            if (*it == '+')
+            {
+                //If hasPlus is already true, then mark flag duplicate
+                if (hasPlus)
+                {
+                    morePlus = true;
+                }
+                //Otherwise just mark it true
+                else
+                {
+                    hasPlus = true;
+    }   }   }   }
+    //Check if there are duplicate +'s
+    if (morePlus)
+    {
+        QMessageBox::warning(this, tr("Invalid Phone Number"),
+                             tr("There can only be one \"+\" in a "
+                                "phone number."),
+                             QMessageBox::Ok);
+        return "NULL";
+    }
+    //Check if phone number is the correct length if it has a +
+    if (hasPlus && (bareNumber.size() - bareNumber.indexOf("+") == 12
+                    || bareNumber.size() - bareNumber.indexOf("+") == 11))
+    {}//It's good, I'm just too lazy to DeMorganize the conditional
+    //Check if phone number has the correct length if there's no +
+    else if (!hasPlus && (bareNumber.size() == 11
+                          || bareNumber.size() == 10))
+    {}//Same deal
+    else
+    {throwGen = true;}
+
+    //Format the number if nothing's wrong
+    if (!throwGen)
+    {
+        //Insert the start of the area code
+        //If there's a +
+        if (hasPlus)
+        {
+            //If the size is 11
+            if (bareNumber.size() - bareNumber.indexOf("+") == 12)
+            {
+                //Insert space after the first character after the +
+                bareNumber.insert(bareNumber.indexOf("+") + 2, " (");
+            }
+            //If the size is 10
+            else
+            {
+                //Insert ( after the +
+                bareNumber.insert(bareNumber.indexOf("+") + 1, "(");
+            }
+        }
+        //If there's no +
+        else
+        {
+            //If size is 11
+            if (bareNumber.size() == 11)
+            {
+                bareNumber.insert(1, " (");
+            }
+            //If size is 10
+            else
+            {
+                bareNumber.insert(0, "(");
+            }
+        }
+        //Finish area code
+        bareNumber.insert(bareNumber.indexOf("(") + 4, ") ");
+        //Add the dash
+        bareNumber.insert(bareNumber.lastIndexOf(" ") + 4,"-");
+        return bareNumber;
+    }
+    //Otherwise throw the generic error
+    else
+    {
+        QMessageBox::warning(this, tr("Invalid Phone Number"),
+                             tr("Phone number is not valid."),
+                             QMessageBox::Ok);
+        return "NULL";
+    }
+}
+
+void AddStadiumWin::on_stadPhone_editingFinished()
+//Validates phone number
+{
+    //Validate the phone number
+    if (phoneCheck(ui->stadPhone->text()) != "NULL")
+    {
+        ui->stadPhone->setText(phoneCheck(ui->stadPhone->text()));
+    }
+    else
+    {
+        ui->stadPhone->clear();
     }
 }
