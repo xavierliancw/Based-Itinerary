@@ -33,30 +33,46 @@ void ItinObj::pushCart(int souvNum, int qty)
 void ItinObj::delCart(int souvNum)
 //Deletes a souvenir from the cart
 {
+//    std::vector<int>::iterator it = itinSouvList.begin();
+    unsigned int index;
     bool found = false; //Validation boolean
 
     //Look for the souvenir in the itinerary
     for (unsigned int x = 0; x < itinSouvList.size(); x++)
+//    for(std::vector<int>::iterator it = itinSouvList.begin();
+//        it != itinSouvList.end(); it ++)
     {
         //If the souvenir in question is found
         if (itinSouvList.at(x) == souvNum)
+//        if(*it == souvNum)
         {
-            qDebug() << "really bicth" << x;
+            qDebug() << "really bicth";
+
             //Delete it
-            std::vector<int>::iterator it = itinSouvList.begin() + x;
-            itinSouvList.erase(it);
-            itinSouvQuant.erase(it);
+//            itinSouvList.erase(itinSouvList.begin()+x);
+//            itinSouvQuant.erase(itinSouvList.begin()+x);
+//            itinSouvList.erase(it);
+//            itinSouvQuant.erase(it);
+//            x--;
 
             //Skip exception
             found = true;
-
-            //Exit loop
-            x = itinSouvList.size();
-            qDebug() << "really bicth";
+            index = x;
         }
+
+//        if(it + 1 != itinSouvList.end())
+//        {
+//            it++;
+//        }
     }
     //Throw an exception if souvenir is not found
-    if (!found)
+    if (found)
+    {
+        qDebug() << "bianca";
+        itinSouvList.erase(itinSouvList.begin() + index);
+        itinSouvQuant.erase(itinSouvList.begin() + index);
+    }
+    else
     {
         qDebug() << "Cannot find souvenir in cart to delete";
     }
@@ -78,9 +94,6 @@ void ItinObj::chgQty(int souvNum, int newQty)
 
             //Skip exception
             found = true;
-
-            //Exit loop
-            x = itinSouvList.size();
         }
     }
     //Throw an exception if souvenir is not found
@@ -114,7 +127,6 @@ int ItinObj::getQtyFor(int souvNum) const
         if (souvNum == itinSouvList.at(x))
         {
             quantity = itinSouvQuant.at(x);
-            x = itinSouvList.size(); //Leave loop
         }
     }
     //Throw an exception if souvenir isn't found

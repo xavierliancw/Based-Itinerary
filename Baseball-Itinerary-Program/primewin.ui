@@ -948,7 +948,7 @@ background-color: qradialgradient(spread:repeat, cx:0.5, cy:0.5, radius:0.5, fx:
            <enum>QTabWidget::Rounded</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="itinTab">
            <attribute name="title">
@@ -1004,17 +1004,17 @@ background-color: qradialgradient(spread:repeat, cx:0.5, cy:0.5, radius:0.5, fx:
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_7">
             <item>
-             <widget class="QTableWidget" name="tableWidget_4"/>
+             <widget class="QTableWidget" name="wishTbl"/>
             </item>
             <item>
-             <widget class="QLabel" name="label_4">
+             <widget class="QLabel" name="totalSouvLbl">
               <property name="text">
                <string># of items</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_15">
+             <widget class="QLabel" name="totalPriceLbl">
               <property name="text">
                <string>grand total</string>
               </property>

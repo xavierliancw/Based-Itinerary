@@ -221,8 +221,6 @@ void PrimeWin::refreshItinSouv(int stadNum)
             }
             //Record position
             itinPosn = it;
-            it = itinList.end();
-            it--;
         }
     }
     //Sort the list to allow for easy popping
@@ -333,7 +331,50 @@ void PrimeWin::refreshItin()
 
 void PrimeWin::refreshWishList()
 {
+    int row = 0;
+    int totalSouv = 0;
+    double totalPrice = 0;
 
+    ui->wishTbl->clear();
+    ui->wishTbl->setRowCount(row);
+    ui->wishTbl->setColumnCount(3);
+
+    for(list<ItinObj>::iterator it = itinList.begin();
+        it != itinList.end(); it++)
+    {
+        for(int i = 0; i < it->getCartSize(); i++)
+        {
+            //Create new row
+            ui->wishTbl->insertRow(row);
+            //Put the stadium name in column 1
+            ui->wishTbl->setItem(row, 0,
+                    new QTableWidgetItem(data.getStadName(it->getStadNum())));
+            //Put the souvenir name in colum 2
+            ui->wishTbl->setItem(row, 1,
+                    new QTableWidgetItem(data.getSouvName(it->getStadNum(),
+                                                          it->getSouvNumAt(i))));
+            //Put the Quantity in coulumn 3
+            ui->wishTbl->setItem(row, 2,
+                    new QTableWidgetItem("x" +QString::number(
+                            it->getQtyFor(it->getSouvNumAt(i)))));
+
+            totalSouv += it->getQtyFor(it->getSouvNumAt(i));
+            totalPrice += it->getQtyFor(it->getSouvNumAt(i)) *
+                    data.getSouvPrice(it->getStadNum(), it->getSouvNumAt(i));
+
+            row++;
+        }
+    }
+    ui->wishTbl->resizeColumnsToContents();
+    ui->wishTbl->setHorizontalHeaderLabels(QStringList() << "Stadium"
+                                               << "Souvenir"
+                                               << "Quantity");
+
+    ui->totalSouvLbl->setText("Total # of Souvenirs: "
+                              + QString::number(totalSouv));
+    ui->totalPriceLbl->setText("Grand Total: $" + QString::number(totalPrice));
+
+    qDebug() << "wish list refreshed";
 }
 
 void PrimeWin::refreshAdminTbl()
@@ -500,9 +541,6 @@ void PrimeWin::catchAddItin()
             {
                 //Remove the stadium from the itinerary queue
                 itinList.erase(it);
-
-                //Leave loop
-                it = itinList.end();
             }
         }
 
@@ -549,18 +587,14 @@ void PrimeWin::catchAddWish()
                 if(it->getSouvNumAt(i) == souvNum)
                 {
                     souvIsQueued = true;
-                    i = it->getCartSize();
                 }
             }
-
-            it = itinList.end();
-            it --;
         }
     }
 
     if(!stadIsQueued)
     {
-        itinList.push_back(stadNum);
+        itinList.push_back(ItinObj(stadNum));
         itinPos = itinList.end();
         itinPos --;
 
@@ -579,24 +613,23 @@ void PrimeWin::catchAddWish()
     {
         itinPos->pushCart(souvNum, 1);
 
-        qDebug() << "cow"
-                 << data.getStadName(itinPos->getStadNum())
-                 << data.getSouvName(itinPos->getStadNum(),
-                                     itinPos->getSouvNumAt(0));
-
         refreshItinSouv(stadNum);
     }
     else
     {
         qDebug() << "cowabunga";
-        itinPos->delCart(souvNum);
+
+//        itinPos->delCart(souvNum);
+
         refreshItinSouv(stadNum);
     }
 
-//    //REFRESH WHISHLIST
-//    bool uninplemented;
+    qDebug() << "kookoo";
+
     refreshItin();
-//    refreshItinBuilder();
+    refreshWishList();
+
+    qDebug() << "kill";
 
     blockSignals.unblock();
 }
