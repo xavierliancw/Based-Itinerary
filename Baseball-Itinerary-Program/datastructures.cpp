@@ -33,6 +33,9 @@ void ItinObj::pushCart(int souvNum, int qty)
 void ItinObj::delCart(int souvNum)
 //Deletes a souvenir from the cart
 {
+    //Iterators
+    std::vector<int>::iterator itSouv = itinSouvList.begin();
+    std::vector<int>::iterator itQuan = itinSouvQuant.begin();
     bool found = false; //Validation boolean
 
     //Look for the souvenir in the itinerary
@@ -42,16 +45,16 @@ void ItinObj::delCart(int souvNum)
         if (itinSouvList.at(x) == souvNum)
         {
             //Delete it
-            std::vector<int>::iterator it = itinSouvList.begin() + x;
-            itinSouvList.erase(it);
-            itinSouvQuant.erase(it);
+            itinSouvList.erase(itSouv);
+            itinSouvQuant.erase(itQuan);
 
             //Skip exception
             found = true;
-
-            //Exit loop
-            x = itinSouvList.size();
         }
+
+        //Increment iterators
+        itSouv++;
+        itQuan++;
     }
     //Throw an exception if souvenir is not found
     if (!found)
@@ -76,9 +79,6 @@ void ItinObj::chgQty(int souvNum, int newQty)
 
             //Skip exception
             found = true;
-
-            //Exit loop
-            x = itinSouvList.size();
         }
     }
     //Throw an exception if souvenir is not found
@@ -112,7 +112,6 @@ int ItinObj::getQtyFor(int souvNum) const
         if (souvNum == itinSouvList.at(x))
         {
             quantity = itinSouvQuant.at(x);
-            x = itinSouvList.size(); //Leave loop
         }
     }
     //Throw an exception if souvenir isn't found

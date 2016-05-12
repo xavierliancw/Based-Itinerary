@@ -21,6 +21,8 @@
 #include <QHeaderView>
 #include <QMovie>
 #include <QStackedLayout>
+#include <QToolButton>
+#include <QSpinBox>
 
 #include "datastructures.h"
 #include "customsorts.h"
@@ -98,11 +100,23 @@ public:
      */
     void refreshItinBuilder();
 
+    //Refreshes the view of the souvenir list (Index 2)
+    /**
+     * @brief Redraw the souvenir listing on the itinerary builder page
+     */
+    void refreshItinSouv(int stadNum);
+
     //Refreshes the itineray view (Index 2)
     /**
      * @brief Redraw the itinerary itself to show any changes made
      */
     void refreshItin();
+
+    //Refreshes the wish list view (Index 2)
+    /**
+     * @brief Redraw the wish list itself to show any changes made
+     */
+    void refreshWishList();
 
     //Refreshes admin stadium table
     /**
@@ -137,6 +151,17 @@ public slots:
      * @brief Update itinerary with newly queued or dequeued stadium
      */
     void catchAddItin();
+
+    /**
+     * @brief Update wish list with newly queued or dequeued souvenir
+     */
+    void catchAddWish();
+
+    /**
+     * @brief Update quantity of queued souvenir
+     * @param caughtThis : New quantity of souvenir
+     */
+    void catchUpdateQuantity(int newQty);
 
     //Event filter to detect drag and drops
     /**
@@ -204,6 +229,8 @@ private slots:
     void on_itinSearchBarLE_textChanged(const QString &arg1);
 
     void itinSearchFilter(QString filter);
+
+    void on_tableWidget_cellClicked(int row/*, int column*/);
 
     void on_itinStartOverBt_clicked();
 
