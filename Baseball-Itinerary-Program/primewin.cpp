@@ -363,7 +363,8 @@ void PrimeWin::refreshWishList()
             ui->wishTbl->setItem(row, 2, new QTableWidgetItem(
                                      "$" + QString::number(
                                          data.getSouvPrice(it->getStadNum(),
-                                                           it->getSouvNumAt(i)))));
+                                                           it->getSouvNumAt(i)),
+                                         'f', 2)));
             //Put the quantity in coulumn 4
             ui->wishTbl->setItem(row, 3, new QTableWidgetItem(
                                      "x" +QString::number(
@@ -373,7 +374,8 @@ void PrimeWin::refreshWishList()
                                      "$" + QString::number(
                                          it->getQtyFor(it->getSouvNumAt(i)) *
                                          data.getSouvPrice(it->getStadNum(),
-                                                           it->getSouvNumAt(i)))));
+                                                           it->getSouvNumAt(i)),
+                                         'f', 2)));
 
             //Update the totalSouv and totalPrice
             totalSouv += it->getQtyFor(it->getSouvNumAt(i));
@@ -390,7 +392,8 @@ void PrimeWin::refreshWishList()
     //Output the total count
     ui->totalSouvLbl->setText("Total number of souvenirs: "
                               + QString::number(totalSouv));
-    ui->totalPriceLbl->setText("Grand Total: $" + QString::number(totalPrice));
+    ui->totalPriceLbl->setText("Grand Total: $" + QString::number(totalPrice,
+                                                                  'f', 2));
 }
 
 void PrimeWin::refreshAdminTbl()
@@ -1241,6 +1244,7 @@ void PrimeWin::itinSearchFilter(QString filter)
 }
 
 void PrimeWin::on_tableWidget_cellClicked(int row/*, int column*/)
+//Updates the souvenier menu
 {
     refreshItinSouv(row);
 }
