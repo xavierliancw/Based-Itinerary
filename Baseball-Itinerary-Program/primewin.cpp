@@ -192,10 +192,119 @@ void PrimeWin::refreshItinBuilder()
         //Put the add button in column 3
         ui->tableWidget->setCellWidget(i, 2, addBt);
     }
-    ui->tableWidget->resizeColumnsToContents();
+
     ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "Stadium"
                                                << "Team"
                                                << "ADD ALL");
+    ui->tableWidget->resizeColumnsToContents();
+}
+
+void PrimeWin::refreshItinSouv(int stadNum)
+//Refreshes the view of the souvenir list (Index 2)
+{
+    QSignalBlocker blockSignals(ui->itinSouvTbl);
+
+    list<ItinObj>::iterator itinPosn;
+    list<int> existingSouv;
+
+    //Look for stadium in itinList
+    for(list<ItinObj>::iterator it = itinList.begin();
+        it != itinList.end(); it++)
+    {
+        //If the stadium is found
+        if(it->getStadNum() == stadNum)
+        {
+            //Push its souvenir into the list
+            for(int i = 0; i < it->getCartSize(); i++)
+            {
+                existingSouv.push_back(it->getSouvNumAt(i));
+            }
+            //Record position
+            itinPosn = it;
+        }
+    }
+    //Sort the list to allow for easy popping
+    if (!existingSouv.empty())
+    {
+        existingSouv.sort();
+    }
+
+    //Refresh the menu's view
+    ui->itinSouvTbl->clear();
+    ui->itinSouvTbl->setColumnCount(data.getSouvListSize(stadNum));
+    ui->itinSouvTbl->setRowCount(2);
+    for (int i = 0; i < data.getSouvListSize(stadNum); i++)
+    {
+        //Construct button to add to wish list
+        QToolButton *addWish = new QToolButton();
+
+        //Construct text label and layout to word wrap
+        QHBoxLayout *boundary = new QHBoxLayout();
+        QLabel *wordWrap = new QLabel();
+        wordWrap->setText(data.getSouvName(stadNum,i) + "\n$"
+                          + QString::number
+                          (data.getSouvPrice(stadNum,i), 'f', 2));
+        wordWrap->setWordWrap(true);
+        wordWrap->setAlignment(Qt::AlignCenter);
+        wordWrap->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
+        wordWrap->setMaximumHeight(100);
+        wordWrap->setMaximumWidth(110);
+        boundary->addWidget(wordWrap);
+        addWish->setText("");
+        addWish->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
+        addWish->setMinimumHeight(100);
+        addWish->setMinimumWidth(110);
+        addWish->setMaximumHeight(100);
+        addWish->setMaximumWidth(110);
+        addWish->setLayout(boundary);
+
+        //Set custom properties
+        addWish->setProperty("souvNum",i);
+        addWish->setProperty("Add/Remove",0);
+
+        //Connect each button to a public slot in PrimeWindow
+        connect(addWish, SIGNAL(clicked(bool)),
+                this, SLOT(catchAddWish()));
+
+        //Draw the button on the table
+        ui->itinSouvTbl->setCellWidget(0,i,addWish);
+
+        //Add a spinbox to the second row if the souv is found in the itin
+        if (i == existingSouv.front() && !existingSouv.empty())
+        {
+            //Pop the front off of existing souvs
+            existingSouv.pop_front();
+
+            //Construct a quantity spinbox widget
+            QFrame *qtyFrame = new QFrame();
+            QHBoxLayout *qtySpinLayout = new QHBoxLayout();
+            QLabel *qtySpinLbl = new QLabel();
+            QSpinBox *qtySpinBox = new QSpinBox();
+            qtySpinLbl->setText("Qty:");
+            qtySpinBox->setRange(1,99);
+            qtySpinBox->setValue(itinPosn->getQtyFor(i));
+            qtySpinLayout->addWidget(qtySpinLbl);
+            qtySpinLayout->addWidget(qtySpinBox);
+            qtyFrame->setLayout(qtySpinLayout);
+
+            //Set custom property to track location of spinbox
+            qtySpinBox->setProperty("stadNum",stadNum);
+            qtySpinBox->setProperty("souvNum",i);
+
+            //Connect each spinbox to a public slot in MainWindow
+            connect(qtySpinBox, SIGNAL(valueChanged(int)),
+                   this, SLOT(catchUpdateQuantity(int)));
+
+            //Add frame to ui
+            ui->itinSouvTbl->setCellWidget(1,i,qtyFrame);
+        }
+    }
+
+    //Resize table
+    ui->itinSouvTbl->resizeColumnsToContents();
+    ui->itinSouvTbl->resizeRowsToContents();
+
+    blockSignals.unblock();
 }
 
 void PrimeWin::refreshItin()
@@ -211,7 +320,81 @@ void PrimeWin::refreshItin()
     {
         ui->listWidget->addItem(data.getStadName(it->getStadNum()));
     }
+
     blockSignals.unblock();
+}
+
+void PrimeWin::refreshWishList()
+//Refreshes the wish list view (Index 2)
+{
+    int row = 0; //row in table
+    int totalSouv = 0; //total number of souvenirs in wish list
+    double totalPrice = 0; //total prive of wish list
+
+    //Clear and set columns and initialize first row
+    ui->wishTbl->clear();
+    ui->wishTbl->setRowCount(row);
+    ui->wishTbl->setColumnCount(5);
+    ui->wishTbl->setHorizontalHeaderLabels(QStringList()
+                                           << "Stadium"
+                                           << "Souvenir"
+                                           << "Price"
+                                           << "Quantity"
+                                           << "Total Price");
+
+    //Go through each stadium in the intin list
+    for(list<ItinObj>::iterator it = itinList.begin();
+        it != itinList.end(); it++)
+    {
+        //Go through cart at eac stadium
+        for(int i = 0; i < it->getCartSize(); i++)
+        {
+            //Create new row
+            ui->wishTbl->insertRow(row);
+
+            //Put the stadium name in column 1
+            ui->wishTbl->setItem(row, 0, new QTableWidgetItem(
+                                     data.getStadName(
+                                         it->getStadNum())));
+            //Put the souvenir name in colum 2
+            ui->wishTbl->setItem(row, 1, new QTableWidgetItem(
+                                     data.getSouvName(it->getStadNum(),
+                                                      it->getSouvNumAt(i))));
+            //Put the price of souvenir in column 3
+            ui->wishTbl->setItem(row, 2, new QTableWidgetItem(
+                                     "$" + QString::number(
+                                         data.getSouvPrice(it->getStadNum(),
+                                                           it->getSouvNumAt(i)),
+                                         'f', 2)));
+            //Put the quantity in coulumn 4
+            ui->wishTbl->setItem(row, 3, new QTableWidgetItem(
+                                     "x" +QString::number(
+                                         it->getQtyFor(it->getSouvNumAt(i)))));
+            //Put the total price in column 5
+            ui->wishTbl->setItem(row, 4, new QTableWidgetItem(
+                                     "$" + QString::number(
+                                         it->getQtyFor(it->getSouvNumAt(i)) *
+                                         data.getSouvPrice(it->getStadNum(),
+                                                           it->getSouvNumAt(i)),
+                                         'f', 2)));
+
+            //Update the totalSouv and totalPrice
+            totalSouv += it->getQtyFor(it->getSouvNumAt(i));
+            totalPrice += it->getQtyFor(it->getSouvNumAt(i)) *
+                    data.getSouvPrice(it->getStadNum(), it->getSouvNumAt(i));
+
+            row++; //move to next row
+        }
+    }
+
+    //Format table columns
+    ui->wishTbl->resizeColumnsToContents();
+
+    //Output the total count
+    ui->totalSouvLbl->setText("Total number of souvenirs: "
+                              + QString::number(totalSouv));
+    ui->totalPriceLbl->setText("Grand Total: $" + QString::number(totalPrice,
+                                                                  'f', 2));
 }
 
 void PrimeWin::refreshAdminTbl()
@@ -361,8 +544,7 @@ void PrimeWin::catchAddItin()
         //Add to the itin
         itinList.push_back(ItinObj(stadNum));
 
-        //?????????show possible souvenirs??????????
-        int UNIMPLEMENTED;
+        ui->tableWidget->selectRow(stadNum);
 
         //Change the bt's text to remove
         addBt->setText("Remove");
@@ -379,9 +561,6 @@ void PrimeWin::catchAddItin()
             {
                 //Remove the stadium from the itinerary queue
                 itinList.erase(it);
-
-                //Leave loop
-                it = itinList.end();
             }
         }
 
@@ -394,7 +573,121 @@ void PrimeWin::catchAddItin()
 
     //Refresh the itinerary
     refreshItin();
-    //?????????show possible souvenirs??????????
+    refreshItinSouv(stadNum);
+    blockSignals.unblock();
+}
+
+void PrimeWin::catchAddWish()
+//Catches signal to update wish list
+{
+    //Block signals to prevent unintended behavior
+    QSignalBlocker blockSignals(ui->itinSouvTbl);
+
+    //Emulated tool button
+    QToolButton *addWish = qobject_cast<QToolButton*>(sender());
+    //Current stadium
+    int stadNum = ui->tableWidget->currentRow();
+    //Current souvenir
+    int souvNum = addWish->property("souvNum").toInt();
+    bool stadIsQueued = false; //If stadium is queued
+    bool souvIsQueued = false; //If souvenir is queued
+    list<ItinObj>::iterator itinPos; //Position of stadium
+
+    //Search for stadium in itinerary
+    for(list<ItinObj>::iterator it = itinList.begin();
+        it != itinList.end(); it++)
+    {
+        if(it->getStadNum() == stadNum)
+        {
+            //If found save iterator
+            stadIsQueued = true;
+            itinPos = it;
+
+            //Search if souvenir is in itinerary
+            for(int i = 0; i < it->getCartSize(); i ++)
+            {
+                if(it->getSouvNumAt(i) == souvNum)
+                {
+                    souvIsQueued = true;
+                }
+            }
+        }
+    }
+
+    //If stadium is not found
+    if(!stadIsQueued)
+    {
+        //Add to Itin and update position iterator
+        itinList.push_back(ItinObj(stadNum));
+        itinPos = itinList.end();
+        itinPos --;
+
+        //Update Add/Remove button
+        QPushButton *addBt = new QPushButton();
+        addBt->setText("Remove");
+        addBt->setProperty("stadNum", stadNum);
+        connect(addBt, SIGNAL(clicked(bool)), this,
+                SLOT(catchAddItin()));
+        ui->tableWidget->setCellWidget(stadNum, 2, addBt);
+    }
+
+    //If souvenir is not found
+    if(!souvIsQueued)
+    {
+        //Add souvenir to cart
+        itinPos->pushCart(souvNum, 1);
+        //Refresh souv menu
+        refreshItinSouv(stadNum);
+    }
+    else
+    {
+        //Remove souvenir from cart
+        itinPos->delCart(souvNum);
+        //Refresh souv menu
+        refreshItinSouv(stadNum);
+    }
+
+    //Refresh itinerary and wish list
+    refreshItin();
+    refreshWishList();
+
+    blockSignals.unblock();
+}
+
+void PrimeWin::catchUpdateQuantity(int newQty)
+//Catches signal to update quantity of souvenir
+{
+    //Block signals to prevent unintended behavior
+    QSignalBlocker blockSignals(ui->itinSouvTbl);
+
+    //Emulated spin box
+    QSpinBox *qtySpinBox = qobject_cast<QSpinBox*>(sender());
+    //Current stadium
+    int stadNum = qtySpinBox->property("stadNum").toInt();
+    //Current souvenir
+    int souvNum = qtySpinBox->property("souvNum").toInt();
+
+    //Search for stadium in itinerary
+    for(list<ItinObj>::iterator it = itinList.begin();
+        it != itinList.end(); it++)
+    {
+        if(it->getStadNum() == stadNum)
+        {
+            //Search for souvenir in cart
+            for(int i = 0; i < it->getCartSize(); i ++)
+            {
+                if(it->getSouvNumAt(i) == souvNum)
+                {
+                    //Update Quantity
+                    it->chgQty(souvNum, newQty);
+                }
+            }
+        }
+    }
+
+    //Refresh wish list
+    refreshWishList();
+
     blockSignals.unblock();
 }
 
@@ -452,6 +745,7 @@ bool PrimeWin::eventFilter(QObject *object, QEvent *event)
 
             //Redraw the itinerary
             refreshItin();
+            refreshWishList();
             calcTrip();
         }
     }
@@ -951,6 +1245,12 @@ void PrimeWin::itinSearchFilter(QString filter)
     }
 }
 
+void PrimeWin::on_tableWidget_cellClicked(int row/*, int column*/)
+//Updates the souvenier menu
+{
+    refreshItinSouv(row);
+}
+
 void PrimeWin::on_itinStartOverBt_clicked()
 //Index 2 to 0
 {
@@ -1079,6 +1379,7 @@ void PrimeWin::on_itinOptimizeBt_clicked()
         //Update itinList to most optimal trip
         itinList = optimal;
         refreshItin();
+        refreshWishList();
         ui->itinDistLbl->setText("Total Distance: "
                                  + QString::number(totalTripDist)
                                  + " miles");
