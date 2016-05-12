@@ -242,19 +242,19 @@ void PrimeWin::refreshItinSouv(int stadNum)
         QLabel *wordWrap = new QLabel();
         wordWrap->setText(data.getSouvName(stadNum,i) + "\n$"
                           + QString::number
-                          (data.getSouvPrice(stadNum,i)));
+                          (data.getSouvPrice(stadNum,i), 'f', 2));
         wordWrap->setWordWrap(true);
         wordWrap->setAlignment(Qt::AlignCenter);
         wordWrap->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
         wordWrap->setMaximumHeight(100);
-        wordWrap->setMaximumWidth(100);
+        wordWrap->setMaximumWidth(110);
         boundary->addWidget(wordWrap);
         addWish->setText("");
         addWish->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
         addWish->setMinimumHeight(100);
-        addWish->setMinimumWidth(100);
+        addWish->setMinimumWidth(110);
         addWish->setMaximumHeight(100);
-        addWish->setMaximumWidth(100);
+        addWish->setMaximumWidth(110);
         addWish->setLayout(boundary);
 
         //Set custom properties
@@ -744,6 +744,7 @@ bool PrimeWin::eventFilter(QObject *object, QEvent *event)
 
             //Redraw the itinerary
             refreshItin();
+            refreshWishList();
             calcTrip();
         }
     }
@@ -1377,6 +1378,7 @@ void PrimeWin::on_itinOptimizeBt_clicked()
         //Update itinList to most optimal trip
         itinList = optimal;
         refreshItin();
+        refreshWishList();
         ui->itinDistLbl->setText("Total Distance: "
                                  + QString::number(totalTripDist)
                                  + " miles");

@@ -1004,7 +1004,17 @@ background-color: qradialgradient(spread:repeat, cx:0.5, cy:0.5, radius:0.5, fx:
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_7">
             <item>
-             <widget class="QTableWidget" name="wishTbl"/>
+             <widget class="QTableWidget" name="wishTbl">
+              <property name="selectionMode">
+               <enum>QAbstractItemView::SingleSelection</enum>
+              </property>
+              <property name="selectionBehavior">
+               <enum>QAbstractItemView::SelectRows</enum>
+              </property>
+              <attribute name="verticalHeaderVisible">
+               <bool>false</bool>
+              </attribute>
+             </widget>
             </item>
             <item>
              <widget class="QLabel" name="totalSouvLbl">
