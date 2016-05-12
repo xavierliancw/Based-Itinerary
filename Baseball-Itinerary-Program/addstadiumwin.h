@@ -9,8 +9,8 @@
 #define ADDSTADIUMWIN_H
 #include <QDialog>
 #include <QMessageBox>
+#include <QIntValidator>
 #include "datastructures.h"
-
 
 namespace Ui {
 class AddStadiumWin;
@@ -45,6 +45,11 @@ signals:
      * @see PrimeWin::catchDataUpdate()
      */
     void throwNewTeamData(Data throwThis);
+
+    /**
+     * @brief Throw command to ask PrimeWin to refresh views
+     */
+    void throwRefreshCmd();
 
 private slots:
     void on_okBtn_clicked();

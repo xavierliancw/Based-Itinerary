@@ -247,6 +247,8 @@ private slots:
 
     void on_adminPrimBt_clicked();
 
+    void newTeamRefresh();
+
     void on_addNewTeamBtn_clicked();
 
 //Index5==================================================================

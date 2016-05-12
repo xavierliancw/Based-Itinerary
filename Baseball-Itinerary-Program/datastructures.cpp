@@ -158,16 +158,13 @@ void Data::addStad(QString name, QString address,
     if (manual)
     {
         //Resize the distance matrix
-        vector<int> newDists;
-        for (int x = 0; x < (int)size(); x++)
+        matrix.resize(masterVect.size());
+        for(int x = 0; x < (int)matrix.size(); x++)
         {
-            newDists.push_back(-1);
+            matrix.at(x).resize(masterVect.size());
         }
-        matrix.push_back(newDists);
-        for (int x = 0; x < (int)size(); x++)
-        {
-            matrix.at(x).resize(size());
-        }
+        adjList.resize(masterVect.size());
+
         //Write empty connections
         for (int x = 0; x < (int)size(); x++)
         {
@@ -781,7 +778,7 @@ struct probject
 int Data::askPrim(vector<pair<int, int> > &edges)
 //Returns cost and edges of Prim's MST
 {
-    MinMeap meap(adjList.size());		//Minimum heap to help algorithm
+    MinMeap meap(size());               //Minimum heap to help algorithm
     int current;                 		//Current vertex
     list<pair<int,int> >::iterator it;	//List iterator
     int totalCost = 0;                  //Total cost of tree
@@ -791,8 +788,8 @@ int Data::askPrim(vector<pair<int, int> > &edges)
     edges.clear();
 
     //Initialize heap and vector of prim objects
-    mstVect.resize(adjList.size());
-    for (int x = 0; x < (int)adjList.size(); x++)
+    mstVect.resize(size());
+    for (int x = 0; x < (int)size(); x++)
     {
         //Initialize starting vertex with 0 cost
         if (x == 0)

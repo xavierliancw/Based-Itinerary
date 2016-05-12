@@ -1448,11 +1448,34 @@ QString PrimeWin::phoneCheck(QString phone)
 void PrimeWin::on_adminPrimBt_clicked()
 //Opens Prim's dialog
 {
+    //Warn user
+    if (ui->adminChangesLbl->text() != "")
+    {
+        QMessageBox::information(this, tr("Warning"),
+                                 tr("MST may not reflect changes made "
+                                    "during this session.\nPlease "
+                                    "save and restart to obtain most "
+                                    "accurate MST."),
+                                 QMessageBox::Ok);
+    }
+
     //Construct new dialog
     MstPrim newPrimDialog(data,this);
 
     //Display the dialog
     newPrimDialog.exec();
+}
+
+void PrimeWin::newTeamRefresh()
+//Prompt user to connect new stad and refreshes the UI to show changes
+{
+    //Pull up distance window to prompt user to connect the stadium
+    QMessageBox::information(this, tr("New Stadium"),
+                             tr("Now make at least one connection to "
+                                "another stadium on the map."),
+                             QMessageBox::Ok);
+    on_adminDistBt_clicked();
+    refreshAdminTbl();
 }
 
 // Admin Page - On Add New Team (and corresponding stadium) Button
@@ -1462,15 +1485,9 @@ void PrimeWin::on_addNewTeamBtn_clicked()
     AddStadiumWin newWin(data, this);
     connect(&newWin,SIGNAL(throwNewTeamData(Data)),
             this,SLOT(catchNewTeamData(Data)));
+    connect(&newWin,SIGNAL(throwRefreshCmd()),
+            this,SLOT(newTeamRefresh()));
     newWin.exec();
-int UNFINISHED;
-//NEEDS AN IF STATEMENT SO THE FOLLOWING DOESN"T GET CALLED IF USER DECIDES TO CANCEL ADDING A NEW STADIUM
-    //Pull up distance window to prompt user to connect the stadium
-    QMessageBox::information(this, tr("New Stadium"),
-                             tr("Now make at least one connection to "
-                                "another stadium on the map."),
-                             QMessageBox::Ok);
-    on_adminDistBt_clicked();
 }
 
 //Index5 - Database Management Page=======================================

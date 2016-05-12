@@ -8,7 +8,6 @@ ui(new Ui::MstPrim)
     ui->setupUi(this);
     this->setWindowFlags(this->windowFlags()
                          & ~Qt::WindowContextHelpButtonHint);
-
     vector<pair<int,int> > edges;       //Vector of edges
     int mileage = data.askPrim(edges);  //Ask Prim to get mileage
     QTableWidgetItem *item;             //QTable item

@@ -5,12 +5,19 @@ AddStadiumWin::AddStadiumWin(Data inData, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::AddStadiumWin)
 {
+    //Gui initialization
     ui->setupUi(this);
+    this->setWindowFlags(this->windowFlags()
+                         & ~Qt::WindowContextHelpButtonHint);
+    QIntValidator *validate = new QIntValidator(0,31,this);
+    ui->openDate->setValidator(validate);
+    QIntValidator *yearVal = new QIntValidator(1839,9999,this);
+    ui->yearLE->setValidator(yearVal);
+
     stadNum = 0;
     aLeague = false;
     nLeague = false;
     data =    inData;
-
 }
 
 AddStadiumWin::~AddStadiumWin()
@@ -27,18 +34,75 @@ void AddStadiumWin::on_okBtn_clicked()
        && ui->stadNameLE->text() != "" && ui->stadPhone->text() != ""
        && ui->stadAddress->text() != "" && ui->stadCapacity != 0
        && ui->openDate->text() != "" && ui->turfType->text() != ""
-       && ui->stadType->text() != "")
+       && ui->stadType->text() != ""
+       && ui->monthBox->currentIndex() != 0
+       && ui->yearLE->text() != "")
     {
+        //Validate date
+        bool dateOk = true;
+        switch (ui->monthBox->currentIndex())
+        {
+        case 2://Feb
+            if (ui->openDate->text().toInt() > 29)
+            {dateOk = false;}
+            break;
+        case 4://Apr
+            if (ui->openDate->text().toInt() > 30)
+            {dateOk = false;}
+            break;
+        case 6://Jun
+            if (ui->openDate->text().toInt() > 30)
+            {dateOk = false;}
+            break;
+        case 9://Sep
+            if (ui->openDate->text().toInt() > 30)
+            {dateOk = false;}
+            break;
+        case 11://Nov
+            if (ui->openDate->text().toInt() > 30)
+            {dateOk = false;}
+            break;
+        }
+        //If a year is entered before baseball was invented
+        if (ui->yearLE->text().toInt() < 1839)
+        {dateOk = false;}
+
+        //Stop this function if a date is invalid
+        if (!dateOk)
+        {
+            QMessageBox::warning(this, tr("Date Error"),
+                                 tr("Check the date."),
+                                 QMessageBox::Ok);
+            return;
+        }
+        //Format date for storage
+        QString formattedDate = "";
+
+        if (ui->openDate->text().toInt() < 10)
+        {
+            formattedDate.append("0");
+        }
+        formattedDate.append(ui->openDate->text());
+        formattedDate.append(" ");
+        if (ui->monthBox->currentIndex() < 10)
+        {
+            formattedDate.append("0");
+        }
+        formattedDate.append(QString::number(ui->monthBox
+                                               ->currentIndex()));
+        formattedDate.append(" ");
+        formattedDate.append(ui->yearLE->text());
+
         // new team info
         QString newTeamName = ui->newNameLE->text();
         QString leagueType;
         if(aLeague)
         {
-            leagueType = "American League";
+            leagueType = "American";
         }
         else
         {
-           leagueType = "National League";
+           leagueType = "National";
         }
         // new stadium info
         QString stadName     = ui->stadNameLE->text();
@@ -46,17 +110,17 @@ void AddStadiumWin::on_okBtn_clicked()
         QString stadAddress  = ui->stadAddress->text();
         int stadCapacity     = ui->stadCapacity->value();
         QString turfType     = ui->turfType->text();
-        QString openDate     = ui->openDate->text();
         QString stadType     = ui->stadType->text();
 
         // fill data, then emit data
         // adds new team
         // adds new stadium
-        data.addStad(stadName, stadAddress, stadPhoneNum,
-                     openDate, stadCapacity, turfType, stadType, true);
+        data.addStad(stadName, stadAddress, stadPhoneNum, formattedDate,
+                     stadCapacity, turfType, stadType, true);
         data.addTeam(data.size() - 1, newTeamName, leagueType);
 
         emit throwNewTeamData(data);
+        emit throwRefreshCmd();
         this->close();
     }
     else // notify user there's missing information
