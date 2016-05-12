@@ -1009,14 +1009,14 @@ background-color: qradialgradient(spread:repeat, cx:0.5, cy:0.5, radius:0.5, fx:
             <item>
              <widget class="QLabel" name="totalSouvLbl">
               <property name="text">
-               <string># of items</string>
+               <string>Total number of souvenirs:</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QLabel" name="totalPriceLbl">
               <property name="text">
-               <string>grand total</string>
+               <string>Grand Total:</string>
               </property>
              </widget>
             </item>

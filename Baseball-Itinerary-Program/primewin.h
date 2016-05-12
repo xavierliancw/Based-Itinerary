@@ -112,6 +112,10 @@ public:
      */
     void refreshItin();
 
+    //Refreshes the wish list view (Index 2)
+    /**
+     * @brief Redraw the wish list itself to show any changes made
+     */
     void refreshWishList();
 
     //Refreshes admin stadium table
@@ -149,9 +153,15 @@ public slots:
     void catchAddItin();
 
     /**
-     * @brief Update whish list with newly queued or dequeued souvenir
+     * @brief Update wish list with newly queued or dequeued souvenir
      */
     void catchAddWish();
+
+    /**
+     * @brief Update quantity of queued souvenir
+     * @param caughtThis : New quantity of souvenir
+     */
+    void catchUpdateQuantity(int newQty);
 
     //Event filter to detect drag and drops
     /**

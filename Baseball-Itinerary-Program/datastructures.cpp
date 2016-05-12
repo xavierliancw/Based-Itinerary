@@ -33,46 +33,31 @@ void ItinObj::pushCart(int souvNum, int qty)
 void ItinObj::delCart(int souvNum)
 //Deletes a souvenir from the cart
 {
-//    std::vector<int>::iterator it = itinSouvList.begin();
-    unsigned int index;
+    //Iterators
+    std::vector<int>::iterator itSouv = itinSouvList.begin();
+    std::vector<int>::iterator itQuan = itinSouvQuant.begin();
     bool found = false; //Validation boolean
 
     //Look for the souvenir in the itinerary
     for (unsigned int x = 0; x < itinSouvList.size(); x++)
-//    for(std::vector<int>::iterator it = itinSouvList.begin();
-//        it != itinSouvList.end(); it ++)
     {
         //If the souvenir in question is found
         if (itinSouvList.at(x) == souvNum)
-//        if(*it == souvNum)
         {
-            qDebug() << "really bicth";
-
             //Delete it
-//            itinSouvList.erase(itinSouvList.begin()+x);
-//            itinSouvQuant.erase(itinSouvList.begin()+x);
-//            itinSouvList.erase(it);
-//            itinSouvQuant.erase(it);
-//            x--;
+            itinSouvList.erase(itSouv);
+            itinSouvQuant.erase(itQuan);
 
             //Skip exception
             found = true;
-            index = x;
         }
 
-//        if(it + 1 != itinSouvList.end())
-//        {
-//            it++;
-//        }
+        //Increment iterators
+        itSouv++;
+        itQuan++;
     }
     //Throw an exception if souvenir is not found
-    if (found)
-    {
-        qDebug() << "bianca";
-        itinSouvList.erase(itinSouvList.begin() + index);
-        itinSouvQuant.erase(itinSouvList.begin() + index);
-    }
-    else
+    if (!found)
     {
         qDebug() << "Cannot find souvenir in cart to delete";
     }
