@@ -135,7 +135,7 @@ Data::~Data()
 
 void Data::addStad(QString name, QString address,
                    QString phone, QString opened, int capacity,
-                   QString grass, QString type)
+                   QString grass, QString type, bool manual)
 //Add a stadium to the end of the vector
 {
     StadObj newStad;    //New stadium object
@@ -152,6 +152,25 @@ void Data::addStad(QString name, QString address,
 
     //Push the stadium into the vector (it's vector index is its stadNum)
     masterVect.push_back(newStad);
+
+    //If a user is manually adding a stadium
+    if (manual)
+    {
+        //Resize the distance matrix
+        matrix.resize(masterVect.size());
+        for(int x = 0; x < (int)matrix.size(); x++)
+        {
+            matrix.at(x).resize(masterVect.size());
+        }
+        adjList.resize(masterVect.size());
+
+        //Write empty connections
+        for (int x = 0; x < (int)size(); x++)
+        {
+            matrix[size() - 1][x] = -1;
+            matrix[x][size() - 1] = -1;
+        }
+    }
 }
 
 void Data::modStadName(int stadNum, QString newName)
@@ -192,7 +211,7 @@ void Data::delStad(int stadNum)
     bool NOTIMPLEMENTED;
 }
 
-void Data::addTeam(int stadNum, QString newTeam, QString newLeague/*LOGOVARIABLE*/)
+void Data::addTeam(int stadNum, QString newTeam, QString newLeague)
 //Adds a team to stadNum
 {
     TeamObj addingTeam;
@@ -354,7 +373,7 @@ void Data::importSQL()
             addStad(query.value(0).toString(),query.value(1).toString(),
                     query.value(2).toString(),query.value(3).toString(),
                     query.value(4).toInt(),query.value(5).toString(),
-                    query.value(6).toString());
+                    query.value(6).toString(), false);
         }
         //Import teams
         query.exec("SELECT stadnum,name,league FROM teams");
@@ -758,7 +777,7 @@ struct probject
 int Data::askPrim(vector<pair<int, int> > &edges)
 //Returns cost and edges of Prim's MST
 {
-    MinMeap meap(adjList.size());		//Minimum heap to help algorithm
+    MinMeap meap(size());               //Minimum heap to help algorithm
     int current;                 		//Current vertex
     list<pair<int,int> >::iterator it;	//List iterator
     int totalCost = 0;                  //Total cost of tree
@@ -768,8 +787,8 @@ int Data::askPrim(vector<pair<int, int> > &edges)
     edges.clear();
 
     //Initialize heap and vector of prim objects
-    mstVect.resize(adjList.size());
-    for (int x = 0; x < (int)adjList.size(); x++)
+    mstVect.resize(size());
+    for (int x = 0; x < (int)size(); x++)
     {
         //Initialize starting vertex with 0 cost
         if (x == 0)

@@ -279,6 +279,7 @@ private:
  * #include <QDir>           <br>
  * #include <QFile>          <br>
  * #include <QTextStream>    <br>
+ * #include <QDate>          <br>
  * #include "minmeap.h"      <br>
  * using namespace std;
  * @warning This class does not have exception handling
@@ -304,7 +305,7 @@ public:
      */
     void addStad(QString name, QString address,
                  QString phone, QString opened, int capacity,
-                 QString grass, QString type);
+                 QString grass, QString type, bool manual);
     //Change a stadium's name
     /**
      * @brief Modify a stadium's name

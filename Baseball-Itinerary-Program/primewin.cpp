@@ -60,6 +60,7 @@ PrimeWin::PrimeWin(QWidget *parent, int dummyVarForNow) :
     //Keystroke to pull up admin login window
     new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return),
                   this, SLOT(on_adminLoginBt_clicked()));
+
 }
 
 void PrimeWin::refreshHomeTbl(vector<int> stadNumOrder)
@@ -1435,6 +1436,57 @@ void PrimeWin::on_adminDistBt_clicked()
 
     //Display the dialog
     newDistDialog.exec();
+
+    //Check for isolated stadiums
+    checkForIsolatedStads();
+}
+
+void PrimeWin::checkForIsolatedStads()
+//Check for stadiums that are not connected to the graph
+{
+    int checker;
+    bool aDisconnectExists = true;
+    QString offendingStad;
+
+    //Loop through all stadiums and check if any have only -1's
+    for (int x = 0; x < data.size(); x++)
+    {
+        aDisconnectExists = true;
+        checker = -1;               //Start with a failure conditions
+
+        //Loop through all possible stadium connections
+        for (int y = 0; y < data.size(); y++)
+        {
+            //If at least one connection exists
+            if (data.getDistBetween(x,y) > -1)
+            {
+                checker++;
+                y = data.size();//Leave loop, check next stad
+            }
+        }
+        //If no connections were found
+        if (checker == -1)
+        {
+            offendingStad = data.getStadName(x);
+            x = data.size();//Leave the loop and return failure condition
+        }
+        //Otherwise this stadium is fine
+        else
+        {
+            aDisconnectExists = false;
+        }
+    }
+    //If there's an isolated stadium, bring up the distance edit window
+    if (aDisconnectExists)
+    {
+        offendingStad += " is not connected. "
+                         "Connect it before proceeding.";
+        QMessageBox::warning(this, tr("Distance Error"),
+                             QObject::tr(qPrintable(offendingStad)),
+                             QMessageBox::Ok);
+        on_adminDistBt_clicked();
+    }
+    //Otherwise, it's all good
 }
 
 void PrimeWin::changesMade()
@@ -1697,11 +1749,34 @@ QString PrimeWin::phoneCheck(QString phone)
 void PrimeWin::on_adminPrimBt_clicked()
 //Opens Prim's dialog
 {
+    //Warn user
+    if (ui->adminChangesLbl->text() != "")
+    {
+        QMessageBox::information(this, tr("Warning"),
+                                 tr("MST may not reflect changes made "
+                                    "during this session.\nPlease "
+                                    "save and restart to obtain most "
+                                    "accurate MST."),
+                                 QMessageBox::Ok);
+    }
+
     //Construct new dialog
     MstPrim newPrimDialog(data,this);
 
     //Display the dialog
     newPrimDialog.exec();
+}
+
+void PrimeWin::newTeamRefresh()
+//Prompt user to connect new stad and refreshes the UI to show changes
+{
+    //Pull up distance window to prompt user to connect the stadium
+    QMessageBox::information(this, tr("New Stadium"),
+                             tr("Now make at least one connection to "
+                                "another stadium on the map."),
+                             QMessageBox::Ok);
+    on_adminDistBt_clicked();
+    refreshAdminTbl();
 }
 
 // Admin Page - On Add New Team (and corresponding stadium) Button
@@ -1711,6 +1786,8 @@ void PrimeWin::on_addNewTeamBtn_clicked()
     AddStadiumWin newWin(data, this);
     connect(&newWin,SIGNAL(throwNewTeamData(Data)),
             this,SLOT(catchNewTeamData(Data)));
+    connect(&newWin,SIGNAL(throwRefreshCmd()),
+            this,SLOT(newTeamRefresh()));
     newWin.exec();
 }
 
@@ -1759,6 +1836,7 @@ void PrimeWin::refreshSouvenirTableAdmin()
 //Refreshes admin page's souvenir table
 {
     QSignalBlocker stopSignalsFrom(ui->adminSouvTable);
+
     int stadNum = ui->adminStadTbl->item(ui->adminStadTbl->currentRow(),
                                          0)->text().toInt();
     QTableWidget *widget = ui->adminSouvTable;
@@ -1799,7 +1877,9 @@ void PrimeWin::refreshSouvenirTableAdmin()
 // when an index is selected, the bottom panel will display a list of souvenirs
 // that corresponds to its stadium
 void PrimeWin::on_adminStadTbl_itemSelectionChanged()
-{refreshSouvenirTableAdmin();}
+{
+    refreshSouvenirTableAdmin();
+}
 
 // on Add New Souvenir Button
 void PrimeWin::on_pushButton_9_clicked()
@@ -1861,3 +1941,4 @@ void PrimeWin::on_deleteSouvBtn_clicked()
        }
    }
 }
+

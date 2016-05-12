@@ -245,6 +245,8 @@ private slots:
 
     void on_adminDistBt_clicked();
 
+    void checkForIsolatedStads();
+
     void changesMade();
 
     void on_adminStadTbl_cellChanged(int row, int column);
@@ -271,6 +273,8 @@ private slots:
     void on_deleteSouvBtn_clicked();
 
     void on_adminPrimBt_clicked();
+
+    void newTeamRefresh();
 
     void on_addNewTeamBtn_clicked();
 
