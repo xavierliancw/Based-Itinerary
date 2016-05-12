@@ -1499,6 +1499,7 @@ void PrimeWin::on_adminStadTbl_cellChanged(int row, int column)
     QString input;
     QIntValidator validate(1,1000000,NULL);
     int valid = 0;
+    QDate validQuestion;
 
     //Grab the input
     input = ui->adminStadTbl->item(row,column)->text();
@@ -1564,8 +1565,34 @@ void PrimeWin::on_adminStadTbl_cellChanged(int row, int column)
         data.modStadGrass(row,input);
         break;
     case 8://Opened
-        data.modStadOpened(row,input);
-        int ValidateThis;
+        //Validate date
+        validQuestion = QDate::fromString(input,"dd MM yyyy");
+        if(validQuestion.isValid())
+        {
+            //Validate year to year baseball was invented
+            if (validQuestion.year() >= 1839)
+            {
+                data.modStadOpened(row,input);
+            }
+            //Otherwise show an error
+            else
+            {
+                QMessageBox::warning(this, tr("Editing Error"),
+                                     tr("Invalid date.\nDate must be "
+                                        "after the year 1839, when "
+                                        "baseball was invented."),
+                                     QMessageBox::Ok);
+            }
+        }
+        //If not valid, show an error
+        else
+        {
+            QMessageBox::warning(this, tr("Editing Error"),
+                                 tr("Invalid date.\nDate must be "
+                                    "formatted dd mm yyyy.\ne.g. 12 05 "
+                                    "2016 for May 12, 2016."),
+                                 QMessageBox::Ok);
+        }
         break;
     case 9://Type
         data.modStadType(row,input);
@@ -1909,7 +1936,8 @@ void PrimeWin::on_deleteSouvBtn_clicked()
 {
    // get selected row
    int stadNum = ui->adminStadTbl->selectionModel()->currentIndex().row();
-   int itemNum = ui->adminSouvTable->selectionModel()->currentIndex().column();
+   int itemNum = ui->adminSouvTable->selectionModel()
+                   ->currentIndex().column();
 
    // error checking
    if(stadNum != -1 && itemNum != -1)

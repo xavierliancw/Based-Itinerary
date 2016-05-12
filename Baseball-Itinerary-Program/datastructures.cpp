@@ -189,7 +189,7 @@ void Data::modStadOpened(int stadNum, QString newOpened)
 //Modifies opening date of stadNum
 {
     masterVect.at(stadNum).opened
-            = QDate::fromString(newOpened,"MMMM dd, yyyy");
+            = QDate::fromString(newOpened,"dd MM yyyy");
 }
 
 void Data::modStadCapacity(int stadNum, int newCapacity)
@@ -266,7 +266,6 @@ void Data::deleteSouv(int stadNum, int souvNum)
     {
         qDebug() << "Error: Can't remove souvenir *** Out of Range ***";
     }
-
 }
 
 /**
