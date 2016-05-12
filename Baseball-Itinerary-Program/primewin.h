@@ -52,6 +52,13 @@ class PrimeWin;
  * #include <QMessageBox>       <br>
  * #include <QFileSystemModel>  <br>
  * #include <QSignalBlocker>    <br>
+ * #include <QDragEnterEvent>   <br>
+ * #include <QDate>             <br>
+ * #include <QHeaderView>       <br>
+ * #include <QMovie>            <br>
+ * #include <QStackedLayout>    <br>
+ * #include <QToolButton>       <br>
+ * #include <QSpinBox>          <br>
  * #include "datastructures.h"  <br>
  * #include "customsorts.h"     <br>
  * #include "adminlogin.h"      <br>
