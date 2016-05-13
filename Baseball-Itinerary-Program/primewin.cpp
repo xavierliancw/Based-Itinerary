@@ -49,6 +49,7 @@ PrimeWin::PrimeWin(QWidget *parent, int dummyVarForNow) :
     movieLabel->setAlignment(Qt::AlignCenter);
     QStackedLayout *stackLay = new QStackedLayout;
     stackLay->addWidget(ui->frame_17);
+    stackLay->addWidget(ui->frame_19);
     stackLay->addWidget(movieLabel);
     stackLay->setStackingMode(QStackedLayout::StackAll);
     QVBoxLayout *lay = new QVBoxLayout;
