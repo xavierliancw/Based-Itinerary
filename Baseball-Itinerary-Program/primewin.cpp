@@ -41,6 +41,9 @@ PrimeWin::PrimeWin(QWidget *parent, int dummyVarForNow) :
             ->setDefaultAlignment(Qt::AlignLeft);
     ui->listWidget->viewport()->installEventFilter(this);
     ui->tableWidget->setHorizontalHeader(new myHeaderView(this));
+    ui->totalSouvLbl->setText("Total Number of Souvenirs: 0");
+    ui->totalPriceLbl->setText("Grand Total: $0.00");
+    ui->tabWidget->setCurrentIndex(0);
 
     //Setup start screen's gif
     QMovie *titleMovie = new QMovie(":/defaults/title.gif");
@@ -392,10 +395,10 @@ void PrimeWin::refreshWishList()
     ui->wishTbl->resizeColumnsToContents();
 
     //Output the total count
-    ui->totalSouvLbl->setText("Total number of souvenirs: "
+    ui->totalSouvLbl->setText("Total Number of Souvenirs: "
                               + QString::number(totalSouv));
-    ui->totalPriceLbl->setText("Grand Total: $" + QString::number(totalPrice,
-                                                                  'f', 2));
+    ui->totalPriceLbl->setText("Grand Total: $"
+                               + QString::number(totalPrice, 'f', 2));
 }
 
 void PrimeWin::refreshAdminTbl()
@@ -840,6 +843,10 @@ void PrimeWin::on_startTripBt_clicked()
 //Index 0 to 2
 {
     refreshItinBuilder();
+    refreshItinSouv(0);
+    ui->tableWidget->selectRow(0);
+    ui->tabWidget->setCurrentIndex(0);
+    ui->wishTbl->setColumnCount(0);
     ui->stackWidg->setCurrentIndex(2);
 }
 
@@ -1255,7 +1262,11 @@ void PrimeWin::on_itinStartOverBt_clicked()
 //Index 2 to 0
 {
     ui->stackWidg->setCurrentIndex(0);
+    ui->wishTbl->clear();
+    ui->wishTbl->setRowCount(0);
     itinList.clear();
+    ui->totalSouvLbl->setText("Total Number of Souvenirs: 0");
+    ui->totalPriceLbl->setText("Grand Total: $0.00");
     refreshItin();
     calcTrip();
 }

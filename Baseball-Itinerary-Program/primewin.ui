@@ -1032,7 +1032,7 @@ background-color: qradialgradient(spread:repeat, cx:0.5, cy:0.5, radius:0.5, fx:
            <enum>QTabWidget::Rounded</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="itinTab">
            <attribute name="title">
@@ -1089,6 +1089,9 @@ background-color: qradialgradient(spread:repeat, cx:0.5, cy:0.5, radius:0.5, fx:
            <layout class="QVBoxLayout" name="verticalLayout_7">
             <item>
              <widget class="QTableWidget" name="wishTbl">
+              <property name="editTriggers">
+               <set>QAbstractItemView::NoEditTriggers</set>
+              </property>
               <property name="selectionMode">
                <enum>QAbstractItemView::SingleSelection</enum>
               </property>
