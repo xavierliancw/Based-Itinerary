@@ -1234,13 +1234,6 @@ background-color: qradialgradient(spread:repeat, cx:0.5, cy:0.5, radius:0.5, fx:
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <item>
-            <widget class="QPushButton" name="pushButton_3">
-             <property name="text">
-              <string>PushButton</string>
-             </property>
-            </widget>
-           </item>
-           <item>
             <spacer name="horizontalSpacer_12">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -1266,16 +1259,16 @@ background-color: qradialgradient(spread:repeat, cx:0.5, cy:0.5, radius:0.5, fx:
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_4">
            <item>
-            <widget class="QPushButton" name="pushButton_4">
+            <widget class="QPushButton" name="sumBackBt">
              <property name="text">
-              <string>PushButton</string>
+              <string>Back</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButton">
+            <widget class="QPushButton" name="sumFinishBt">
              <property name="text">
-              <string>PushButton</string>
+              <string>Finish</string>
              </property>
             </widget>
            </item>
@@ -1286,6 +1279,7 @@ background-color: qradialgradient(spread:repeat, cx:0.5, cy:0.5, radius:0.5, fx:
          <widget class="QTextEdit" name="sumOutputLE">
           <property name="font">
            <font>
+            <family>Courier New</family>
             <pointsize>10</pointsize>
            </font>
           </property>

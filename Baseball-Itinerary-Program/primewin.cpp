@@ -488,14 +488,14 @@ void PrimeWin::calcTrip()
     list<ItinObj>::iterator it;
     deque<int> distMap;
     int tripDist = 0;
-
+    vector<int> paths;
 
     it = itinList.begin();
 
     while (it != itinList.end())
     {
         //Ask Dijkstra for distances to all other vertices from iterator
-        distMap = data.askDijkstra((*it).getStadNum());
+        distMap = data.askDijkstra((*it).getStadNum(), paths);
 
         //Look at next stadium in the itin
         it++;
@@ -1311,6 +1311,7 @@ void PrimeWin::on_itinOptimizeBt_clicked()
         pair<int,int> stadDist;             //stadNum/dist pair
         list<pair<int,int> > sortThese;     //List that gets sorted
         int totalTripDist = 0;              //Tracks trip distance
+        vector<int> paths;                  //Tracks paths
 
         //Initialize valid/visited map such that all are invalid/unvisted
         for (int x = 0; x < (int)data.size(); x++)
@@ -1336,7 +1337,8 @@ void PrimeWin::on_itinOptimizeBt_clicked()
             valvisMap.at(optimal.back().getStadNum()).second = true;
 
             //Ask Dijkstra for shortest paths from optimal's back
-            djMap = data.askDijkstra(optimal.back().getStadNum());//elogn
+            djMap = data.askDijkstra(optimal.back().getStadNum(),
+                                     paths);//elogn
 
             //Build a list of VALID & UNVISITED stads
             for (int x = 0; x < (int)djMap.size(); x++)//O(n), n = # stads
@@ -1397,23 +1399,124 @@ void PrimeWin::on_itinOptimizeBt_clicked()
 
 void PrimeWin::on_itinFinalizeBt_clicked()
 {
+    const int STAD_WID = 28;
+    const int SOUV_NAME_WID = 20;
+    const int SOUV_PRICE_WID = 5;
+    const int SOUV_QTY_WID = 2;
+    const int TOTAL_PRICE_WID = 7;
+
+    list<ItinObj>::iterator it;
+    list<ItinObj>::iterator it2;
+    int stadListIndex;
+    int stadNum;
+    QString stadName;
+    int souvNum;
+    QString souvName;
+    double souvPrice;
+    int souvQty;
     QString finalOutput;
+    int stadNum2;
+    QString stadName2;
+    deque<int> distances;
+    vector<int> parents;
+    vector<int> path;
+    int pathIndex;
 
-    finalOutput.append("cute\n");
+    stadListIndex = 1;
 
-    for(list<ItinObj>::iterator it = itinList.begin();
-        it != itinList.end(); it++)
+    finalOutput.append("    STADIUM" + QString(24, ' ') +
+                       "SOUVENIR" + QString(13, ' ') +
+                       "PRICE  #   TOTAL\n" + QString(75, '-') + "\n");
+
+    it2 = itinList.begin();
+    it2 ++;
+    for(it = itinList.begin(); it != itinList.end(); it++)
     {
-        finalOutput.append(data.getStadName(it->getStadNum()));
-        finalOutput.append("\n");
+        stadNum = it->getStadNum();
+        stadName = data.getStadName(stadNum);
+
+        finalOutput.append(QString(2 - QString::number(
+                                       stadListIndex).size(), ' ') +
+                           QString::number(stadListIndex) + ". " +
+                           stadName +
+                           QString(STAD_WID - stadName.size(), ' '));
+        stadListIndex ++;
 
         for(int i = 0; i < it->getCartSize(); i ++)
         {
-            finalOutput.append(" - ");
-            finalOutput.append(data.getSouvName(it->getStadNum(),
-                                                it->getSouvNumAt(i)));
-            finalOutput.append("\n");
+            souvNum = it->getSouvNumAt(i);
+            souvName = data.getSouvName(stadNum, souvNum);
+            souvPrice = data.getSouvPrice(stadNum, souvNum);
+            souvQty = it->getQtyFor(souvNum);
+
+            if(i > 0)
+            {
+                finalOutput.append(QString(STAD_WID, ' ') + "    ");
+            }
+            finalOutput.append(" - " + souvName +
+                               QString(SOUV_NAME_WID - souvName.size(),
+                                       ' ') +
+                               " $" +
+                               QString(SOUV_PRICE_WID - QString::number(
+                                           souvPrice, 'f', 2).size(),
+                                       ' ') +
+                               QString::number(souvPrice, 'f', 2) +
+                               " x" +
+                               QString(SOUV_QTY_WID - QString::number(
+                                           souvQty).size(), ' ') +
+                               QString::number(souvQty) +
+                               " $" + QString(TOTAL_PRICE_WID -
+                                              QString::number(
+                                                  souvQty * souvPrice,
+                                                  'f', 2).size(), ' ') +
+                               QString::number(souvQty * souvPrice,
+                                               'f', 2));
+            if(i < it->getCartSize() - 1)
+            {
+                finalOutput.append("\n");
+            }
         }
+
+        finalOutput.append("\n" + QString(75, '-') + "\n");
+
+        if(it2 != itinList.end())
+        {
+            stadNum2 = it2->getStadNum();
+            stadName2 = data.getStadName(stadNum2);
+            distances = data.askDijkstra(stadNum, parents);
+            path.clear();
+            pathIndex = stadNum2;
+
+            finalOutput.append("    FROM " + stadName + " TO " +
+                               stadName2 + "\n");
+
+
+            while(pathIndex > -1)
+            {
+                path.push_back(pathIndex);
+                pathIndex = parents[pathIndex];
+            }
+
+            if(path.size() > 2)
+            {
+                finalOutput.append("    LAYOVERS:\n");
+                for(unsigned int i = path.size() - 2; i > 0; i--)
+                {
+                    finalOutput.append("     - " + data.getStadName(path[i]) +
+                                       "\n");
+                }
+            }
+            else
+            {
+                finalOutput.append("    NO LAYOVERS\n");
+            }
+
+            finalOutput.append("    DISTANCE TRAVELED: " +
+                               QString::number(distances.at(stadNum2)) +
+                               "\n" + QString(75, '-') + "\n");
+        }
+
+        it2 ++;
     }
 
     ui->sumOutputLE->setText(finalOutput);
@@ -1422,6 +1525,20 @@ void PrimeWin::on_itinFinalizeBt_clicked()
 }
 
 //Index3 - Summary Page===================================================
+void PrimeWin::on_sumBackBt_clicked()
+{
+    ui->stackWidg->setCurrentIndex(2);
+}
+
+void PrimeWin::on_sumFinishBt_clicked()
+{
+    itinList.clear();
+    refreshItin();
+    refreshItinBuilder();
+    ui->itinSouvTbl->setRowCount(0);
+    refreshWishList();
+    ui->stackWidg->setCurrentIndex(0);
+}
 
 //Index4 - Admin Page=====================================================
 void PrimeWin::on_adminRestartBt_clicked()
@@ -1996,4 +2113,3 @@ void PrimeWin::on_deleteSouvBtn_clicked()
        }
    }
 }
-
