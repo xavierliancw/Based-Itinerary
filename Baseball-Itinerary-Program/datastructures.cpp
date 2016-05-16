@@ -697,7 +697,7 @@ bool Data::importTXT(QString path)
     return !failure;
 }
 
-deque<int> Data::askDijkstra(int startingVertex)
+deque<int> Data::askDijkstra(int startingVertex, vector<int> &paths)
 //Uses Dijkstra's algorithm to calculate paths to all other vertices
 //Complexity: O(elogv) where e = number of edges, v = number of vertices
 {
@@ -758,6 +758,7 @@ deque<int> Data::askDijkstra(int startingVertex)
             it++;
         }
     }
+    paths = parentMap;
     return distMap;
 }
 

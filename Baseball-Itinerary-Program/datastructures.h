@@ -547,7 +547,7 @@ public:
      * Complexity: O(elogv), e = number of stadium connections, v = number
      * of stadiums
      */
-    deque<int> askDijkstra(int startingVertex);
+    deque<int> askDijkstra(int startingVertex, vector<int> &paths);
 
     //Performs a Prim operation on the entire graph of stadiums
     /**

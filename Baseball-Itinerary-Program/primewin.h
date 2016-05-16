@@ -243,7 +243,12 @@ private slots:
 
     void on_itinOptimizeBt_clicked();
 
+    void on_itinFinalizeBt_clicked();
+
 //Index3==================================================================
+    void on_sumBackBt_clicked();
+
+    void on_sumFinishBt_clicked();
 
 //Index4==================================================================
     void on_adminRestartBt_clicked();
