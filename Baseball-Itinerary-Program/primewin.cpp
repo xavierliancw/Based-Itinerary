@@ -1536,7 +1536,16 @@ void PrimeWin::on_itinFinalizeBt_clicked()
 
     ui->sumOutputLE->setText(finalOutput);
 
-    ui->stackWidg->setCurrentIndex(3);
+    if(itinList.size() > 0)
+    {
+        ui->stackWidg->setCurrentIndex(3);
+    }
+    else
+    {
+        QMessageBox::warning(this, tr("Nothing Queued"),
+                             tr("There is nothing queued to your "
+                                "itinerary."), QMessageBox::Ok);
+    }
 }
 
 //Index3 - Summary Page===================================================
