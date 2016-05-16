@@ -236,6 +236,8 @@ private slots:
 
     void on_itinOptimizeBt_clicked();
 
+    void on_itinFinalizeBt_clicked();
+
 //Index3==================================================================
 
 //Index4==================================================================

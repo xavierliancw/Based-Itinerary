@@ -1393,6 +1393,32 @@ void PrimeWin::on_itinOptimizeBt_clicked()
     }
 }
 
+void PrimeWin::on_itinFinalizeBt_clicked()
+{
+    QString finalOutput;
+
+    finalOutput.append("cute\n");
+
+    for(list<ItinObj>::iterator it = itinList.begin();
+        it != itinList.end(); it++)
+    {
+        finalOutput.append(data.getStadName(it->getStadNum()));
+        finalOutput.append("\n");
+
+        for(int i = 0; i < it->getCartSize(); i ++)
+        {
+            finalOutput.append(" - ");
+            finalOutput.append(data.getSouvName(it->getStadNum(),
+                                                it->getSouvNumAt(i)));
+            finalOutput.append("\n");
+        }
+    }
+
+    ui->sumOutputLE->setText(finalOutput);
+
+    ui->stackWidg->setCurrentIndex(3);
+}
+
 //Index3 - Summary Page===================================================
 
 //Index4 - Admin Page=====================================================
