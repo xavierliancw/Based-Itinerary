@@ -133,6 +133,11 @@ public:
      */
     QString type;              //This stadium's type
     /**
+     * @brief This stadium's projected revenue based on user's souvenir
+     * queues
+     */
+    double revenue;
+    /**
      * @brief This stadium's baseball team
      */
     TeamObj team;              //This stadium's team
@@ -305,7 +310,7 @@ public:
      */
     void addStad(QString name, QString address,
                  QString phone, QString opened, int capacity,
-                 QString grass, QString type, bool manual);
+                 QString grass, QString type, double revenue,bool manual);
     //Change a stadium's name
     /**
      * @brief Modify a stadium's name
@@ -355,6 +360,15 @@ public:
      * @param newType : Stadium's new typology
      */
     void modStadType(int stadNum, QString newType);
+
+    /**
+     * @brief Modify a stadium's revenue
+     * @param stadNum : Index location of the stadium of interest
+     * @param newRev : Stadium's edited revenue
+     */
+    //Modify a stadium's revenue
+    void modStadRev(int stadNum, double newRev);
+
     //Delete a stadium
     /**
      * @brief Delete a stadium
@@ -466,6 +480,7 @@ public:
     int getStadCapactiy(int stadNum) const;
     QString getStadGrass(int stadNum) const;
     QString getStadType(int stadNum) const;
+    QString getStadRev(int stadNum) const;
     QString getStadFieldPicPath(int stadNum) const;
 
     //Return various data points pertaining to teams

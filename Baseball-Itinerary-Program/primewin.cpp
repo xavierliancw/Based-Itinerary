@@ -472,9 +472,8 @@ void PrimeWin::refreshAdminTbl()
         ui->adminStadTbl->setItem(x,9,item);
 
         //Populate eleventh column with park revenue
-        int NOTDONE;
         item = new QTableWidgetItem;
-        item->setData(0,"$REVENUE");
+        item->setData(0,"$" + data.getStadRev(x));
         ui->adminStadTbl->setItem(x,10,item);
     }
     ui->adminStadTbl->resizeColumnsToContents();
@@ -1556,6 +1555,26 @@ void PrimeWin::on_sumBackBt_clicked()
 
 void PrimeWin::on_sumFinishBt_clicked()
 {
+    //Update stadium revenues
+    list<ItinObj>::iterator it = itinList.begin();
+    double revenue;
+    while (it != itinList.end())
+    {
+        //Get revenue stadium already has
+        revenue = data.getStadRev((*it).getStadNum()).toDouble();
+
+        //Loop through all souvenirs queued at this stad
+        for (int x = 0; x < (*it).getCartSize(); x++)
+        {
+            //Quantity x price
+            revenue += (double)(*it).getQtyFor((*it).getSouvNumAt(x))
+                    * data.getSouvPrice((*it).getStadNum(),
+                                        (*it).getSouvNumAt(x));
+        }
+        //Update revenue
+        data.modStadRev((*it).getStadNum(),revenue);
+        it++;
+    }
     itinList.clear();
     refreshItin();
     refreshItinBuilder();
@@ -1617,13 +1636,13 @@ void PrimeWin::checkForIsolatedStads()
     QString offendingStad;
 
     //Loop through all stadiums and check if any have only -1's
-    for (int x = 0; x < data.size(); x++)
+    for (int x = 0; x < (int)data.size(); x++)
     {
         aDisconnectExists = true;
         checker = -1;               //Start with a failure conditions
 
         //Loop through all possible stadium connections
-        for (int y = 0; y < data.size(); y++)
+        for (int y = 0; y < (int)data.size(); y++)
         {
             //If at least one connection exists
             if (data.getDistBetween(x,y) > -1)
@@ -1667,6 +1686,8 @@ void PrimeWin::on_adminStadTbl_cellChanged(int row, int column)
     QString input;
     QIntValidator validate(1,1000000,NULL);
     int valid = 0;
+    double newPrice;
+    QLocale us; //Constructs a default QLocale
     QDate validQuestion;
 
     //Grab the input
@@ -1766,8 +1787,26 @@ void PrimeWin::on_adminStadTbl_cellChanged(int row, int column)
         data.modStadType(row,input);
         break;
     case 10://Revenue
-        int UNIMPLEMENTED;
-        qDebug() << "REVENUE EDITING IS UNIMPLEMENTED";
+        bool ok;
+        QLocale::setDefault(QLocale(QLocale::English,
+                                    QLocale::UnitedStates));
+        us.toDouble(input, &ok);
+        newPrice = input.toDouble();
+        input = QString::number(newPrice, 'f', 2);
+        newPrice = input.toDouble();
+        if (newPrice > INT_MAX - 1 || newPrice < 0)
+        {
+            ok = false;
+        }
+        if (ok)
+        {data.modStadRev(row,newPrice);}
+        else
+        {
+            QMessageBox::warning(this, tr("Revenue Editing Error"),
+                                 tr("Price must be positive and less"
+                                    " than $2,147,483,646.00."),
+                                 QMessageBox::Ok);
+        }
         break;
     default:
         QMessageBox::critical(this, tr("Editing Critical Error"),
@@ -1782,7 +1821,7 @@ void PrimeWin::on_adminStadTbl_cellChanged(int row, int column)
 // when a cell in admin souvenir is modified
 void PrimeWin::on_adminSouvTable_cellChanged(int row, int column)
 {
-    int stadNum   = ui->adminStadTbl->selectionModel()->currentIndex().row();
+    int stadNum =ui->adminStadTbl->selectionModel()->currentIndex().row();
     QString newName;
     double newPrice;
     bool ok;

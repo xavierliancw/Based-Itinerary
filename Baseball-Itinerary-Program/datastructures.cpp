@@ -135,7 +135,8 @@ Data::~Data()
 
 void Data::addStad(QString name, QString address,
                    QString phone, QString opened, int capacity,
-                   QString grass, QString type, bool manual)
+                   QString grass, QString type, double revenue,
+                   bool manual)
 //Add a stadium to the end of the vector
 {
     StadObj newStad;    //New stadium object
@@ -148,6 +149,7 @@ void Data::addStad(QString name, QString address,
     newStad.capacity = capacity;
     newStad.grass = grass;
     newStad.type = type;
+    newStad.revenue = revenue;
     newStad.fieldPicPath = ":/stadiums/" + name + ".jpg";
 
     //Push the stadium into the vector (it's vector index is its stadNum)
@@ -203,6 +205,10 @@ void Data::modStadGrass(int stadNum, QString newGrass)
 void Data::modStadType(int stadNum, QString newType)
 //Modifies the type of stadium stadNum is
 {masterVect.at(stadNum).type = newType;}
+
+void Data::modStadRev(int stadNum, double newRev)
+//Modifies the revenue of a stadium
+{masterVect.at(stadNum).revenue = newRev;}
 
 void Data::delStad(int stadNum)
 //Deletes stadNum from the vector
@@ -362,7 +368,7 @@ void Data::importSQL()
 
         //Import stadiums
         query.exec("SELECT name, address, phone, opened,"
-                   "       capacity, grass, type "
+                   "       capacity, grass, type, revenue "
                    "FROM stadiuminfo;");
 
         //Loop through all SQL table rows
@@ -372,7 +378,8 @@ void Data::importSQL()
             addStad(query.value(0).toString(),query.value(1).toString(),
                     query.value(2).toString(),query.value(3).toString(),
                     query.value(4).toInt(),query.value(5).toString(),
-                    query.value(6).toString(), false);
+                    query.value(6).toString(),query.value(7).toDouble(),
+                    false);
         }
         //Import teams
         query.exec("SELECT stadnum,name,league FROM teams");
@@ -460,9 +467,9 @@ bool Data::exportSQL()
         query.exec("DELETE FROM stadiuminfo");
         query.prepare("INSERT INTO stadiuminfo(stadnum,name,address,"
                       "                        phone,opened,capacity,"
-                      "                        grass,type)"
+                      "                        grass,type,revenue)"
                       "VALUES (:stadnum,:name,:address,:phone,"
-                      "        :opened,:capacity,:grass,:type)");
+                      "        :opened,:capacity,:grass,:type,:revenue)");
         for (unsigned int x = 0; x < masterVect.size(); x++)
         {
             query.bindValue(":stadnum",x);
@@ -473,6 +480,7 @@ bool Data::exportSQL()
             query.bindValue(":capacity",getStadCapactiy(x));
             query.bindValue(":grass",getStadGrass(x));
             query.bindValue(":type",getStadType(x));
+            query.bindValue(":revenue",getStadRev(x));
             if (!query.exec())
             {
                 qDebug() << "SQL exporting stadiuminfo failed with "
@@ -870,8 +878,8 @@ QString Data::getStadOpened(int stadNum,bool format) const
     }
     else
     {
-        return masterVect.at(stadNum).opened.toString("yyyyMMdd"); // used to compare dates
-
+        //Used to compare dates
+        return masterVect.at(stadNum).opened.toString("yyyyMMdd");
     }
     return "";
 }
@@ -887,6 +895,10 @@ QString Data::getStadGrass(int stadNum) const
 QString Data::getStadType(int stadNum) const
 //Returns type of stadium at stadNum
 {return masterVect.at(stadNum).type;}
+
+QString Data::getStadRev(int stadNum) const
+//Returns revenue at a stadium
+{return QString::number(masterVect.at(stadNum).revenue,'f',2);}
 
 QString Data::getStadFieldPicPath(int stadNum) const
 //Returns path to stadium's field pic

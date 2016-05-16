@@ -111,12 +111,13 @@ void AddStadiumWin::on_okBtn_clicked()
         int stadCapacity     = ui->stadCapacity->value();
         QString turfType     = ui->turfType->text();
         QString stadType     = ui->stadType->text();
+        double rev = 0;
 
         // fill data, then emit data
         // adds new team
         // adds new stadium
         data.addStad(stadName, stadAddress, stadPhoneNum, formattedDate,
-                     stadCapacity, turfType, stadType, true);
+                     stadCapacity, turfType, stadType, rev, true);
         data.addTeam(data.size() - 1, newTeamName, leagueType);
 
         emit throwNewTeamData(data);
