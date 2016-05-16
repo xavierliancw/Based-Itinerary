@@ -1421,8 +1421,12 @@ void PrimeWin::on_itinFinalizeBt_clicked()
     vector<int> parents;
     vector<int> path;
     int pathIndex;
+    int tripDist;
+    double tripTotalPrice;
 
     stadListIndex = 1;
+    tripDist = 0;
+    tripTotalPrice = 0;
 
     finalOutput.append("    STADIUM" + QString(24, ' ') +
                        "SOUVENIR" + QString(13, ' ') +
@@ -1448,6 +1452,7 @@ void PrimeWin::on_itinFinalizeBt_clicked()
             souvName = data.getSouvName(stadNum, souvNum);
             souvPrice = data.getSouvPrice(stadNum, souvNum);
             souvQty = it->getQtyFor(souvNum);
+            tripTotalPrice += souvQty * souvPrice;
 
             if(i > 0)
             {
@@ -1514,10 +1519,20 @@ void PrimeWin::on_itinFinalizeBt_clicked()
             finalOutput.append("    DISTANCE TRAVELED: " +
                                QString::number(distances.at(stadNum2)) +
                                "\n" + QString(75, '-') + "\n");
+
+            tripDist += distances.at(stadNum2);
         }
 
         it2 ++;
     }
+
+    finalOutput.append("\nNUMBER OF STADIUMS VISITED:       " +
+                       QString::number(itinList.size()) +
+                       "\nTOTAL DISTANCE TRAVELED IN MILES: " +
+                       QString::number(tripDist) +
+                       "\nSOUVENIR PRICE TOTAL:             $" +
+                       QString::number(tripTotalPrice, 'f', 2) +
+                       "\n\nTHANK YOU FOR USING OUR PROGRAM!");
 
     ui->sumOutputLE->setText(finalOutput);
 
