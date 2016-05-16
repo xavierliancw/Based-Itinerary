@@ -111,38 +111,13 @@ void editdistances::on_distLE_returnPressed()
 
 void editdistances::on_saveBt_clicked()
 {
-    //If there is a disconnected stadium
-    if (thereAreDisconnects())
-    {
-        QMessageBox::critical(this, tr("Distance Error"),
-                                    tr("There is an isolated stadium. "
-                                       "Connect it"),
-                                    QMessageBox::Ok);
-    }
-    //Otherwise save and close
-    else
-    {
-        emit throwUpdatedData(data);
-        this->close();
-    }
+    //Update distances
+    emit throwUpdatedData(data);
+    this->close();
 }
 
 void editdistances::on_closeBt_clicked()
-{
-    //If there is a disconnected stadium
-    if (thereAreDisconnects())
-    {
-        QMessageBox::critical(this, tr("Distance Error"),
-                                    tr("There is an isolated stadium. "
-                                       "Connect it."),
-                                    QMessageBox::Ok);
-    }
-    //Otherwise just close the window
-    else
-    {
-        this->close();
-    }
-}
+{this->close();}
 
 void editdistances::on_firStadLst_currentRowChanged()
 {refreshDist();}
@@ -252,40 +227,3 @@ void editdistances::on_matrixTbl_cellChanged(int row, int column)
     refreshMatrix();
     refreshDist();
 }}
-
-bool editdistances::thereAreDisconnects()
-//Checks if there are any stadiums that don't have connections to the graph
-//Complexity: O(n^2)
-{
-    int checker;
-    bool aDisconnectExists = true;
-
-    //Loop through all stadiums and check if any have only -1's
-    for (int x = 0; x < data.size(); x++)
-    {
-        aDisconnectExists = true;
-        checker = -1;               //Start with a failure conditions
-
-        //Loop through all possible stadium connections
-        for (int y = 0; y < data.size(); y++)
-        {
-            //If at least one connection exists
-            if (data.getDistBetween(x,y) > -1)
-            {
-                checker++;
-                y = data.size();//Leave loop, check next stad
-            }
-        }
-        //If no connections were found
-        if (checker == -1)
-        {
-            x = data.size();//Leave the loop and return failure condition
-        }
-        //Otherwise this stadium is fine
-        else
-        {
-            aDisconnectExists = false;
-        }
-    }
-    return aDisconnectExists;
-}

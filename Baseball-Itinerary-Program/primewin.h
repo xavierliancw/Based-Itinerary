@@ -52,6 +52,13 @@ class PrimeWin;
  * #include <QMessageBox>       <br>
  * #include <QFileSystemModel>  <br>
  * #include <QSignalBlocker>    <br>
+ * #include <QDragEnterEvent>   <br>
+ * #include <QDate>             <br>
+ * #include <QHeaderView>       <br>
+ * #include <QMovie>            <br>
+ * #include <QStackedLayout>    <br>
+ * #include <QToolButton>       <br>
+ * #include <QSpinBox>          <br>
  * #include "datastructures.h"  <br>
  * #include "customsorts.h"     <br>
  * #include "adminlogin.h"      <br>
@@ -247,6 +254,8 @@ private slots:
 
     void on_adminDistBt_clicked();
 
+    void checkForIsolatedStads();
+
     void changesMade();
 
     void on_adminStadTbl_cellChanged(int row, int column);
@@ -273,6 +282,8 @@ private slots:
     void on_deleteSouvBtn_clicked();
 
     void on_adminPrimBt_clicked();
+
+    void newTeamRefresh();
 
     void on_addNewTeamBtn_clicked();
 

@@ -9,8 +9,8 @@
 #define ADDSTADIUMWIN_H
 #include <QDialog>
 #include <QMessageBox>
+#include <QIntValidator>
 #include "datastructures.h"
-
 
 namespace Ui {
 class AddStadiumWin;
@@ -46,6 +46,11 @@ signals:
      */
     void throwNewTeamData(Data throwThis);
 
+    /**
+     * @brief Throw command to ask PrimeWin to refresh views
+     */
+    void throwRefreshCmd();
+
 private slots:
     void on_okBtn_clicked();
     void on_cancelBtn_clicked();
@@ -53,12 +58,17 @@ private slots:
     void on_nLeagueButn_toggled(bool checked);
 
 
+    void on_stadPhone_editingFinished();
+
 private:
     int stadNum;
     bool aLeague;
     bool nLeague;
     Data data;
     Ui::AddStadiumWin *ui;
+
+    //Validate phone numbers
+    QString phoneCheck(QString phone);
 };
 
 #endif // ADDSTADIUMWIN_H
