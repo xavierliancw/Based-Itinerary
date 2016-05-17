@@ -2,12 +2,22 @@
 	VECTOR of souvenir objects (each stadium object has a vector of souvenirs)
 	VECTOR of team objects (each stadium has a vector of teams)
 Reason: The program only requires stadium information retrieval, so a vector's constant-time data retrieval is the best option.
+Where To Find: datastructures.h / line 585
 
-~GRAPH of stadiums-distances relationships
+~2D ADJACENCY MATRIX REPRESENTATION OF THE GRAPH of stadiums-distances relationships
 Reason: The program will use a graph implemented by means of an adjacency matrix to store all stadiums and the flight distances between. An adjacency matrix will allow constant-time distance queries, so it is the ideal option.
+Where To Find: datastructures.h / line 586
 
 ~DOUBLY LINKED LIST of  of itinerary objects
 Reason: The program will need to reorder the itinerary very often. Since a doubly linked list allows for constant-time data reordering, it is the ideal option.
+Where To Find: primewin.h / line 300
 
 ~MINIMUM HEAP of Dijkstra objects
 Reason: The program's implementation of Dijkstra's algorithm uses a minimum heap to determine the shortest path among other paths in O(1) time. As paths are updated, the heap automatically allows for this constant-time access of the shortest path in O(logn).
+Whiere To Find: datastructures.cpp / line 714
+
+~ADJACENCY LIST REPRESENTATION OF THE GRAPH
+Reason: Having this adjacency list allows the Dijkstra and Prim algorithms to run faster than O(n^2).
+Where To Find: datastructures.h / line 587
+
+There are many other data structures that are used in our program. These are just a few examples. Refer to the code to find others.
