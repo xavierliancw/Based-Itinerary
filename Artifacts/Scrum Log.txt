@@ -51,3 +51,11 @@ Scrum Log
 - Addressed some Waffle issues with some group members
 - Updated Doxygen standards
 - Planning poker for various issues
+
+11 May
+- Compiled artifacts
+- Program review with product leader
+
+16 May
+- Final checkpoint
+- Client project review
